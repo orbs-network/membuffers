@@ -17,17 +17,17 @@ func (m *Message) Init(buf []byte, size Offset, scheme []FieldType, unions [][]F
 	m.Unions = unions
 }
 
-func AlignOffsetToType(off Offset, fieldType FieldType) Offset {
+func alignOffsetToType(off Offset, fieldType FieldType) Offset {
 	fieldSize := FieldAlignment[fieldType]
 	return (off + fieldSize - 1) / fieldSize * fieldSize
 }
 
-func AlignDynamicFieldContentOffset(off Offset, fieldType FieldType) Offset {
+func alignDynamicFieldContentOffset(off Offset, fieldType FieldType) Offset {
 	contentAlignment := FieldDynamicContentAlignment[fieldType]
 	return (off + contentAlignment - 1) / contentAlignment * contentAlignment
 }
 
-func (m *Message) LazyCalcOffsets() bool {
+func (m *Message) lazyCalcOffsets() bool {
 	if m.Offsets != nil {
 		return true
 	}
@@ -36,7 +36,7 @@ func (m *Message) LazyCalcOffsets() bool {
 	var unionNum = 0
 	for fieldNum, fieldType := range m.Scheme {
 		// write the current offset
-		off = AlignOffsetToType(off, fieldType)
+		off = alignOffsetToType(off, fieldType)
 		if off >= m.Size {
 			return false
 		}
@@ -54,7 +54,7 @@ func (m *Message) LazyCalcOffsets() bool {
 			}
 			fieldType = m.Unions[unionNum][unionType]
 			unionNum += 1
-			off = AlignOffsetToType(off, fieldType)
+			off = alignOffsetToType(off, fieldType)
 		}
 		if FieldDynamic[fieldType] {
 			if off + FieldSizes[fieldType] > m.Size {
@@ -62,7 +62,7 @@ func (m *Message) LazyCalcOffsets() bool {
 			}
 			contentSize := GetOffset(m.Bytes[off:])
 			off += FieldSizes[fieldType]
-			off = AlignDynamicFieldContentOffset(off, fieldType)
+			off = alignDynamicFieldContentOffset(off, fieldType)
 			off += contentSize
 		} else {
 			off += FieldSizes[fieldType]
@@ -76,7 +76,7 @@ func (m *Message) LazyCalcOffsets() bool {
 }
 
 func (m *Message) IsValid() bool {
-	return m.LazyCalcOffsets()
+	return m.lazyCalcOffsets()
 }
 
 func (m *Message) RawBuffer() []byte {
@@ -84,7 +84,7 @@ func (m *Message) RawBuffer() []byte {
 }
 
 func (m *Message) RawBufferForField(fieldNum int, unionNum int) []byte {
-	if !m.LazyCalcOffsets() || fieldNum >= len(m.Offsets) || fieldNum >= len(m.Scheme) {
+	if !m.lazyCalcOffsets() || fieldNum >= len(m.Offsets) || fieldNum >= len(m.Scheme) {
 		return []byte{}
 	}
 	fieldType := m.Scheme[fieldNum]
@@ -96,12 +96,12 @@ func (m *Message) RawBufferForField(fieldNum int, unionNum int) []byte {
 			return []byte{}
 		}
 		fieldType = m.Unions[unionNum][unionType]
-		off = AlignOffsetToType(off, fieldType)
+		off = alignOffsetToType(off, fieldType)
 	}
 	if FieldDynamic[fieldType] {
 		contentSize := GetOffset(m.Bytes[off:])
 		off += FieldSizes[fieldType]
-		off = AlignDynamicFieldContentOffset(off, fieldType)
+		off = alignDynamicFieldContentOffset(off, fieldType)
 		return m.Bytes[off:off+contentSize]
 	} else {
 		return m.Bytes[off:off+FieldSizes[fieldType]]
@@ -109,7 +109,7 @@ func (m *Message) RawBufferForField(fieldNum int, unionNum int) []byte {
 }
 
 func (m *Message) GetUint8(fieldNum int) uint8 {
-	if !m.LazyCalcOffsets() || fieldNum >= len(m.Offsets) {
+	if !m.lazyCalcOffsets() || fieldNum >= len(m.Offsets) {
 		return 0
 	}
 	off := m.Offsets[fieldNum]
@@ -117,7 +117,7 @@ func (m *Message) GetUint8(fieldNum int) uint8 {
 }
 
 func (m *Message) GetUint16(fieldNum int) uint16 {
-	if !m.LazyCalcOffsets() || fieldNum >= len(m.Offsets) {
+	if !m.lazyCalcOffsets() || fieldNum >= len(m.Offsets) {
 		return 0
 	}
 	off := m.Offsets[fieldNum]
@@ -125,7 +125,7 @@ func (m *Message) GetUint16(fieldNum int) uint16 {
 }
 
 func (m *Message) GetUint32(fieldNum int) uint32 {
-	if !m.LazyCalcOffsets() || fieldNum >= len(m.Offsets) {
+	if !m.lazyCalcOffsets() || fieldNum >= len(m.Offsets) {
 		return 0
 	}
 	off := m.Offsets[fieldNum]
@@ -133,22 +133,26 @@ func (m *Message) GetUint32(fieldNum int) uint32 {
 }
 
 func (m *Message) GetUint64(fieldNum int) uint64 {
-	if !m.LazyCalcOffsets() || fieldNum >= len(m.Offsets) {
+	if !m.lazyCalcOffsets() || fieldNum >= len(m.Offsets) {
 		return 0
 	}
 	off := m.Offsets[fieldNum]
 	return GetUint64(m.Bytes[off:])
 }
 
+func (m *Message) getBytesInOffset(off Offset) []byte {
+	contentSize := GetOffset(m.Bytes[off:])
+	off += FieldSizes[TypeBytes]
+	off = alignDynamicFieldContentOffset(off, TypeBytes)
+	return m.Bytes[off:off+contentSize]
+}
+
 func (m *Message) GetBytes(fieldNum int) []byte {
-	if !m.LazyCalcOffsets() || fieldNum >= len(m.Offsets) {
+	if !m.lazyCalcOffsets() || fieldNum >= len(m.Offsets) {
 		return []byte{}
 	}
 	off := m.Offsets[fieldNum]
-	contentSize := GetOffset(m.Bytes[off:])
-	off += FieldSizes[TypeBytes]
-	off = AlignDynamicFieldContentOffset(off, TypeBytes)
-	return m.Bytes[off:off+contentSize]
+	return m.getBytesInOffset(off)
 }
 
 func (m *Message) GetString(fieldNum int) string {
