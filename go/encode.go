@@ -9,31 +9,38 @@ type (
 	Offset uint32
 )
 
-// GetByte decodes a little-endian byte from a byte slice.
 func GetByte(buf []byte) byte {
 	return byte(GetUint8(buf))
 }
 
-// GetBool decodes a little-endian bool from a byte slice.
 func GetBool(buf []byte) bool {
 	return buf[0] == 1
 }
 
-// GetUint8 decodes a little-endian uint8 from a byte slice.
 func GetUint8(buf []byte) (n uint8) {
+	return *(*uint8)(unsafe.Pointer(&buf[0]))
+}
+
+func GetUint8Polyfill(buf []byte) (n uint8) {
 	n = uint8(buf[0])
 	return
 }
 
-// GetUint16 decodes a little-endian uint16 from a byte slice.
-func GetUint16(buf []byte) (n uint16) {
+func GetUint16(buf []byte) uint16 {
+	return *(*uint16)(unsafe.Pointer(&buf[0]))
+}
+
+func GetUint16Polyfill(buf []byte) (n uint16) {
 	n |= uint16(buf[0])
 	n |= uint16(buf[1]) << 8
 	return
 }
 
-// GetUint32 decodes a little-endian uint32 from a byte slice.
-func GetUint32(buf []byte) (n uint32) {
+func GetUint32(buf []byte) uint32 {
+	return *(*uint32)(unsafe.Pointer(&buf[0]))
+}
+
+func GetUint32Polyfill(buf []byte) (n uint32) {
 	n |= uint32(buf[0])
 	n |= uint32(buf[1]) << 8
 	n |= uint32(buf[2]) << 16
@@ -41,8 +48,11 @@ func GetUint32(buf []byte) (n uint32) {
 	return
 }
 
-// GetUint64 decodes a little-endian uint64 from a byte slice.
-func GetUint64(buf []byte) (n uint64) {
+func GetUint64(buf []byte) uint64 {
+	return *(*uint64)(unsafe.Pointer(&buf[0]))
+}
+
+func GetUint64Polyfill(buf []byte) (n uint64) {
 	n |= uint64(buf[0])
 	n |= uint64(buf[1]) << 8
 	n |= uint64(buf[2]) << 16
@@ -54,23 +64,30 @@ func GetUint64(buf []byte) (n uint64) {
 	return
 }
 
-// return *(*uint64)(unsafe.Pointer(&buf[0]))
+func GetInt8(buf []byte) int8 {
+	return *(*int8)(unsafe.Pointer(&buf[0]))
+}
 
-// GetInt8 decodes a little-endian int8 from a byte slice.
-func GetInt8(buf []byte) (n int8) {
+func GetInt8Polyfill(buf []byte) (n int8) {
 	n = int8(buf[0])
 	return
 }
 
-// GetInt16 decodes a little-endian int16 from a byte slice.
-func GetInt16(buf []byte) (n int16) {
+func GetInt16(buf []byte) int16 {
+	return *(*int16)(unsafe.Pointer(&buf[0]))
+}
+
+func GetInt16Polyfill(buf []byte) (n int16) {
 	n |= int16(buf[0])
 	n |= int16(buf[1]) << 8
 	return
 }
 
-// GetInt32 decodes a little-endian int32 from a byte slice.
-func GetInt32(buf []byte) (n int32) {
+func GetInt32(buf []byte) int32 {
+	return *(*int32)(unsafe.Pointer(&buf[0]))
+}
+
+func GetInt32Polyfill(buf []byte) (n int32) {
 	n |= int32(buf[0])
 	n |= int32(buf[1]) << 8
 	n |= int32(buf[2]) << 16
@@ -78,8 +95,11 @@ func GetInt32(buf []byte) (n int32) {
 	return
 }
 
-// GetInt64 decodes a little-endian int64 from a byte slice.
-func GetInt64(buf []byte) (n int64) {
+func GetInt64(buf []byte) int64 {
+	return *(*int64)(unsafe.Pointer(&buf[0]))
+}
+
+func GetInt64Polyfill(buf []byte) (n int64) {
 	n |= int64(buf[0])
 	n |= int64(buf[1]) << 8
 	n |= int64(buf[2]) << 16
@@ -91,13 +111,11 @@ func GetInt64(buf []byte) (n int64) {
 	return
 }
 
-// GetFloat32 decodes a little-endian float32 from a byte slice.
 func GetFloat32(buf []byte) float32 {
 	x := GetUint32(buf)
 	return math.Float32frombits(x)
 }
 
-// GetFloat64 decodes a little-endian float64 from a byte slice.
 func GetFloat64(buf []byte) float64 {
 	x := GetUint64(buf)
 	return math.Float64frombits(x)
@@ -111,12 +129,10 @@ func GetUnionType(buf []byte) int {
 	return int(GetUint16(buf))
 }
 
-// WriteByte encodes a little-endian uint8 into a byte slice.
 func WriteByte(buf []byte, n byte) {
 	WriteUint8(buf, uint8(n))
 }
 
-// WriteBool encodes a little-endian bool into a byte slice.
 func WriteBool(buf []byte, b bool) {
 	buf[0] = 0
 	if b {
@@ -124,7 +140,6 @@ func WriteBool(buf []byte, b bool) {
 	}
 }
 
-// WriteUint8 encodes a little-endian uint8 into a byte slice.
 func WriteUint8(buf []byte, n uint8) {
 	buf[0] = byte(n)
 }
