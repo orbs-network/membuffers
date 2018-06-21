@@ -48,8 +48,10 @@ func GetUint32Polyfill(buf []byte) (n uint32) {
 	return
 }
 
-func GetUint64(buf []byte) uint64 {
-	return *(*uint64)(unsafe.Pointer(&buf[0]))
+func GetUint64(buf []byte) (n uint64) {
+	n |= uint64(*(*uint32)(unsafe.Pointer(&buf[0])))
+	n |= uint64(*(*uint32)(unsafe.Pointer(&buf[4]))) << 32
+	return
 }
 
 func GetUint64Polyfill(buf []byte) (n uint64) {

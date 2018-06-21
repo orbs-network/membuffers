@@ -42,7 +42,7 @@ var FieldAlignment = map[FieldType]Offset{
 	TypeUint8: 1,
 	TypeUint16: 2,
 	TypeUint32: 4,
-	TypeUint64: 8,
+	TypeUint64: 4,
 	TypeUint8Array: 4,
 	TypeUint16Array: 4,
 	TypeUint32Array: 4,
@@ -67,7 +67,7 @@ var FieldDynamic = map[FieldType]bool{
 }
 
 var FieldDynamicContentAlignment = map[FieldType]Offset{
-	TypeMessage: 8,
+	TypeMessage: 4,
 	TypeBytes: 1,
 	TypeString: 1,
 	TypeUnion: 0,
@@ -78,6 +78,6 @@ var FieldDynamicContentAlignment = map[FieldType]Offset{
 	TypeUint8Array: 1,
 	TypeUint16Array: 2,
 	TypeUint32Array: 4,
-	TypeUint64Array: 8,
-	TypeMessageArray: 8,
+	TypeUint64Array: 4,
+	TypeMessageArray: 4,
 }
