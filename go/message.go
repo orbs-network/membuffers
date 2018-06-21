@@ -108,6 +108,10 @@ func (m *Message) RawBufferForField(fieldNum int, unionNum int) []byte {
 	}
 }
 
+func (m *Message) GetOffsetInOffset(off Offset) Offset {
+	return GetOffset(m.Bytes[off:])
+}
+
 func (m *Message) GetUint8InOffset(off Offset) uint8 {
 	return GetUint8(m.Bytes[off:])
 }
@@ -175,6 +179,9 @@ func (m *Message) GetBytesInOffset(off Offset) []byte {
 	contentSize := GetOffset(m.Bytes[off:])
 	off += FieldSizes[TypeBytes]
 	off = alignDynamicFieldContentOffset(off, TypeBytes)
+	if off+contentSize > Offset(len(m.Bytes)) {
+		return []byte{}
+	}
 	return m.Bytes[off:off+contentSize]
 }
 
@@ -188,17 +195,11 @@ func (m *Message) GetBytes(fieldNum int) []byte {
 
 func (m *Message) GetStringInOffset(off Offset) string {
 	b := m.GetBytesInOffset(off)
-	if len(b) == 0 {
-		return ""
-	}
 	return byteSliceToString(b)
 }
 
 func (m *Message) GetString(fieldNum int) string {
 	b := m.GetBytes(fieldNum)
-	if len(b) == 0 {
-		return ""
-	}
 	return byteSliceToString(b)
 }
 
@@ -312,6 +313,46 @@ func (m *Message) GetMessageArrayIteratorInOffset(off Offset) *Iterator {
 func (m *Message) GetMessageArrayIterator(fieldNum int) *Iterator {
 	if !m.lazyCalcOffsets() || fieldNum >= len(m.Offsets) {
 		return &Iterator{0,0,TypeMessage,m}
+	}
+	off := m.Offsets[fieldNum]
+	return m.GetMessageArrayIteratorInOffset(off)
+}
+
+func (m *Message) GetBytesArrayIteratorInOffset(off Offset) *Iterator {
+	contentSize := GetOffset(m.Bytes[off:])
+	off += FieldSizes[TypeBytesArray]
+	off = alignDynamicFieldContentOffset(off, TypeBytesArray)
+	return &Iterator{
+		cursor: off,
+		endCursor: off+contentSize,
+		fieldType: TypeBytes,
+		m: m,
+	}
+}
+
+func (m *Message) GetBytesArrayIterator(fieldNum int) *Iterator {
+	if !m.lazyCalcOffsets() || fieldNum >= len(m.Offsets) {
+		return &Iterator{0,0,TypeBytes,m}
+	}
+	off := m.Offsets[fieldNum]
+	return m.GetMessageArrayIteratorInOffset(off)
+}
+
+func (m *Message) GetStringArrayIteratorInOffset(off Offset) *Iterator {
+	contentSize := GetOffset(m.Bytes[off:])
+	off += FieldSizes[TypeStringArray]
+	off = alignDynamicFieldContentOffset(off, TypeStringArray)
+	return &Iterator{
+		cursor: off,
+		endCursor: off+contentSize,
+		fieldType: TypeString,
+		m: m,
+	}
+}
+
+func (m *Message) GetStringArrayIterator(fieldNum int) *Iterator {
+	if !m.lazyCalcOffsets() || fieldNum >= len(m.Offsets) {
+		return &Iterator{0,0,TypeString,m}
 	}
 	off := m.Offsets[fieldNum]
 	return m.GetMessageArrayIteratorInOffset(off)

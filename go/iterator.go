@@ -60,14 +60,38 @@ func (i *Iterator) NextMessage() (buf []byte, size Offset) {
 		i.cursor = i.endCursor
 		return []byte{}, 0
 	}
-	resBuf, resSize := i.m.GetMessageInOffset(i.cursor)
+	resSize := i.m.GetOffsetInOffset(i.cursor)
 	i.cursor += FieldSizes[TypeMessage]
 	i.cursor = alignDynamicFieldContentOffset(i.cursor, TypeMessage)
 	if i.cursor+resSize > i.endCursor {
 		i.cursor = i.endCursor
 		return []byte{}, 0
 	}
+	resBuf := i.m.Bytes[i.cursor:i.cursor+resSize]
 	i.cursor += resSize
 	i.cursor = alignDynamicFieldContentOffset(i.cursor, TypeMessageArray)
 	return resBuf, resSize
+}
+
+func (i *Iterator) NextBytes() []byte {
+	if i.cursor+FieldSizes[TypeBytes] > i.endCursor {
+		i.cursor = i.endCursor
+		return []byte{}
+	}
+	resSize := i.m.GetOffsetInOffset(i.cursor)
+	i.cursor += FieldSizes[TypeBytes]
+	i.cursor = alignDynamicFieldContentOffset(i.cursor, TypeBytes)
+	if i.cursor+resSize > i.endCursor {
+		i.cursor = i.endCursor
+		return []byte{}
+	}
+	resBuf := i.m.Bytes[i.cursor:i.cursor+resSize]
+	i.cursor += resSize
+	i.cursor = alignDynamicFieldContentOffset(i.cursor, TypeBytesArray)
+	return resBuf
+}
+
+func (i *Iterator) NextString() string {
+	b := i.NextBytes()
+	return byteSliceToString(b)
 }
