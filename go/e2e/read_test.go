@@ -5,7 +5,7 @@ import (
 	"reflect"
 )
 
-var buf = []byte{
+var transactionBuf = []byte{
 	// Transaction
 		// TransactionData
 		0x58,0x00,0x00,0x00, // size
@@ -25,7 +25,7 @@ var buf = []byte{
 }
 
 func TestReadPrimitives(t *testing.T) {
-	transaction := ReadTransaction(buf)
+	transaction := ReadTransaction(transactionBuf)
 	sig := transaction.Signature()
 	if !reflect.DeepEqual(sig, []byte{0x11,0x22,0x33,0x44,0x55,0x66}) {
 		t.Fatalf("Signature: instead of expected got %v", sig)
@@ -45,7 +45,7 @@ func TestReadPrimitives(t *testing.T) {
 }
 
 func TestReadArrays(t *testing.T) {
-	transaction := ReadTransaction(buf)
+	transaction := ReadTransaction(transactionBuf)
 	names := []string{}
 	friends := []string{}
 	for i:= transaction.Data().SenderIterator(); i.HasNext(); {
@@ -64,9 +64,9 @@ func TestReadArrays(t *testing.T) {
 }
 
 func TestReadRawBuffers(t *testing.T) {
-	transaction := ReadTransaction(buf)
+	transaction := ReadTransaction(transactionBuf)
 	transaction_rb := transaction._RawBuffer()
-	if !reflect.DeepEqual(transaction_rb, buf) {
+	if !reflect.DeepEqual(transaction_rb, transactionBuf) {
 		t.Fatalf("transaction_rb: instead of expected got %v", transaction_rb)
 	}
 	data_rb := transaction._RawBuffer_Data()
@@ -80,5 +80,56 @@ func TestReadRawBuffers(t *testing.T) {
 	vc_rb := transaction.Data()._RawBuffer_VirtualChain()
 	if !reflect.DeepEqual(vc_rb, []byte{0x08,0x07,0x06,0x05,0x04,0x03,0x02,0x01,}) {
 		t.Fatalf("vc_rb: instead of expected got %v", vc_rb)
+	}
+}
+
+var methodBuf  = []byte{
+	// Method
+	0x03,0x00,0x00,0x00, 'm','e','t',0x00,
+	0x1c,0x00,0x00,0x00,
+		// MethodCallArgument
+		0x08,0x00,0x00,0x00, // size
+		0x00,0x00,0x00,0x00, 0x04,0x03,0x02,0x01,
+		// MethodCallArgument
+		0x0c,0x00,0x00,0x00, // size
+		0x01,0x00,0x00,0x00, 0x03,0x00,0x00,0x00, 'a','r','g', 0x00,
+}
+
+func TestReadUnion(t *testing.T) {
+	method := ReadMethod(methodBuf)
+	iteration := 0
+	for i := method.ArgIterator(); i.HasNext(); {
+		arg := i.NextArg()
+		if iteration == 0 {
+			if !arg.IsType_Num() {
+				t.Fatalf("first union is not a num although it is")
+			}
+			if arg.IsType_Data() {
+				t.Fatalf("first union is a data although it is not")
+			}
+			if arg.Type() != MethodCallArgument_Type_Num {
+				t.Fatalf("first union is incorrect enum value")
+			}
+			num := arg.Type_Num()
+			if num != 0x01020304 {
+				t.Fatalf("first union instead of expected got %v", num)
+			}
+		}
+		if iteration == 1 {
+			if !arg.IsType_Str() {
+				t.Fatalf("second union is not a str although it is")
+			}
+			if arg.IsType_Data() {
+				t.Fatalf("second union is a data although it is not")
+			}
+			if arg.Type() != MethodCallArgument_Type_Str {
+				t.Fatalf("second union is incorrect enum value")
+			}
+			str := arg.Type_Str()
+			if str != "arg" {
+				t.Fatalf("second union instead of expected got %v", str)
+			}
+		}
+		iteration++
 	}
 }
