@@ -486,3 +486,139 @@ func TestMessageReadMessage(t *testing.T) {
 		}
 	}
 }
+
+var readUnion = []struct{
+	buf []byte
+	scheme []FieldType
+	unions [][]FieldType
+	fieldNum int
+	unionNum int
+	unionIndex int
+	expectedIs bool
+	expectedOff Offset
+}{
+	{
+		[]byte{0x00,0x00,0x00,0x00, 0x01,0x02,0x03,0x04},
+		[]FieldType{TypeUnion},
+		[][]FieldType{{TypeUint32,TypeUint8}},
+		0,
+		0,
+		0,
+		true,
+		4,
+	},
+	{
+		[]byte{0x00,0x00,0x00,0x00, 0x01,0x02,0x03,0x04},
+		[]FieldType{TypeUnion},
+		[][]FieldType{{TypeUint32,TypeUint8}},
+		0,
+		0,
+		1,
+		false,
+		4,
+	},
+	{
+		[]byte{0x01,0x00,0x00,0x00, 0x01,0x02,0x03,0x04},
+		[]FieldType{TypeUnion},
+		[][]FieldType{{TypeUint32,TypeUint8}},
+		0,
+		0,
+		1,
+		true,
+		2,
+	},
+	{
+		[]byte{0x01,0x00,0x11,0x00, 0x00,0x00,0x22,0x23},
+		[]FieldType{TypeUnion,TypeUnion},
+		[][]FieldType{{TypeUint32,TypeUint8},{TypeUint16,TypeUint8,TypeUint32}},
+		1,
+		1,
+		0,
+		true,
+		6,
+	},
+	{
+		[]byte{0x00,0x00,0x00,0x00, 0x11,0x22,0x33,0x44, 0x00,0x00,0x22,0x23},
+		[]FieldType{TypeUnion,TypeUnion},
+		[][]FieldType{{TypeUint32,TypeUint8},{TypeUint16,TypeUint8,TypeUint32}},
+		1,
+		1,
+		0,
+		true,
+		10,
+	},
+	{
+		[]byte{0x00,0x00,0x00,0x00, 0x11,0x22,0x33,0x44, 0x02,0x00,0x00,0x00, 0x01,0x02,0x03,0x04},
+		[]FieldType{TypeUnion,TypeUnion},
+		[][]FieldType{{TypeUint32,TypeUint8},{TypeUint16,TypeUint8,TypeUint32}},
+		1,
+		1,
+		2,
+		true,
+		12,
+	},
+	{
+		[]byte{0x22,0x22,0x22,0x22, 0x02,0x00,0x00,0x00, 0x05,0x00,0x00,0x00, 0x01,0x02,0x03,0x04, 0x05,0x00,0x01,0x00, 0x17},
+		[]FieldType{TypeUint32,TypeUnion,TypeUnion},
+		[][]FieldType{{TypeUint32,TypeUint8,TypeMessage},{TypeUint16,TypeUint8,TypeUint32}},
+		2,
+		1,
+		1,
+		true,
+		20,
+	},
+	{
+		[]byte{0x22,0x22,0x22,0x22, 0x07,0x00,0x00,0x00, 0x05,0x00,0x00,0x00, 0x01,0x02,0x03,0x04, 0x05,0x00,0x01,0x00, 0x17},
+		[]FieldType{TypeUint32,TypeUnion,TypeUnion},
+		[][]FieldType{{TypeUint32,TypeUint8,TypeMessage},{TypeUint16,TypeUint8,TypeUint32}},
+		2,
+		1,
+		1,
+		false,
+		0,
+	},
+	{
+		[]byte{0x22,0x22,0x22,0x22, 0x02,0x00,0x00,0x00, 0x05,0x00,0x00,0x00, 0x01,0x02,0x03,0x04, 0x05,0x00,0x01},
+		[]FieldType{TypeUint32,TypeUnion,TypeUnion},
+		[][]FieldType{{TypeUint32,TypeUint8,TypeMessage},{TypeUint16,TypeUint8,TypeUint32}},
+		2,
+		1,
+		1,
+		false,
+		0,
+	},
+	{
+		[]byte{0x22,0x22,0x22,0x22, 0x02,0x00,0x00,0x00, 0x05,0x00,0x00,0x00, 0x01,0x02,0x03,0x04, 0x05,0x00,0x01,0x00},
+		[]FieldType{TypeUint32,TypeUnion,TypeUnion},
+		[][]FieldType{{TypeUint32,TypeUint8,TypeMessage},{TypeUint16,TypeUint8,TypeUint32}},
+		2,
+		1,
+		1,
+		false,
+		0,
+	},
+	{
+		[]byte{0x22,0x22,0x22,0x22, 0x02,0x00,0x00,0x00, 0x05,0x00,0x00,0x00, 0x01,0x02,0x03,0x04, 0x05,0x00,0x00,0x00, 0x11},
+		[]FieldType{TypeUint32,TypeUnion,TypeUnion},
+		[][]FieldType{{TypeUint32,TypeUint8,TypeMessage},{TypeUint16,TypeUint8,TypeUint32}},
+		2,
+		1,
+		1,
+		false,
+		0,
+	},
+}
+
+func TestMessageReadUnion(t *testing.T) {
+	for tn, tt := range readUnion {
+		m := Message{}
+		m.Init(tt.buf, Offset(len(tt.buf)), tt.scheme, tt.unions)
+		is, off := m.IsUnionIndex(tt.fieldNum, tt.unionNum, tt.unionIndex)
+		if is != tt.expectedIs {
+			t.Fatalf("expected \"%v\" but got \"%v\" in test #%d", tt.expectedIs, is, tn)
+		}
+		if off != tt.expectedOff {
+			t.Fatalf("expected \"%v\" but got \"%v\" in test #%d", tt.expectedOff, off, tn)
+		}
+	}
+}
