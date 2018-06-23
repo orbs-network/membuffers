@@ -123,8 +123,8 @@ func GetOffset(buf []byte) Offset {
 	return Offset(GetUint32(buf))
 }
 
-func GetUnionType(buf []byte) int {
-	return int(GetUint16(buf))
+func GetUnionType(buf []byte) uint16 {
+	return GetUint16(buf)
 }
 
 func WriteByte(buf []byte, n byte) {
@@ -221,8 +221,8 @@ func WriteOffset(buf []byte, n Offset) {
 	WriteUint32(buf, uint32(n))
 }
 
-func WriteUnionType(buf []byte, n int) {
-	WriteUint16(buf, uint16(n))
+func WriteUnionType(buf []byte, n uint16) {
+	WriteUint16(buf, n)
 }
 
 func byteSliceToString(b []byte) string {

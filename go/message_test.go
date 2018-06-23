@@ -533,7 +533,7 @@ var readUnion = []struct{
 	unions [][]FieldType
 	fieldNum int
 	unionNum int
-	unionIndex int
+	unionIndex uint16
 	expectedIs bool
 	expectedOff Offset
 }{

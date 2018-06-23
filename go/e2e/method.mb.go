@@ -9,6 +9,8 @@ message Method {
 }
 */
 
+// reader
+
 type Method struct {
 	_Message membuffers.Message
 }
@@ -55,6 +57,32 @@ func (x *Method) _RawBuffer_ArgArray() []byte {
 	return x._Message.RawBufferForField(1, 0)
 }
 
+// writer
+
+type MethodWriter struct {
+	_Writer membuffers.Writer
+	Name string
+	Arg []*MethodCallArgumentWriter
+}
+
+func (w *MethodWriter) arg() []membuffers.MessageWriter {
+	res := make([]membuffers.MessageWriter, len(w.Arg))
+	for i, v := range w.Arg {
+		res[i] = v
+	}
+	return res
+}
+
+func (w *MethodWriter) Write(buf []byte) {
+	w._Writer.Reset()
+	w._Writer.WriteString(buf, w.Name)
+	w._Writer.WriteMessageArray(buf, w.arg())
+}
+
+func (w *MethodWriter) GetSize() membuffers.Offset {
+	return w._Writer.GetSize()
+}
+
 /*
 message MethodCallArgument {
 	oneof type {
@@ -64,6 +92,8 @@ message MethodCallArgument {
 	}
 }
 */
+
+// reader
 
 type MethodCallArgument struct {
 	_Message membuffers.Message
@@ -126,4 +156,31 @@ func (x *MethodCallArgument) Type_Data() []byte {
 
 func (x *MethodCallArgument) _RawBuffer_Type() []byte {
 	return x._Message.RawBufferForField(0, 0)
+}
+
+// writer
+
+type MethodCallArgumentWriter struct {
+	_Writer membuffers.Writer
+	Num uint32
+	Str string
+	Data []byte
+	Type MethodCallArgument_Type
+}
+
+func (w *MethodCallArgumentWriter) Write(buf []byte) {
+	w._Writer.Reset()
+	w._Writer.WriteUnionIndex(buf, uint16(w.Type))
+	switch w.Type {
+	case MethodCallArgument_Type_Num:
+		w._Writer.WriteUint32(buf, w.Num)
+	case MethodCallArgument_Type_Str:
+		w._Writer.WriteString(buf, w.Str)
+	case MethodCallArgument_Type_Data:
+		w._Writer.WriteBytes(buf, w.Data)
+	}
+}
+
+func (w *MethodCallArgumentWriter) GetSize() membuffers.Offset {
+	return w._Writer.GetSize()
 }

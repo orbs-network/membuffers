@@ -6,13 +6,13 @@ import (
 )
 
 func TestWriterUint8(t *testing.T) {
-	w := _MessageWriter{}
+	w := Writer{}
 	v := uint8(0x17)
 	w.WriteUint8(nil, v)
-	if w._Size != 1 {
-		t.Fatalf("instead of expected size got %v", w._Size)
+	if w.Size != 1 {
+		t.Fatalf("instead of expected size got %v", w.Size)
 	}
-	buf := make([]byte, w._Size)
+	buf := make([]byte, w.Size)
 	w.Reset()
 	w.WriteUint8(buf, v)
 	expected := []byte{0x17}
@@ -22,13 +22,13 @@ func TestWriterUint8(t *testing.T) {
 }
 
 func TestWriterUint16(t *testing.T) {
-	w := _MessageWriter{}
+	w := Writer{}
 	v := uint16(0x17)
 	w.WriteUint16(nil, v)
-	if w._Size != 2 {
-		t.Fatalf("instead of expected size got %v", w._Size)
+	if w.Size != 2 {
+		t.Fatalf("instead of expected size got %v", w.Size)
 	}
-	buf := make([]byte, w._Size)
+	buf := make([]byte, w.Size)
 	w.Reset()
 	w.WriteUint16(buf, v)
 	expected := []byte{0x17,0x00}
@@ -38,13 +38,13 @@ func TestWriterUint16(t *testing.T) {
 }
 
 func TestWriterUint32(t *testing.T) {
-	w := _MessageWriter{}
+	w := Writer{}
 	v := uint32(0x17)
 	w.WriteUint32(nil, v)
-	if w._Size != 4 {
-		t.Fatalf("instead of expected size got %v", w._Size)
+	if w.Size != 4 {
+		t.Fatalf("instead of expected size got %v", w.Size)
 	}
-	buf := make([]byte, w._Size)
+	buf := make([]byte, w.Size)
 	w.Reset()
 	w.WriteUint32(buf, v)
 	expected := []byte{0x17,0x00,0x00,0x00}
@@ -54,13 +54,13 @@ func TestWriterUint32(t *testing.T) {
 }
 
 func TestWriterUint64(t *testing.T) {
-	w := _MessageWriter{}
+	w := Writer{}
 	v := uint64(0x17)
 	w.WriteUint64(nil, v)
-	if w._Size != 8 {
-		t.Fatalf("instead of expected size got %v", w._Size)
+	if w.Size != 8 {
+		t.Fatalf("instead of expected size got %v", w.Size)
 	}
-	buf := make([]byte, w._Size)
+	buf := make([]byte, w.Size)
 	w.Reset()
 	w.WriteUint64(buf, v)
 	expected := []byte{0x17,0x00,0x00,0x00,0x00,0x00,0x00,0x00}
@@ -70,17 +70,17 @@ func TestWriterUint64(t *testing.T) {
 }
 
 func TestWriterBytes(t *testing.T) {
-	w := _MessageWriter{}
+	w := Writer{}
 	v := []byte{0x01,0x02,0x03}
 	w.WriteBytes(nil, v)
-	if w._Size != 7 {
-		t.Fatalf("instead of expected size got %v", w._Size)
+	if w.Size != 7 {
+		t.Fatalf("instead of expected size got %v", w.Size)
 	}
 	w.WriteBytes(nil, v)
-	if w._Size != 15 {
-		t.Fatalf("instead of expected size got %v", w._Size)
+	if w.Size != 15 {
+		t.Fatalf("instead of expected size got %v", w.Size)
 	}
-	buf := make([]byte, w._Size)
+	buf := make([]byte, w.Size)
 	w.Reset()
 	w.WriteBytes(buf, v)
 	expected := []byte{0x03,0x00,0x00,0x00, 0x01,0x02,0x03}
@@ -95,17 +95,17 @@ func TestWriterBytes(t *testing.T) {
 }
 
 func TestWriterString(t *testing.T) {
-	w := _MessageWriter{}
+	w := Writer{}
 	v := "hello"
 	w.WriteString(nil, v)
-	if w._Size != 9 {
-		t.Fatalf("instead of expected size got %v", w._Size)
+	if w.Size != 9 {
+		t.Fatalf("instead of expected size got %v", w.Size)
 	}
 	w.WriteString(nil, v)
-	if w._Size != 21 {
-		t.Fatalf("instead of expected size got %v", w._Size)
+	if w.Size != 21 {
+		t.Fatalf("instead of expected size got %v", w.Size)
 	}
-	buf := make([]byte, w._Size)
+	buf := make([]byte, w.Size)
 	w.Reset()
 	w.WriteString(buf, v)
 	expected := []byte{0x05,0x00,0x00,0x00, 'h','e','l','l','o'}
@@ -120,13 +120,13 @@ func TestWriterString(t *testing.T) {
 }
 
 func TestWriterUnionIndex(t *testing.T) {
-	w := _MessageWriter{}
-	v := int(0x01)
+	w := Writer{}
+	v := uint16(0x01)
 	w.WriteUnionIndex(nil, v)
-	if w._Size != 2 {
-		t.Fatalf("instead of expected size got %v", w._Size)
+	if w.Size != 2 {
+		t.Fatalf("instead of expected size got %v", w.Size)
 	}
-	buf := make([]byte, w._Size)
+	buf := make([]byte, w.Size)
 	w.Reset()
 	w.WriteUnionIndex(buf, v)
 	expected := []byte{0x01,0x00}
@@ -136,13 +136,13 @@ func TestWriterUnionIndex(t *testing.T) {
 }
 
 func TestWriterUint8Array(t *testing.T) {
-	w := _MessageWriter{}
+	w := Writer{}
 	v := []uint8{0x01,0x02,0x03}
 	w.WriteUint8Array(nil, v)
-	if w._Size != 7 {
-		t.Fatalf("instead of expected size got %v", w._Size)
+	if w.Size != 7 {
+		t.Fatalf("instead of expected size got %v", w.Size)
 	}
-	buf := make([]byte, w._Size)
+	buf := make([]byte, w.Size)
 	w.Reset()
 	w.WriteUint8Array(buf, v)
 	expected := []byte{0x03,0x00,0x00,0x00, 0x01,0x02,0x03}
@@ -152,13 +152,13 @@ func TestWriterUint8Array(t *testing.T) {
 }
 
 func TestWriterUint16Array(t *testing.T) {
-	w := _MessageWriter{}
+	w := Writer{}
 	v := []uint16{0x01,0x02,0x03}
 	w.WriteUint16Array(nil, v)
-	if w._Size != 10 {
-		t.Fatalf("instead of expected size got %v", w._Size)
+	if w.Size != 10 {
+		t.Fatalf("instead of expected size got %v", w.Size)
 	}
-	buf := make([]byte, w._Size)
+	buf := make([]byte, w.Size)
 	w.Reset()
 	w.WriteUint16Array(buf, v)
 	expected := []byte{0x06,0x00,0x00,0x00, 0x01,0x00, 0x02,0x00, 0x03,0x00}
@@ -168,13 +168,13 @@ func TestWriterUint16Array(t *testing.T) {
 }
 
 func TestWriterUint32Array(t *testing.T) {
-	w := _MessageWriter{}
+	w := Writer{}
 	v := []uint32{0x01,0x02,0x03}
 	w.WriteUint32Array(nil, v)
-	if w._Size != 16 {
-		t.Fatalf("instead of expected size got %v", w._Size)
+	if w.Size != 16 {
+		t.Fatalf("instead of expected size got %v", w.Size)
 	}
-	buf := make([]byte, w._Size)
+	buf := make([]byte, w.Size)
 	w.Reset()
 	w.WriteUint32Array(buf, v)
 	expected := []byte{0x0c,0x00,0x00,0x00, 0x01,0x00,0x00,0x00, 0x02,0x00,0x00,0x00, 0x03,0x00,0x00,0x00}
@@ -184,13 +184,13 @@ func TestWriterUint32Array(t *testing.T) {
 }
 
 func TestWriterUint64Array(t *testing.T) {
-	w := _MessageWriter{}
+	w := Writer{}
 	v := []uint64{0x01,0x02,0x03}
 	w.WriteUint64Array(nil, v)
-	if w._Size != 28 {
-		t.Fatalf("instead of expected size got %v", w._Size)
+	if w.Size != 28 {
+		t.Fatalf("instead of expected size got %v", w.Size)
 	}
-	buf := make([]byte, w._Size)
+	buf := make([]byte, w.Size)
 	w.Reset()
 	w.WriteUint64Array(buf, v)
 	expected := []byte{0x18,0x00,0x00,0x00, 0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00, 0x02,0x00,0x00,0x00,0x00,0x00,0x00,0x00, 0x03,0x00,0x00,0x00,0x00,0x00,0x00,0x00}
@@ -200,13 +200,13 @@ func TestWriterUint64Array(t *testing.T) {
 }
 
 func TestWriterBytesArray(t *testing.T) {
-	w := _MessageWriter{}
+	w := Writer{}
 	v := [][]byte{{0x01,0x02,0x03},{0x04,0x05}}
 	w.WriteBytesArray(nil, v)
-	if w._Size != 18 {
-		t.Fatalf("instead of expected size got %v", w._Size)
+	if w.Size != 18 {
+		t.Fatalf("instead of expected size got %v", w.Size)
 	}
-	buf := make([]byte, w._Size)
+	buf := make([]byte, w.Size)
 	w.Reset()
 	w.WriteBytesArray(buf, v)
 	expected := []byte{0x0e,0x00,0x00,0x00, 0x03,0x00,0x00,0x00, 0x01,0x02,0x03,0x00, 0x02,0x00,0x00,0x00, 0x04,0x05}
@@ -216,13 +216,13 @@ func TestWriterBytesArray(t *testing.T) {
 }
 
 func TestWriterStringArray(t *testing.T) {
-	w := _MessageWriter{}
+	w := Writer{}
 	v := []string{"jay","lo"}
 	w.WriteStringArray(nil, v)
-	if w._Size != 18 {
-		t.Fatalf("instead of expected size got %v", w._Size)
+	if w.Size != 18 {
+		t.Fatalf("instead of expected size got %v", w.Size)
 	}
-	buf := make([]byte, w._Size)
+	buf := make([]byte, w.Size)
 	w.Reset()
 	w.WriteStringArray(buf, v)
 	expected := []byte{0x0e,0x00,0x00,0x00, 0x03,0x00,0x00,0x00, 'j','a','y',0x00, 0x02,0x00,0x00,0x00, 'l','o'}
@@ -232,21 +232,25 @@ func TestWriterStringArray(t *testing.T) {
 }
 
 type TestMessageWriter struct {
-	_MessageWriter
+	_Writer Writer
 }
 func (w *TestMessageWriter) Write(buf []byte) {
-	w.WriteUint8(buf, 0x17)
-	w.WriteUint32(buf, 0x033)
+	w._Writer.Reset()
+	w._Writer.WriteUint8(buf, 0x17)
+	w._Writer.WriteUint32(buf, 0x033)
+}
+func (w *TestMessageWriter) GetSize() Offset {
+	return w._Writer.GetSize()
 }
 
 func TestWriterMessage(t *testing.T) {
-	w := _MessageWriter{}
+	w := Writer{}
 	v := TestMessageWriter{}
 	w.WriteMessage(nil, &v)
-	if w._Size != 12 {
-		t.Fatalf("instead of expected size got %v", w._Size)
+	if w.Size != 12 {
+		t.Fatalf("instead of expected size got %v", w.Size)
 	}
-	buf := make([]byte, w._Size)
+	buf := make([]byte, w.Size)
 	w.Reset()
 	w.WriteMessage(buf, &v)
 	expected := []byte{0x08,0x00,0x00,0x00, 0x17,0x00,0x00,0x00, 0x33,0x00,0x00,0x00}
@@ -256,13 +260,13 @@ func TestWriterMessage(t *testing.T) {
 }
 
 func TestWriterMessageArray(t *testing.T) {
-	w := _MessageWriter{}
+	w := Writer{}
 	v := []MessageWriter{&TestMessageWriter{}, &TestMessageWriter{}}
 	w.WriteMessageArray(nil, v)
-	if w._Size != 28 {
-		t.Fatalf("instead of expected size got %v", w._Size)
+	if w.Size != 28 {
+		t.Fatalf("instead of expected size got %v", w.Size)
 	}
-	buf := make([]byte, w._Size)
+	buf := make([]byte, w.Size)
 	w.Reset()
 	w.WriteMessageArray(buf, v)
 	expected := []byte{0x18,0x00,0x00,0x00, 0x08,0x00,0x00,0x00, 0x17,0x00,0x00,0x00, 0x33,0x00,0x00,0x00, 0x08,0x00,0x00,0x00, 0x17,0x00,0x00,0x00, 0x33,0x00,0x00,0x00}

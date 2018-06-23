@@ -1,196 +1,189 @@
 package membuffers
 
 type MessageWriter interface {
-	Reset()
 	Write(buf []byte)
 	GetSize() Offset
 }
 
-type _MessageWriter struct {
-	_Size Offset
+type Writer struct {
+	Size Offset
 }
 
-func (w *_MessageWriter) Reset() {
-	w._Size = 0
+func (w *Writer) Reset() {
+	w.Size = 0
 }
 
-func (w *_MessageWriter) CalcRequiredRawBufferSize() uint32 {
-	w.Reset()
-	w.Write(nil)
-	return uint32(w._Size)
-}
-
-func (w *_MessageWriter) Write(buf []byte) {
+func (w *Writer) Write(buf []byte) {
 	// override me
+	w.Reset()
 }
 
-func (w *_MessageWriter) GetSize() Offset {
-	return w._Size
+func (w *Writer) GetSize() Offset {
+	return w.Size
 }
 
-func (w *_MessageWriter) WriteUint8(buf []byte, v uint8) {
-	w._Size = alignOffsetToType(w._Size, TypeUint8)
+func (w *Writer) WriteUint8(buf []byte, v uint8) {
+	w.Size = alignOffsetToType(w.Size, TypeUint8)
 	if buf != nil {
-		WriteUint8(buf[w._Size:], v)
+		WriteUint8(buf[w.Size:], v)
 	}
-	w._Size += FieldSizes[TypeUint8]
+	w.Size += FieldSizes[TypeUint8]
 }
 
-func (w *_MessageWriter) WriteUint16(buf []byte, v uint16) {
-	w._Size = alignOffsetToType(w._Size, TypeUint16)
+func (w *Writer) WriteUint16(buf []byte, v uint16) {
+	w.Size = alignOffsetToType(w.Size, TypeUint16)
 	if buf != nil {
-		WriteUint16(buf[w._Size:], v)
+		WriteUint16(buf[w.Size:], v)
 	}
-	w._Size += FieldSizes[TypeUint16]
+	w.Size += FieldSizes[TypeUint16]
 }
 
-func (w *_MessageWriter) WriteUint32(buf []byte, v uint32) {
-	w._Size = alignOffsetToType(w._Size, TypeUint32)
+func (w *Writer) WriteUint32(buf []byte, v uint32) {
+	w.Size = alignOffsetToType(w.Size, TypeUint32)
 	if buf != nil {
-		WriteUint32(buf[w._Size:], v)
+		WriteUint32(buf[w.Size:], v)
 	}
-	w._Size += FieldSizes[TypeUint32]
+	w.Size += FieldSizes[TypeUint32]
 }
 
-func (w *_MessageWriter) WriteUint64(buf []byte, v uint64) {
-	w._Size = alignOffsetToType(w._Size, TypeUint64)
+func (w *Writer) WriteUint64(buf []byte, v uint64) {
+	w.Size = alignOffsetToType(w.Size, TypeUint64)
 	if buf != nil {
-		WriteUint64(buf[w._Size:], v)
+		WriteUint64(buf[w.Size:], v)
 	}
-	w._Size += FieldSizes[TypeUint64]
+	w.Size += FieldSizes[TypeUint64]
 }
 
-func (w *_MessageWriter) WriteBytes(buf []byte, v []byte) {
-	w._Size = alignOffsetToType(w._Size, TypeBytes)
+func (w *Writer) WriteBytes(buf []byte, v []byte) {
+	w.Size = alignOffsetToType(w.Size, TypeBytes)
 	if buf != nil {
-		WriteOffset(buf[w._Size:], Offset(len(v)))
+		WriteOffset(buf[w.Size:], Offset(len(v)))
 	}
-	w._Size += FieldSizes[TypeBytes]
-	w._Size = alignDynamicFieldContentOffset(w._Size, TypeBytes)
+	w.Size += FieldSizes[TypeBytes]
+	w.Size = alignDynamicFieldContentOffset(w.Size, TypeBytes)
 	if buf != nil {
-		copy(buf[w._Size:], v)
+		copy(buf[w.Size:], v)
 	}
-	w._Size += Offset(len(v))
+	w.Size += Offset(len(v))
 }
 
-func (w *_MessageWriter) WriteString(buf []byte, v string) {
+func (w *Writer) WriteString(buf []byte, v string) {
 	w.WriteBytes(buf, []byte(v))
 }
 
-func (w *_MessageWriter) WriteUnionIndex(buf []byte, unionIndex int) {
-	w._Size = alignOffsetToType(w._Size, TypeUnion)
+func (w *Writer) WriteUnionIndex(buf []byte, unionIndex uint16) {
+	w.Size = alignOffsetToType(w.Size, TypeUnion)
 	if buf != nil {
-		WriteUnionType(buf[w._Size:], unionIndex)
+		WriteUnionType(buf[w.Size:], unionIndex)
 	}
-	w._Size += FieldSizes[TypeUnion]
+	w.Size += FieldSizes[TypeUnion]
 }
 
-func (w *_MessageWriter) WriteUint8Array(buf []byte, v []uint8) {
-	w._Size = alignOffsetToType(w._Size, TypeUint8Array)
+func (w *Writer) WriteUint8Array(buf []byte, v []uint8) {
+	w.Size = alignOffsetToType(w.Size, TypeUint8Array)
 	if buf != nil {
-		WriteOffset(buf[w._Size:], Offset(len(v)) * FieldSizes[TypeUint8])
+		WriteOffset(buf[w.Size:], Offset(len(v)) * FieldSizes[TypeUint8])
 	}
-	w._Size += FieldSizes[TypeUint8Array]
-	w._Size = alignDynamicFieldContentOffset(w._Size, TypeUint8Array)
+	w.Size += FieldSizes[TypeUint8Array]
+	w.Size = alignDynamicFieldContentOffset(w.Size, TypeUint8Array)
 	for _, vv := range v {
 		w.WriteUint8(buf, vv)
 	}
 }
 
-func (w *_MessageWriter) WriteUint16Array(buf []byte, v []uint16) {
-	w._Size = alignOffsetToType(w._Size, TypeUint16Array)
+func (w *Writer) WriteUint16Array(buf []byte, v []uint16) {
+	w.Size = alignOffsetToType(w.Size, TypeUint16Array)
 	if buf != nil {
-		WriteOffset(buf[w._Size:], Offset(len(v)) * FieldSizes[TypeUint16])
+		WriteOffset(buf[w.Size:], Offset(len(v)) * FieldSizes[TypeUint16])
 	}
-	w._Size += FieldSizes[TypeUint16Array]
-	w._Size = alignDynamicFieldContentOffset(w._Size, TypeUint16Array)
+	w.Size += FieldSizes[TypeUint16Array]
+	w.Size = alignDynamicFieldContentOffset(w.Size, TypeUint16Array)
 	for _, vv := range v {
 		w.WriteUint16(buf, vv)
 	}
 }
 
-func (w *_MessageWriter) WriteUint32Array(buf []byte, v []uint32) {
-	w._Size = alignOffsetToType(w._Size, TypeUint32Array)
+func (w *Writer) WriteUint32Array(buf []byte, v []uint32) {
+	w.Size = alignOffsetToType(w.Size, TypeUint32Array)
 	if buf != nil {
-		WriteOffset(buf[w._Size:], Offset(len(v)) * FieldSizes[TypeUint32])
+		WriteOffset(buf[w.Size:], Offset(len(v)) * FieldSizes[TypeUint32])
 	}
-	w._Size += FieldSizes[TypeUint32Array]
-	w._Size = alignDynamicFieldContentOffset(w._Size, TypeUint32Array)
+	w.Size += FieldSizes[TypeUint32Array]
+	w.Size = alignDynamicFieldContentOffset(w.Size, TypeUint32Array)
 	for _, vv := range v {
 		w.WriteUint32(buf, vv)
 	}
 }
 
-func (w *_MessageWriter) WriteUint64Array(buf []byte, v []uint64) {
-	w._Size = alignOffsetToType(w._Size, TypeUint64Array)
+func (w *Writer) WriteUint64Array(buf []byte, v []uint64) {
+	w.Size = alignOffsetToType(w.Size, TypeUint64Array)
 	if buf != nil {
-		WriteOffset(buf[w._Size:], Offset(len(v)) * FieldSizes[TypeUint64])
+		WriteOffset(buf[w.Size:], Offset(len(v)) * FieldSizes[TypeUint64])
 	}
-	w._Size += FieldSizes[TypeUint64Array]
-	w._Size = alignDynamicFieldContentOffset(w._Size, TypeUint64Array)
+	w.Size += FieldSizes[TypeUint64Array]
+	w.Size = alignDynamicFieldContentOffset(w.Size, TypeUint64Array)
 	for _, vv := range v {
 		w.WriteUint64(buf, vv)
 	}
 }
 
-func (w *_MessageWriter) WriteBytesArray(buf []byte, v [][]byte) {
-	w._Size = alignOffsetToType(w._Size, TypeBytesArray)
-	sizePlaceholderOffset := w._Size
-	w._Size += FieldSizes[TypeBytesArray]
-	w._Size = alignDynamicFieldContentOffset(w._Size, TypeBytesArray)
-	contentSizeStartOffset := w._Size
+func (w *Writer) WriteBytesArray(buf []byte, v [][]byte) {
+	w.Size = alignOffsetToType(w.Size, TypeBytesArray)
+	sizePlaceholderOffset := w.Size
+	w.Size += FieldSizes[TypeBytesArray]
+	w.Size = alignDynamicFieldContentOffset(w.Size, TypeBytesArray)
+	contentSizeStartOffset := w.Size
 	for _, vv := range v {
 		w.WriteBytes(buf, vv)
 	}
-	contentSize := w._Size - contentSizeStartOffset
+	contentSize := w.Size - contentSizeStartOffset
 	if buf != nil {
 		WriteOffset(buf[sizePlaceholderOffset:], contentSize)
 	}
 }
 
-func (w *_MessageWriter) WriteStringArray(buf []byte, v []string) {
-	w._Size = alignOffsetToType(w._Size, TypeStringArray)
-	sizePlaceholderOffset := w._Size
-	w._Size += FieldSizes[TypeStringArray]
-	w._Size = alignDynamicFieldContentOffset(w._Size, TypeStringArray)
-	contentSizeStartOffset := w._Size
+func (w *Writer) WriteStringArray(buf []byte, v []string) {
+	w.Size = alignOffsetToType(w.Size, TypeStringArray)
+	sizePlaceholderOffset := w.Size
+	w.Size += FieldSizes[TypeStringArray]
+	w.Size = alignDynamicFieldContentOffset(w.Size, TypeStringArray)
+	contentSizeStartOffset := w.Size
 	for _, vv := range v {
 		w.WriteString(buf, vv)
 	}
-	contentSize := w._Size - contentSizeStartOffset
+	contentSize := w.Size - contentSizeStartOffset
 	if buf != nil {
 		WriteOffset(buf[sizePlaceholderOffset:], contentSize)
 	}
 }
 
-func (w *_MessageWriter) WriteMessage(buf []byte, v MessageWriter) {
-	w._Size = alignOffsetToType(w._Size, TypeMessage)
-	sizePlaceholderOffset := w._Size
-	w._Size += FieldSizes[TypeMessage]
-	w._Size = alignDynamicFieldContentOffset(w._Size, TypeMessage)
-	v.Reset()
+func (w *Writer) WriteMessage(buf []byte, v MessageWriter) {
+	w.Size = alignOffsetToType(w.Size, TypeMessage)
+	sizePlaceholderOffset := w.Size
+	w.Size += FieldSizes[TypeMessage]
+	w.Size = alignDynamicFieldContentOffset(w.Size, TypeMessage)
 	if buf != nil {
-		v.Write(buf[w._Size:])
+		v.Write(buf[w.Size:])
 	} else {
 		v.Write(nil)
 	}
 	contentSize := v.GetSize()
-	w._Size += contentSize
+	w.Size += contentSize
 	if buf != nil {
 		WriteOffset(buf[sizePlaceholderOffset:], contentSize)
 	}
 }
 
-func (w *_MessageWriter) WriteMessageArray(buf []byte, v []MessageWriter) {
-	w._Size = alignOffsetToType(w._Size, TypeMessageArray)
-	sizePlaceholderOffset := w._Size
-	w._Size += FieldSizes[TypeMessageArray]
-	w._Size = alignDynamicFieldContentOffset(w._Size, TypeMessageArray)
-	contentSizeStartOffset := w._Size
+func (w *Writer) WriteMessageArray(buf []byte, v []MessageWriter) {
+	w.Size = alignOffsetToType(w.Size, TypeMessageArray)
+	sizePlaceholderOffset := w.Size
+	w.Size += FieldSizes[TypeMessageArray]
+	w.Size = alignDynamicFieldContentOffset(w.Size, TypeMessageArray)
+	contentSizeStartOffset := w.Size
 	for _, vv := range v {
 		w.WriteMessage(buf, vv)
 	}
-	contentSize := w._Size - contentSizeStartOffset
+	contentSize := w.Size - contentSizeStartOffset
 	if buf != nil {
 		WriteOffset(buf[sizePlaceholderOffset:], contentSize)
 	}

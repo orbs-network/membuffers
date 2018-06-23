@@ -49,7 +49,7 @@ func (m *Message) lazyCalcOffsets() bool {
 			}
 			unionType := GetUnionType(m.Bytes[off:])
 			off += FieldSizes[TypeUnion]
-			if unionNum >= len(m.Unions) || unionType >= len(m.Unions[unionNum]) {
+			if unionNum >= len(m.Unions) || int(unionType) >= len(m.Unions[unionNum]) {
 				return false
 			}
 			fieldType = m.Unions[unionNum][unionType]
@@ -92,7 +92,7 @@ func (m *Message) RawBufferForField(fieldNum int, unionNum int) []byte {
 	if fieldType == TypeUnion {
 		unionType := GetUnionType(m.Bytes[off:])
 		off += FieldSizes[TypeUnion]
-		if unionNum >= len(m.Unions) || unionType >= len(m.Unions[unionNum]) {
+		if unionNum >= len(m.Unions) || int(unionType) >= len(m.Unions[unionNum]) {
 			return []byte{}
 		}
 		fieldType = m.Unions[unionNum][unionType]
@@ -203,14 +203,14 @@ func (m *Message) GetString(fieldNum int) string {
 	return byteSliceToString(b)
 }
 
-func (m *Message) IsUnionIndex(fieldNum int, unionNum int, unionIndex int) (bool, Offset) {
+func (m *Message) IsUnionIndex(fieldNum int, unionNum int, unionIndex uint16) (bool, Offset) {
 	if !m.lazyCalcOffsets() || fieldNum >= len(m.Offsets) {
 		return false, 0
 	}
 	off := m.Offsets[fieldNum]
 	unionType := GetUnionType(m.Bytes[off:])
 	off += FieldSizes[TypeUnion]
-	if unionNum >= len(m.Unions) || unionType >= len(m.Unions[unionNum]) {
+	if unionNum >= len(m.Unions) || int(unionType) >= len(m.Unions[unionNum]) {
 		return false, 0
 	}
 	fieldType := m.Unions[unionNum][unionType]

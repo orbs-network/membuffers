@@ -1,6 +1,8 @@
 package e2e
 
-import "github.com/orbs-network/membuffers/go"
+import (
+	"github.com/orbs-network/membuffers/go"
+)
 
 /*
 message Transaction {
@@ -8,6 +10,8 @@ message Transaction {
 	bytes signature = 2;
 }
 */
+
+// reader
 
 type Transaction struct {
 	_Message membuffers.Message
@@ -43,6 +47,24 @@ func (x *Transaction) _RawBuffer_Signature() []byte {
 	return x._Message.RawBufferForField(1, 0)
 }
 
+// writer
+
+type TransactionWriter struct {
+	_Writer membuffers.Writer
+	Data *TransactionDataWriter
+	Signature []byte
+}
+
+func (w *TransactionWriter) Write(buf []byte) {
+	w._Writer.Reset()
+	w._Writer.WriteMessage(buf, w.Data)
+	w._Writer.WriteBytes(buf, w.Signature)
+}
+
+func (w *TransactionWriter) GetSize() membuffers.Offset {
+	return w._Writer.GetSize()
+}
+
 /*
 message TransactionData {
 	uint32 protocol_version = 1;
@@ -51,6 +73,8 @@ message TransactionData {
 	int64 time_stamp = 4;
 }
 */
+
+// reader
 
 type TransactionData struct {
 	_Message membuffers.Message
@@ -114,12 +138,44 @@ func (x *TransactionData) _RawBuffer_TimeStamp() []byte {
 	return x._Message.RawBufferForField(3, 0)
 }
 
+// writer
+
+type TransactionDataWriter struct {
+	_Writer membuffers.Writer
+	ProtocolVersion uint32
+	VirtualChain uint64
+	Sender []*TransactionSenderWriter
+	TimeStamp uint64
+}
+
+func (w *TransactionDataWriter) sender() []membuffers.MessageWriter {
+	res := make([]membuffers.MessageWriter, len(w.Sender))
+	for i, v := range w.Sender {
+		res[i] = v
+	}
+	return res
+}
+
+func (w *TransactionDataWriter) Write(buf []byte) {
+	w._Writer.Reset()
+	w._Writer.WriteUint32(buf, w.ProtocolVersion)
+	w._Writer.WriteUint64(buf, w.VirtualChain)
+	w._Writer.WriteMessageArray(buf, w.sender())
+	w._Writer.WriteUint64(buf, w.TimeStamp)
+}
+
+func (w *TransactionDataWriter) GetSize() membuffers.Offset {
+	return w._Writer.GetSize()
+}
+
 /*
 message TransactionSender {
 	string name = 1;
 	repeated string friend = 2;
 }
 */
+
+// reader
 
 type TransactionSender struct {
 	_Message membuffers.Message
@@ -164,4 +220,22 @@ func (i *TransactionSender_FriendIterator) NextFriend() string {
 
 func (x *TransactionSender) _RawBuffer_FriendArray() []byte {
 	return x._Message.RawBufferForField(1, 0)
+}
+
+// writer
+
+type TransactionSenderWriter struct {
+	_Writer membuffers.Writer
+	Name string
+	Friend []string
+}
+
+func (w *TransactionSenderWriter) Write(buf []byte) {
+	w._Writer.Reset()
+	w._Writer.WriteString(buf, w.Name)
+	w._Writer.WriteStringArray(buf, w.Friend)
+}
+
+func (w *TransactionSenderWriter) GetSize() membuffers.Offset {
+	return w._Writer.GetSize()
 }
