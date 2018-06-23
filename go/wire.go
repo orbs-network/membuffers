@@ -13,10 +13,6 @@ func GetByte(buf []byte) byte {
 	return byte(GetUint8(buf))
 }
 
-func GetBool(buf []byte) bool {
-	return buf[0] == 1
-}
-
 func GetUint8(buf []byte) (n uint8) {
 	return *(*uint8)(unsafe.Pointer(&buf[0]))
 }
@@ -135,72 +131,98 @@ func WriteByte(buf []byte, n byte) {
 	WriteUint8(buf, uint8(n))
 }
 
-func WriteBool(buf []byte, b bool) {
-	buf[0] = 0
-	if b {
-		buf[0] = 1
-	}
-}
-
 func WriteUint8(buf []byte, n uint8) {
+	*(*uint8)(unsafe.Pointer(&buf[0])) = n
+}
+
+func WriteUint8Polyfill(buf []byte, n uint8) {
 	buf[0] = byte(n)
 }
 
-// WriteUint16 encodes a little-endian uint16 into a byte slice.
 func WriteUint16(buf []byte, n uint16) {
+	*(*uint16)(unsafe.Pointer(&buf[0])) = n
+}
+
+func WriteUint16Polyfill(buf []byte, n uint16) {
 	buf[0] = byte(n)
 	buf[1] = byte(n >> 8)
 }
 
-// WriteUint32 encodes a little-endian uint32 into a byte slice.
 func WriteUint32(buf []byte, n uint32) {
+	*(*uint32)(unsafe.Pointer(&buf[0])) = n
+}
+
+func WriteUint32Polyfill(buf []byte, n uint32) {
 	buf[0] = byte(n)
 	buf[1] = byte(n >> 8)
 	buf[2] = byte(n >> 16)
 	buf[3] = byte(n >> 24)
 }
 
-// WriteUint64 encodes a little-endian uint64 into a byte slice.
 func WriteUint64(buf []byte, n uint64) {
+	*(*uint32)(unsafe.Pointer(&buf[0])) = uint32(n)
+	*(*uint32)(unsafe.Pointer(&buf[4])) = uint32(n >> 32)
+}
+
+func WriteUint64Polyfill(buf []byte, n uint64) {
 	for i := uint(0); i < uint(8); i++ {
 		buf[i] = byte(n >> (i * 8))
 	}
 }
 
-// WriteInt8 encodes a little-endian int8 into a byte slice.
 func WriteInt8(buf []byte, n int8) {
+	*(*int8)(unsafe.Pointer(&buf[0])) = n
+}
+
+func WriteInt8Polyfill(buf []byte, n int8) {
 	buf[0] = byte(n)
 }
 
-// WriteInt16 encodes a little-endian int16 into a byte slice.
 func WriteInt16(buf []byte, n int16) {
+	*(*int16)(unsafe.Pointer(&buf[0])) = n
+}
+
+func WriteInt16Polyfill(buf []byte, n int16) {
 	buf[0] = byte(n)
 	buf[1] = byte(n >> 8)
 }
 
-// WriteInt32 encodes a little-endian int32 into a byte slice.
 func WriteInt32(buf []byte, n int32) {
+	*(*int32)(unsafe.Pointer(&buf[0])) = n
+}
+
+func WriteInt32Polyfill(buf []byte, n int32) {
 	buf[0] = byte(n)
 	buf[1] = byte(n >> 8)
 	buf[2] = byte(n >> 16)
 	buf[3] = byte(n >> 24)
 }
 
-// WriteInt64 encodes a little-endian int64 into a byte slice.
 func WriteInt64(buf []byte, n int64) {
+	*(*uint32)(unsafe.Pointer(&buf[0])) = uint32(n)
+	*(*uint32)(unsafe.Pointer(&buf[4])) = uint32(n >> 32)
+}
+
+func WriteInt64Polyfill(buf []byte, n int64) {
 	for i := uint(0); i < uint(8); i++ {
 		buf[i] = byte(n >> (i * 8))
 	}
 }
 
-// WriteFloat32 encodes a little-endian float32 into a byte slice.
 func WriteFloat32(buf []byte, n float32) {
 	WriteUint32(buf, math.Float32bits(n))
 }
 
-// WriteFloat64 encodes a little-endian float64 into a byte slice.
 func WriteFloat64(buf []byte, n float64) {
 	WriteUint64(buf, math.Float64bits(n))
+}
+
+func WriteOffset(buf []byte, n Offset) {
+	WriteUint32(buf, uint32(n))
+}
+
+func WriteUnionType(buf []byte, n int) {
+	WriteUint16(buf, uint16(n))
 }
 
 func byteSliceToString(b []byte) string {
