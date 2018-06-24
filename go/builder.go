@@ -14,9 +14,14 @@ func (w *Builder) Reset() {
 	w.Size = 0
 }
 
+// override me
 func (w *Builder) Write(buf []byte) {
-	// override me
 	w.Reset()
+}
+
+func (w *Builder) CalcRequiredSize() Offset {
+	w.Write(nil)
+	return w.GetSize()
 }
 
 func (w *Builder) GetSize() Offset {
@@ -62,10 +67,12 @@ func (w *Builder) WriteBytes(buf []byte, v []byte) {
 	}
 	w.Size += FieldSizes[TypeBytes]
 	w.Size = alignDynamicFieldContentOffset(w.Size, TypeBytes)
-	if buf != nil {
-		copy(buf[w.Size:], v)
+	if v != nil {
+		if buf != nil {
+			copy(buf[w.Size:], v)
+		}
+		w.Size += Offset(len(v))
 	}
-	w.Size += Offset(len(v))
 }
 
 func (w *Builder) WriteString(buf []byte, v string) {

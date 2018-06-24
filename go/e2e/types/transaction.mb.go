@@ -56,16 +56,25 @@ type TransactionBuilder struct {
 }
 
 func (w *TransactionBuilder) Write(buf []byte) {
+	if w == nil {
+		return
+	}
 	w.builder.Reset()
 	w.builder.WriteMessage(buf, w.Data)
 	w.builder.WriteBytes(buf, w.Signature)
 }
 
 func (w *TransactionBuilder) GetSize() membuffers.Offset {
+	if w == nil {
+		return 0
+	}
 	return w.builder.GetSize()
 }
 
 func (w *TransactionBuilder) CalcRequiredSize() membuffers.Offset {
+	if w == nil {
+		return 0
+	}
 	w.Write(nil)
 	return w.builder.GetSize()
 }
@@ -162,6 +171,9 @@ func (w *TransactionDataBuilder) sender() []membuffers.MessageBuilder {
 }
 
 func (w *TransactionDataBuilder) Write(buf []byte) {
+	if w == nil {
+		return
+	}
 	w.builder.Reset()
 	w.builder.WriteUint32(buf, w.ProtocolVersion)
 	w.builder.WriteUint64(buf, w.VirtualChain)
@@ -170,10 +182,16 @@ func (w *TransactionDataBuilder) Write(buf []byte) {
 }
 
 func (w *TransactionDataBuilder) GetSize() membuffers.Offset {
+	if w == nil {
+		return 0
+	}
 	return w.builder.GetSize()
 }
 
 func (w *TransactionDataBuilder) CalcRequiredSize() membuffers.Offset {
+	if w == nil {
+		return 0
+	}
 	w.Write(nil)
 	return w.builder.GetSize()
 }
@@ -241,16 +259,25 @@ type TransactionSenderBuilder struct {
 }
 
 func (w *TransactionSenderBuilder) Write(buf []byte) {
+	if w == nil {
+		return
+	}
 	w.builder.Reset()
 	w.builder.WriteString(buf, w.Name)
 	w.builder.WriteStringArray(buf, w.Friend)
 }
 
 func (w *TransactionSenderBuilder) GetSize() membuffers.Offset {
+	if w == nil {
+		return 0
+	}
 	return w.builder.GetSize()
 }
 
 func (w *TransactionSenderBuilder) CalcRequiredSize() membuffers.Offset {
+	if w == nil {
+		return 0
+	}
 	w.Write(nil)
 	return w.builder.GetSize()
 }

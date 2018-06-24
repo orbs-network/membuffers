@@ -74,16 +74,25 @@ func (w *MethodBuilder) arg() []membuffers.MessageBuilder {
 }
 
 func (w *MethodBuilder) Write(buf []byte) {
+	if w == nil {
+		return
+	}
 	w.builder.Reset()
 	w.builder.WriteString(buf, w.Name)
 	w.builder.WriteMessageArray(buf, w.arg())
 }
 
 func (w *MethodBuilder) GetSize() membuffers.Offset {
+	if w == nil {
+		return 0
+	}
 	return w.builder.GetSize()
 }
 
 func (w *MethodBuilder) CalcRequiredSize() membuffers.Offset {
+	if w == nil {
+		return 0
+	}
 	w.Write(nil)
 	return w.builder.GetSize()
 }
@@ -174,6 +183,9 @@ type MethodCallArgumentBuilder struct {
 }
 
 func (w *MethodCallArgumentBuilder) Write(buf []byte) {
+	if w == nil {
+		return
+	}
 	w.builder.Reset()
 	w.builder.WriteUnionIndex(buf, uint16(w.Type))
 	switch w.Type {
@@ -187,10 +199,16 @@ func (w *MethodCallArgumentBuilder) Write(buf []byte) {
 }
 
 func (w *MethodCallArgumentBuilder) GetSize() membuffers.Offset {
+	if w == nil {
+		return 0
+	}
 	return w.builder.GetSize()
 }
 
 func (w *MethodCallArgumentBuilder) CalcRequiredSize() membuffers.Offset {
+	if w == nil {
+		return 0
+	}
 	w.Write(nil)
 	return w.builder.GetSize()
 }

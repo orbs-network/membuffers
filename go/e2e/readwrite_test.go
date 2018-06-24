@@ -132,3 +132,46 @@ func TestReadWriteMethod(t *testing.T) {
 		t.Fatalf("Arg1.Str: instead of expected got %v", arg1.TypeStr())
 	}
 }
+
+func TestEmptyTransaction(t *testing.T) {
+	// write
+	builder := &types.TransactionBuilder{}
+	buf := make([]byte, builder.CalcRequiredSize())
+	builder.Write(buf)
+
+	// read
+	transaction := types.TransactionReader(buf)
+	if transaction.Data().ProtocolVersion() != 0 {
+		t.Fatalf("ProtocolVersion: instead of expected got %v", transaction.Data().ProtocolVersion())
+	}
+	if transaction.Data().VirtualChain() != 0 {
+		t.Fatalf("VirtualChain: instead of expected got %v", transaction.Data().VirtualChain())
+	}
+	if transaction.Data().TimeStamp() != 0 {
+		t.Fatalf("TimeStamp: instead of expected got %v", transaction.Data().TimeStamp())
+	}
+	if !bytes.Equal(transaction.Signature(), []byte{}) {
+		t.Fatalf("Signature: instead of expected got %v", transaction.Signature())
+	}
+	i := transaction.Data().SenderIterator()
+	if i.HasNext() {
+		t.Fatalf("Sender: array is not empty")
+	}
+}
+
+func TestEmptyMethod(t *testing.T) {
+	// write
+	builder := &types.MethodBuilder{}
+	buf := make([]byte, builder.CalcRequiredSize())
+	builder.Write(buf)
+
+	// read
+	method := types.MethodReader(buf)
+	if method.Name() != "" {
+		t.Fatalf("Name: instead of expected got %v", method.Name())
+	}
+	i := method.ArgIterator()
+	if i.HasNext() {
+		t.Fatalf("Arg: array is not empty")
+	}
+}
