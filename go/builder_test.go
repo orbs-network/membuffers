@@ -234,10 +234,16 @@ func TestBuilderStringArray(t *testing.T) {
 type ExampleMessageBuilder struct {
 	builder Builder
 }
-func (w *ExampleMessageBuilder) Write(buf []byte) {
+func (w *ExampleMessageBuilder) Write(buf []byte) (err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			err = &ErrBufferOverrun{}
+		}
+	}()
 	w.builder.Reset()
 	w.builder.WriteUint8(buf, 0x17)
 	w.builder.WriteUint32(buf, 0x033)
+	return nil
 }
 func (w *ExampleMessageBuilder) GetSize() Offset {
 	return w.builder.GetSize()

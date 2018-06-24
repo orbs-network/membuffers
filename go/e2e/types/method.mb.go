@@ -81,13 +81,22 @@ func (w *MethodBuilder) arg() []membuffers.MessageBuilder {
 	return res
 }
 
-func (w *MethodBuilder) Write(buf []byte) {
+func (w *MethodBuilder) Write(buf []byte) (err error) {
 	if w == nil {
 		return
 	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = &membuffers.ErrBufferOverrun{}
+		}
+	}()
 	w.builder.Reset()
 	w.builder.WriteString(buf, w.Name)
-	w.builder.WriteMessageArray(buf, w.arg())
+	err = w.builder.WriteMessageArray(buf, w.arg())
+	if err != nil {
+		return
+	}
+	return nil
 }
 
 func (w *MethodBuilder) GetSize() membuffers.Offset {
@@ -221,10 +230,15 @@ type MethodCallArgumentBuilder struct {
 	Type    MethodCallArgumentType
 }
 
-func (w *MethodCallArgumentBuilder) Write(buf []byte) {
+func (w *MethodCallArgumentBuilder) Write(buf []byte) (err error) {
 	if w == nil {
 		return
 	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = &membuffers.ErrBufferOverrun{}
+		}
+	}()
 	w.builder.Reset()
 	w.builder.WriteUnionIndex(buf, uint16(w.Type))
 	switch w.Type {
@@ -235,6 +249,7 @@ func (w *MethodCallArgumentBuilder) Write(buf []byte) {
 	case MethodCallArgumentTypeData:
 		w.builder.WriteBytes(buf, w.Data)
 	}
+	return nil
 }
 
 func (w *MethodCallArgumentBuilder) GetSize() membuffers.Offset {

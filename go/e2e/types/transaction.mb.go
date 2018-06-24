@@ -63,13 +63,22 @@ type TransactionBuilder struct {
 	Signature []byte
 }
 
-func (w *TransactionBuilder) Write(buf []byte) {
+func (w *TransactionBuilder) Write(buf []byte) (err error) {
 	if w == nil {
 		return
 	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = &membuffers.ErrBufferOverrun{}
+		}
+	}()
 	w.builder.Reset()
-	w.builder.WriteMessage(buf, w.Data)
+	err = w.builder.WriteMessage(buf, w.Data)
+	if err != nil {
+		return
+	}
 	w.builder.WriteBytes(buf, w.Signature)
+	return nil
 }
 
 func (w *TransactionBuilder) GetSize() membuffers.Offset {
@@ -194,15 +203,24 @@ func (w *TransactionDataBuilder) sender() []membuffers.MessageBuilder {
 	return res
 }
 
-func (w *TransactionDataBuilder) Write(buf []byte) {
+func (w *TransactionDataBuilder) Write(buf []byte) (err error) {
 	if w == nil {
 		return
 	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = &membuffers.ErrBufferOverrun{}
+		}
+	}()
 	w.builder.Reset()
 	w.builder.WriteUint32(buf, w.ProtocolVersion)
 	w.builder.WriteUint64(buf, w.VirtualChain)
-	w.builder.WriteMessageArray(buf, w.sender())
+	err = w.builder.WriteMessageArray(buf, w.sender())
+	if err != nil {
+		return
+	}
 	w.builder.WriteUint64(buf, w.TimeStamp)
+	return nil
 }
 
 func (w *TransactionDataBuilder) GetSize() membuffers.Offset {
@@ -290,13 +308,19 @@ type TransactionSenderBuilder struct {
 	Friend  []string
 }
 
-func (w *TransactionSenderBuilder) Write(buf []byte) {
+func (w *TransactionSenderBuilder) Write(buf []byte) (err error) {
 	if w == nil {
 		return
 	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = &membuffers.ErrBufferOverrun{}
+		}
+	}()
 	w.builder.Reset()
 	w.builder.WriteString(buf, w.Name)
 	w.builder.WriteStringArray(buf, w.Friend)
+	return nil
 }
 
 func (w *TransactionSenderBuilder) GetSize() membuffers.Offset {

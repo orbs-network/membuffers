@@ -17,7 +17,10 @@ func TestMutateFields(t *testing.T) {
 		Signature: []byte{0x00,0x00,0x00,0x00,0x00,0x00,0x00},
 	}
 	buf := make([]byte, builder.CalcRequiredSize())
-	builder.Write(buf)
+	err := builder.Write(buf)
+	if err != nil {
+		t.Fatalf("error while writing in builder")
+	}
 
 	// read
 	transaction := types.TransactionReader(buf)
@@ -37,7 +40,7 @@ func TestMutateFields(t *testing.T) {
 	if !reflect.DeepEqual(transaction.Signature(), []byte{0x55,0x55,0x55,0x55,0x55,0x55,0x55}) {
 		t.Fatalf("Signature: instead of expected got %v", transaction.Signature())
 	}
-	err := transaction.MutateSignature([]byte{0x66,0x66,0x66})
+	err = transaction.MutateSignature([]byte{0x66,0x66,0x66})
 	if !reflect.DeepEqual(transaction.Signature(), []byte{0x55,0x55,0x55,0x55,0x55,0x55,0x55}) {
 		t.Fatalf("Signature: instead of expected got %v", transaction.Signature())
 	}

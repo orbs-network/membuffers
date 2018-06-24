@@ -1,7 +1,7 @@
 package membuffers
 
 type MessageBuilder interface {
-	Write(buf []byte)
+	Write(buf []byte) (err error)
 	GetSize() Offset
 	CalcRequiredSize() Offset
 }
@@ -15,8 +15,14 @@ func (w *Builder) Reset() {
 }
 
 // override me
-func (w *Builder) Write(buf []byte) {
+func (w *Builder) Write(buf []byte) (err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			err = &ErrBufferOverrun{}
+		}
+	}()
 	w.Reset()
+	return nil
 }
 
 func (w *Builder) CalcRequiredSize() Offset {
@@ -165,34 +171,39 @@ func (w *Builder) WriteStringArray(buf []byte, v []string) {
 	}
 }
 
-func (w *Builder) WriteMessage(buf []byte, v MessageBuilder) {
+func (w *Builder) WriteMessage(buf []byte, v MessageBuilder) (err error) {
 	w.Size = alignOffsetToType(w.Size, TypeMessage)
 	sizePlaceholderOffset := w.Size
 	w.Size += FieldSizes[TypeMessage]
 	w.Size = alignDynamicFieldContentOffset(w.Size, TypeMessage)
 	if buf != nil {
-		v.Write(buf[w.Size:])
+		err = v.Write(buf[w.Size:])
 	} else {
-		v.Write(nil)
+		err = v.Write(nil)
 	}
 	contentSize := v.GetSize()
 	w.Size += contentSize
 	if buf != nil {
 		WriteOffset(buf[sizePlaceholderOffset:], contentSize)
 	}
+	return
 }
 
-func (w *Builder) WriteMessageArray(buf []byte, v []MessageBuilder) {
+func (w *Builder) WriteMessageArray(buf []byte, v []MessageBuilder) (err error) {
 	w.Size = alignOffsetToType(w.Size, TypeMessageArray)
 	sizePlaceholderOffset := w.Size
 	w.Size += FieldSizes[TypeMessageArray]
 	w.Size = alignDynamicFieldContentOffset(w.Size, TypeMessageArray)
 	contentSizeStartOffset := w.Size
 	for _, vv := range v {
-		w.WriteMessage(buf, vv)
+		err = w.WriteMessage(buf, vv)
+		if err != nil {
+			return
+		}
 	}
 	contentSize := w.Size - contentSizeStartOffset
 	if buf != nil {
 		WriteOffset(buf[sizePlaceholderOffset:], contentSize)
 	}
+	return nil
 }

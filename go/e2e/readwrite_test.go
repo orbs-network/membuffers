@@ -27,7 +27,10 @@ func TestReadWriteTransaction(t *testing.T) {
 		Signature: []byte{0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,},
 	}
 	buf := make([]byte, builder.CalcRequiredSize())
-	builder.Write(buf)
+	err := builder.Write(buf)
+	if err != nil {
+		t.Fatalf("error while writing in builder")
+	}
 
 	// read
 	transaction := types.TransactionReader(buf)
@@ -97,7 +100,10 @@ func TestReadWriteMethod(t *testing.T) {
 		},
 	}
 	buf := make([]byte, builder.CalcRequiredSize())
-	builder.Write(buf)
+	err := builder.Write(buf)
+	if err != nil {
+		t.Fatalf("error while writing in builder")
+	}
 
 	// read
 	method := types.MethodReader(buf)
@@ -137,7 +143,10 @@ func TestEmptyTransaction(t *testing.T) {
 	// write
 	builder := &types.TransactionBuilder{}
 	buf := make([]byte, builder.CalcRequiredSize())
-	builder.Write(buf)
+	err := builder.Write(buf)
+	if err != nil {
+		t.Fatalf("error while writing in builder")
+	}
 
 	// read
 	transaction := types.TransactionReader(buf)
@@ -163,7 +172,10 @@ func TestEmptyMethod(t *testing.T) {
 	// write
 	builder := &types.MethodBuilder{}
 	buf := make([]byte, builder.CalcRequiredSize())
-	builder.Write(buf)
+	err := builder.Write(buf)
+	if err != nil {
+		t.Fatalf("error while writing in builder")
+	}
 
 	// read
 	method := types.MethodReader(buf)
@@ -173,5 +185,37 @@ func TestEmptyMethod(t *testing.T) {
 	i := method.ArgIterator()
 	if i.HasNext() {
 		t.Fatalf("Arg: array is not empty")
+	}
+}
+
+func TestEmptyBuffer(t *testing.T) {
+	builder := &types.TransactionBuilder{
+		Data: &types.TransactionDataBuilder{
+			ProtocolVersion: 0x01,
+			VirtualChain: 0x11223344,
+			TimeStamp: 0x445566778899,
+		},
+		Signature: []byte{0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,},
+	}
+	buf := []byte{}
+	err := builder.Write(buf)
+	if err == nil {
+		t.Fatalf("did not receive error while writing in builder")
+	}
+}
+
+func TestInsufficientBuffer(t *testing.T) {
+	builder := &types.TransactionBuilder{
+		Data: &types.TransactionDataBuilder{
+			ProtocolVersion: 0x01,
+			VirtualChain: 0x11223344,
+			TimeStamp: 0x445566778899,
+		},
+		Signature: []byte{0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,},
+	}
+	buf := make([]byte, 20)
+	err := builder.Write(buf)
+	if err == nil {
+		t.Fatalf("did not receive error while writing in builder")
 	}
 }

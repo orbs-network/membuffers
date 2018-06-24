@@ -436,9 +436,3 @@ func (m *Message) GetStringArrayIterator(fieldNum int) *Iterator {
 	off := m.Offsets[fieldNum]
 	return m.GetMessageArrayIteratorInOffset(off)
 }
-
-type ErrInvalidField struct {}
-func (e *ErrInvalidField) Error() string { return "invalid field" }
-
-type ErrSizeMismatch struct {}
-func (e *ErrSizeMismatch) Error() string { return "size mismatch" }
