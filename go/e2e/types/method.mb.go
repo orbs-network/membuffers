@@ -24,6 +24,10 @@ func MethodReader(buf []byte) *Method {
 	return x
 }
 
+func (x *Method) IsValid() bool {
+	return x.message.IsValid()
+}
+
 func (x *Method) Raw() []byte {
 	return x.message.RawBuffer()
 }
@@ -124,6 +128,10 @@ func MethodCallArgumentReader(buf []byte) *MethodCallArgument {
 	x := &MethodCallArgument{}
 	x.message.Init(buf, membuffers.Offset(len(buf)), m_MethodCallArgument_Scheme, m_MethodCallArgument_Unions)
 	return x
+}
+
+func (x *MethodCallArgument) IsValid() bool {
+	return x.message.IsValid()
 }
 
 func (x *MethodCallArgument) Raw() []byte {

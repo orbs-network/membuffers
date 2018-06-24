@@ -26,6 +26,10 @@ func TransactionReader(buf []byte) *Transaction {
 	return x
 }
 
+func (x *Transaction) IsValid() bool {
+	return x.message.IsValid()
+}
+
 func (x *Transaction) Raw() []byte {
 	return x.message.RawBuffer()
 }
@@ -105,6 +109,10 @@ func TransactionDataReader(buf []byte) *TransactionData {
 	x := &TransactionData{}
 	x.message.Init(buf, membuffers.Offset(len(buf)), m_TransactionData_Scheme, m_TransactionData_Unions)
 	return x
+}
+
+func (x *TransactionData) IsValid() bool {
+	return x.message.IsValid()
 }
 
 func (x *TransactionData) Raw() []byte {
@@ -232,6 +240,10 @@ func TransactionSenderReader(buf []byte) *TransactionSender {
 	x := &TransactionSender{}
 	x.message.Init(buf, membuffers.Offset(len(buf)), m_TransactionSender_Scheme, m_TransactionSender_Unions)
 	return x
+}
+
+func (x *TransactionSender) IsValid() bool {
+	return x.message.IsValid()
 }
 
 func (x *TransactionSender) Raw() []byte {
