@@ -1,0 +1,15 @@
+syntax = "proto3";
+package types;
+
+message Method {
+    string name = 1;
+    repeated MethodCallArgument arg = 2;
+}
+
+message MethodCallArgument {
+    oneof type {
+        uint32 num = 1;
+        string str = 2;
+        bytes data = 3;
+    }
+}

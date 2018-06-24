@@ -1,4 +1,4 @@
-package e2e
+package types
 
 import "github.com/orbs-network/membuffers/go"
 

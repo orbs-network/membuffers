@@ -3,6 +3,7 @@ package e2e
 import (
 	"testing"
 	"reflect"
+	"github.com/orbs-network/membuffers/go/e2e/types"
 )
 
 var transactionBuf = []byte{
@@ -25,7 +26,7 @@ var transactionBuf = []byte{
 }
 
 func TestReadPrimitives(t *testing.T) {
-	transaction := TransactionReader(transactionBuf)
+	transaction := types.TransactionReader(transactionBuf)
 	sig := transaction.Signature()
 	if !reflect.DeepEqual(sig, []byte{0x11,0x22,0x33,0x44,0x55,0x66}) {
 		t.Fatalf("Signature: instead of expected got %v", sig)
@@ -45,7 +46,7 @@ func TestReadPrimitives(t *testing.T) {
 }
 
 func TestReadArrays(t *testing.T) {
-	transaction := TransactionReader(transactionBuf)
+	transaction := types.TransactionReader(transactionBuf)
 	names := []string{}
 	friends := []string{}
 	for i:= transaction.Data().SenderIterator(); i.HasNext(); {
@@ -64,7 +65,7 @@ func TestReadArrays(t *testing.T) {
 }
 
 func TestReadRawBuffers(t *testing.T) {
-	transaction := TransactionReader(transactionBuf)
+	transaction := types.TransactionReader(transactionBuf)
 	transaction_rb := transaction.Raw()
 	if !reflect.DeepEqual(transaction_rb, transactionBuf) {
 		t.Fatalf("transaction_rb: instead of expected got %v", transaction_rb)
@@ -96,7 +97,7 @@ var methodBuf  = []byte{
 }
 
 func TestReadUnion(t *testing.T) {
-	method := MethodReader(methodBuf)
+	method := types.MethodReader(methodBuf)
 	iteration := 0
 	for i := method.ArgIterator(); i.HasNext(); {
 		arg := i.NextArg()
@@ -107,7 +108,7 @@ func TestReadUnion(t *testing.T) {
 			if arg.IsTypeData() {
 				t.Fatalf("first union is a data although it is not")
 			}
-			if arg.Type() != MethodCallArgumentTypeNum {
+			if arg.Type() != types.MethodCallArgumentTypeNum {
 				t.Fatalf("first union is incorrect enum value")
 			}
 			num := arg.TypeNum()
@@ -122,7 +123,7 @@ func TestReadUnion(t *testing.T) {
 			if arg.IsTypeData() {
 				t.Fatalf("second union is a data although it is not")
 			}
-			if arg.Type() != MethodCallArgumentTypeStr {
+			if arg.Type() != types.MethodCallArgumentTypeStr {
 				t.Fatalf("second union is incorrect enum value")
 			}
 			str := arg.TypeStr()

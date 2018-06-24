@@ -3,20 +3,21 @@ package e2e
 import (
 	"testing"
 	"bytes"
+	"github.com/orbs-network/membuffers/go/e2e/types"
 )
 
 func TestReadWriteTransaction(t *testing.T) {
 	// write
-	builder := &TransactionBuilder{
-		Data: &TransactionDataBuilder{
+	builder := &types.TransactionBuilder{
+		Data: &types.TransactionDataBuilder{
 			ProtocolVersion: 0x01,
 			VirtualChain: 0x11223344,
-			Sender: []*TransactionSenderBuilder{
-				&TransactionSenderBuilder{
+			Sender: []*types.TransactionSenderBuilder{
+				&types.TransactionSenderBuilder{
 					Name: "johnny",
 					Friend: []string{"billy","jeff","alex"},
 				},
-				&TransactionSenderBuilder{
+				&types.TransactionSenderBuilder{
 					Name: "rachel",
 					Friend: []string{"jessica","sara"},
 				},
@@ -29,7 +30,7 @@ func TestReadWriteTransaction(t *testing.T) {
 	builder.Write(buf)
 
 	// read
-	transaction := TransactionReader(buf)
+	transaction := types.TransactionReader(buf)
 	if transaction.Data().ProtocolVersion() != 0x01 {
 		t.Fatalf("ProtocolVersion: instead of expected got %v", transaction.Data().ProtocolVersion())
 	}
@@ -78,19 +79,19 @@ func TestReadWriteTransaction(t *testing.T) {
 
 func TestReadWriteMethod(t *testing.T) {
 	// write
-	builder := &MethodBuilder{
+	builder := &types.MethodBuilder{
 		Name: "MyMethod",
-		Arg: []*MethodCallArgumentBuilder{
-			&MethodCallArgumentBuilder{
-				Type: MethodCallArgumentTypeNum,
+		Arg: []*types.MethodCallArgumentBuilder{
+			&types.MethodCallArgumentBuilder{
+				Type: types.MethodCallArgumentTypeNum,
 				Num:  0x17,
 			},
-			&MethodCallArgumentBuilder{
-				Type: MethodCallArgumentTypeStr,
+			&types.MethodCallArgumentBuilder{
+				Type: types.MethodCallArgumentTypeStr,
 				Str:  "flower",
 			},
-			&MethodCallArgumentBuilder{
-				Type: MethodCallArgumentTypeData,
+			&types.MethodCallArgumentBuilder{
+				Type: types.MethodCallArgumentTypeData,
 				Data: []byte{0x01,0x02,0x03},
 			},
 		},
@@ -99,7 +100,7 @@ func TestReadWriteMethod(t *testing.T) {
 	builder.Write(buf)
 
 	// read
-	method := MethodReader(buf)
+	method := types.MethodReader(buf)
 	if method.Name() != "MyMethod" {
 		t.Fatalf("Name: instead of expected got %v", method.Name())
 	}
@@ -111,7 +112,7 @@ func TestReadWriteMethod(t *testing.T) {
 	if arg0.IsTypeStr() {
 		t.Fatalf("Arg0: is type is str")
 	}
-	if arg0.Type() != MethodCallArgumentTypeNum {
+	if arg0.Type() != types.MethodCallArgumentTypeNum {
 		t.Fatalf("Arg0: type is not num")
 	}
 	if arg0.TypeNum() != 0x17 {
@@ -124,7 +125,7 @@ func TestReadWriteMethod(t *testing.T) {
 	if arg1.IsTypeNum() {
 		t.Fatalf("Arg1: is type is num")
 	}
-	if arg1.Type() != MethodCallArgumentTypeStr {
+	if arg1.Type() != types.MethodCallArgumentTypeStr {
 		t.Fatalf("Arg1: type is not str")
 	}
 	if arg1.TypeStr() != "flower" {
