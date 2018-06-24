@@ -47,6 +47,10 @@ func (x *Transaction) RawSignature() []byte {
 	return x.message.RawBufferForField(1, 0)
 }
 
+func (x *Transaction) MutateSignature(v []byte) error {
+	return x.message.SetBytes(1, v)
+}
+
 // builder
 
 type TransactionBuilder struct {
@@ -115,12 +119,20 @@ func (x *TransactionData) RawProtocolVersion() []byte {
 	return x.message.RawBufferForField(0, 0)
 }
 
+func (x *TransactionData) MutateProtocolVersion(v uint32) error {
+	return x.message.SetUint32(0, v)
+}
+
 func (x *TransactionData) VirtualChain() uint64 {
 	return x.message.GetUint64(1)
 }
 
 func (x *TransactionData) RawVirtualChain() []byte {
 	return x.message.RawBufferForField(1, 0)
+}
+
+func (x *TransactionData) MutateVirtualChain(v uint64) error {
+	return x.message.SetUint64(1, v)
 }
 
 func (x *TransactionData) SenderIterator() *TransactionDataSenderIterator {
@@ -150,6 +162,10 @@ func (x *TransactionData) TimeStamp() uint64 {
 
 func (x *TransactionData) RawTimeStamp() []byte {
 	return x.message.RawBufferForField(3, 0)
+}
+
+func (x *TransactionData) MutateTimeStamp(v uint64) error {
+	return x.message.SetUint64(3, v)
 }
 
 // builder
@@ -228,6 +244,10 @@ func (x *TransactionSender) Name() string {
 
 func (x *TransactionSender) RawName() []byte {
 	return x.message.RawBufferForField(0, 0)
+}
+
+func (x *TransactionSender) MutateName(v string) error {
+	return x.message.SetString(0, v)
 }
 
 func (x *TransactionSender) FriendIterator() *TransactionSender_FriendIterator {

@@ -662,3 +662,315 @@ func TestMessageReadUnion(t *testing.T) {
 		}
 	}
 }
+
+var mutateUint32 = []struct{
+	buf []byte
+	scheme []FieldType
+	unions [][]FieldType
+	fieldNum int
+	expected []byte
+	err bool
+}{
+	{
+		[]byte{0x44,0x33,0x22,0x11},
+		[]FieldType{TypeUint32},
+		[][]FieldType{{}},
+		0,
+		[]byte{0x55,0x55,0x55,0x55},
+		false,
+	},
+	{
+		[]byte{0x44,0x33,0x22,0x11, 0x88,0x77,0x66,0x55},
+		[]FieldType{TypeUint32,TypeUint32},
+		[][]FieldType{{}},
+		1,
+		[]byte{0x44,0x33,0x22,0x11, 0x55,0x55,0x55,0x55},
+		false,
+	},
+	{
+		[]byte{0x01, 0x00,0x00,0x00, 0x44,0x33,0x22,0x11, 0x88,0x77,0x66,0x55},
+		[]FieldType{TypeUint8,TypeUint32,TypeUint32},
+		[][]FieldType{{}},
+		1,
+		[]byte{0x01, 0x00,0x00,0x00, 0x55,0x55,0x55,0x55, 0x88,0x77,0x66,0x55},
+		false,
+	},
+	{
+		[]byte{0x01,0x01,0x01, 0x00, 0x44,0x33,0x22,0x11, 0x88,0x77,0x66,0x55},
+		[]FieldType{TypeUint8,TypeUint8,TypeUint8,TypeUint32,TypeUint32},
+		[][]FieldType{{}},
+		3,
+		[]byte{0x01,0x01,0x01, 0x00, 0x55,0x55,0x55,0x55, 0x88,0x77,0x66,0x55},
+		false,
+	},
+	{
+		[]byte{0x05,0x00,0x00,0x00, 0x01,0x02,0x03,0x04,0x05, 0x00,0x00,0x00, 0x44,0x33,0x22,0x11, 0x88,0x77,0x66,0x55},
+		[]FieldType{TypeMessage,TypeUint32,TypeUint32},
+		[][]FieldType{{}},
+		1,
+		[]byte{0x05,0x00,0x00,0x00, 0x01,0x02,0x03,0x04,0x05, 0x00,0x00,0x00, 0x55,0x55,0x55,0x55, 0x88,0x77,0x66,0x55},
+		false,
+	},
+	{
+		[]byte{0x44,0x33,0x22,0x11},
+		[]FieldType{TypeUint32},
+		[][]FieldType{{}},
+		1,
+		[]byte{0x44,0x33,0x22,0x11},
+		true,
+	},
+	{
+		[]byte{0x44,0x33,0x22},
+		[]FieldType{TypeUint32},
+		[][]FieldType{{}},
+		0,
+		[]byte{0x44,0x33,0x22},
+		true,
+	},
+}
+
+func TestMessageMutateUint32(t *testing.T) {
+	for tn, tt := range mutateUint32 {
+		m := Message{}
+		m.Init(tt.buf, Offset(len(tt.buf)), tt.scheme, tt.unions)
+		err := m.SetUint32(tt.fieldNum, 0x55555555)
+		if !bytes.Equal(tt.expected, tt.buf) {
+			t.Fatalf("expected \"%v\" but got \"%v\" in test #%d", tt.expected, tt.buf, tn)
+		}
+		if (err != nil) != tt.err {
+			t.Fatalf("expected error \"%v\" but got \"%v\" in test #%d", err != nil, tt.err, tn)
+		}
+	}
+}
+
+var mutateUint8 = []struct{
+	buf []byte
+	scheme []FieldType
+	unions [][]FieldType
+	fieldNum int
+	expected []byte
+	err bool
+}{
+	{
+		[]byte{0x44,0x33,0x22,0x11,0x88,0x99},
+		[]FieldType{TypeUint32,TypeUint8,TypeUint8},
+		[][]FieldType{{}},
+		2,
+		[]byte{0x44,0x33,0x22,0x11,0x88,0x55},
+		false,
+	},
+}
+
+func TestMessageMutateUint8(t *testing.T) {
+	for tn, tt := range mutateUint8 {
+		m := Message{}
+		m.Init(tt.buf, Offset(len(tt.buf)), tt.scheme, tt.unions)
+		err := m.SetUint8(tt.fieldNum, 0x55)
+		if !bytes.Equal(tt.expected, tt.buf) {
+			t.Fatalf("expected \"%v\" but got \"%v\" in test #%d", tt.expected, tt.buf, tn)
+		}
+		if (err != nil) != tt.err {
+			t.Fatalf("expected error \"%v\" but got \"%v\" in test #%d", err != nil, tt.err, tn)
+		}
+	}
+}
+
+var mutateUint16 = []struct{
+	buf []byte
+	scheme []FieldType
+	unions [][]FieldType
+	fieldNum int
+	expected []byte
+	err bool
+}{
+	{
+		[]byte{0x44,0x33,0x22,0x11,0x88,0x00,0x99,0xaa},
+		[]FieldType{TypeUint32,TypeUint8,TypeUint16},
+		[][]FieldType{{}},
+		2,
+		[]byte{0x44,0x33,0x22,0x11,0x88,0x00,0x55,0x55},
+		false,
+	},
+}
+
+func TestMessageMutateUint16(t *testing.T) {
+	for tn, tt := range mutateUint16 {
+		m := Message{}
+		m.Init(tt.buf, Offset(len(tt.buf)), tt.scheme, tt.unions)
+		err := m.SetUint16(tt.fieldNum, 0x5555)
+		if !bytes.Equal(tt.expected, tt.buf) {
+			t.Fatalf("expected \"%v\" but got \"%v\" in test #%d", tt.expected, tt.buf, tn)
+		}
+		if (err != nil) != tt.err {
+			t.Fatalf("expected error \"%v\" but got \"%v\" in test #%d", err != nil, tt.err, tn)
+		}
+	}
+}
+
+var mutateUint64 = []struct{
+	buf []byte
+	scheme []FieldType
+	unions [][]FieldType
+	fieldNum int
+	expected []byte
+	err bool
+}{
+	{
+		[]byte{0x44,0x33,0x22,0x11, 0x88,0x77,0x66,0x55,0x44,0x33,0x22,0x11},
+		[]FieldType{TypeUint32,TypeUint64},
+		[][]FieldType{{}},
+		1,
+		[]byte{0x44,0x33,0x22,0x11, 0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55},
+		false,
+	},
+	{
+		[]byte{0x44,0x00,0x00,0x00, 0x88,0x77,0x66,0x55,0x44,0x33,0x22,0x11},
+		[]FieldType{TypeUint8,TypeUint64},
+		[][]FieldType{{}},
+		1,
+		[]byte{0x44,0x00,0x00,0x00, 0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55},
+		false,
+	},
+}
+
+func TestMessageMutateUint64(t *testing.T) {
+	for tn, tt := range mutateUint64 {
+		m := Message{}
+		m.Init(tt.buf, Offset(len(tt.buf)), tt.scheme, tt.unions)
+		err := m.SetUint64(tt.fieldNum, 0x5555555555555555)
+		if !bytes.Equal(tt.expected, tt.buf) {
+			t.Fatalf("expected \"%v\" but got \"%v\" in test #%d", tt.expected, tt.buf, tn)
+		}
+		if (err != nil) != tt.err {
+			t.Fatalf("expected error \"%v\" but got \"%v\" in test #%d", err != nil, tt.err, tn)
+		}
+	}
+}
+
+var mutateBytes = []struct{
+	buf []byte
+	scheme []FieldType
+	unions [][]FieldType
+	fieldNum int
+	expected []byte
+	err bool
+}{
+	{
+		[]byte{0x00,0x00,0x00,0x00},
+		[]FieldType{TypeBytes},
+		[][]FieldType{{}},
+		0,
+		[]byte{0x00,0x00,0x00,0x00},
+		true,
+	},
+	{
+		[]byte{0x03,0x00,0x00,0x00, 0x22,0x23,0x24},
+		[]FieldType{TypeBytes},
+		[][]FieldType{{}},
+		0,
+		[]byte{0x03,0x00,0x00,0x00, 0x55,0x55,0x55},
+		false,
+	},
+	{
+		[]byte{0x03,0x00,0x00,0x00, 0x22,0x23,0x24, 0x00, 0x02,0x00,0x00,0x00, 0x77,0x88},
+		[]FieldType{TypeBytes,TypeBytes},
+		[][]FieldType{{}},
+		1,
+		[]byte{0x03,0x00,0x00,0x00, 0x22,0x23,0x24, 0x00, 0x02,0x00,0x00,0x00, 0x77,0x88},
+		true,
+	},
+	{
+		[]byte{0x01, 0x00,0x00,0x00, 0x03,0x00,0x00,0x00, 0x11,0x22,0x33, 0x00, 0x88,0x77,0x66,0x55},
+		[]FieldType{TypeUint8,TypeBytes,TypeUint32},
+		[][]FieldType{{}},
+		1,
+		[]byte{0x01, 0x00,0x00,0x00, 0x03,0x00,0x00,0x00, 0x55,0x55,0x55, 0x00, 0x88,0x77,0x66,0x55},
+		false,
+	},
+	{
+		[]byte{0x01,0x01,0x01, 0x00, 0x03,0x00,0x00,0x00, 0x11,0x22,0x33, 0x00, 0x88,0x77,0x66,0x55},
+		[]FieldType{TypeUint8,TypeUint8,TypeUint8,TypeBytes,TypeUint32},
+		[][]FieldType{{}},
+		3,
+		[]byte{0x01,0x01,0x01, 0x00, 0x03,0x00,0x00,0x00, 0x55,0x55,0x55, 0x00, 0x88,0x77,0x66,0x55},
+		false,
+	},
+	{
+		[]byte{0x05,0x00,0x00,0x00, 0x01,0x02,0x03,0x04,0x05, 0x00,0x00,0x00, 0x03,0x00,0x00,0x00, 0x11,0x22,0x33, 0x00, 0x88,0x77,0x66,0x55},
+		[]FieldType{TypeMessage,TypeBytes,TypeUint32},
+		[][]FieldType{{}},
+		1,
+		[]byte{0x05,0x00,0x00,0x00, 0x01,0x02,0x03,0x04,0x05, 0x00,0x00,0x00, 0x03,0x00,0x00,0x00, 0x55,0x55,0x55, 0x00, 0x88,0x77,0x66,0x55},
+		false,
+	},
+	{
+		[]byte{0x44,0x33,0x22,0x11},
+		[]FieldType{TypeBytes},
+		[][]FieldType{{}},
+		0,
+		[]byte{0x44,0x33,0x22,0x11},
+		true,
+	},
+	{
+		[]byte{0x44,0x33,0x22},
+		[]FieldType{TypeBytes},
+		[][]FieldType{{}},
+		0,
+		[]byte{0x44,0x33,0x22},
+		true,
+	},
+	{
+		[]byte{0x03,0x00,0x00,0x00, 0x11,0x22},
+		[]FieldType{TypeBytes},
+		[][]FieldType{{}},
+		0,
+		[]byte{0x03,0x00,0x00,0x00, 0x11,0x22},
+		true,
+	},
+}
+
+func TestMessageMutateBytes(t *testing.T) {
+	for tn, tt := range mutateBytes {
+		m := Message{}
+		m.Init(tt.buf, Offset(len(tt.buf)), tt.scheme, tt.unions)
+		err := m.SetBytes(tt.fieldNum, []byte{0x55,0x55,0x55})
+		if !bytes.Equal(tt.expected, tt.buf) {
+			t.Fatalf("expected \"%v\" but got \"%v\" in test #%d", tt.expected, tt.buf, tn)
+		}
+		if (err != nil) != tt.err {
+			t.Fatalf("expected error \"%v\" but got \"%v\" in test #%d", err != nil, tt.err, tn)
+		}
+	}
+}
+
+var mutateString = []struct{
+	buf []byte
+	scheme []FieldType
+	unions [][]FieldType
+	fieldNum int
+	expected []byte
+	err bool
+}{
+	{
+		[]byte{0x03,0x00,0x00,0x00, 'a','b','c'},
+		[]FieldType{TypeString},
+		[][]FieldType{{}},
+		0,
+		[]byte{0x03,0x00,0x00,0x00, 'z','z','z'},
+		false,
+	},
+}
+
+func TestMessageMutateString(t *testing.T) {
+	for tn, tt := range mutateString {
+		m := Message{}
+		m.Init(tt.buf, Offset(len(tt.buf)), tt.scheme, tt.unions)
+		err := m.SetString(tt.fieldNum, "zzz")
+		if !bytes.Equal(tt.expected, tt.buf) {
+			t.Fatalf("expected \"%v\" but got \"%v\" in test #%d", tt.expected, tt.buf, tn)
+		}
+		if (err != nil) != tt.err {
+			t.Fatalf("expected error \"%v\" but got \"%v\" in test #%d", err != nil, tt.err, tn)
+		}
+	}
+}

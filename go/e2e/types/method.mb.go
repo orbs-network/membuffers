@@ -36,6 +36,10 @@ func (x *Method) RawName() []byte {
 	return x.message.RawBufferForField(0, 0)
 }
 
+func (x *Method) MutateName(v string) error {
+	return x.message.SetString(0, v)
+}
+
 func (x *Method) ArgIterator() *MethodArgIterator {
 	return &MethodArgIterator{iterator: x.message.GetMessageArrayIterator(1)}
 }
@@ -148,6 +152,15 @@ func (x *MethodCallArgument) TypeNum() uint32 {
 	return x.message.GetUint32InOffset(off)
 }
 
+func (x *MethodCallArgument) MutateTypeNum(v uint32) error {
+	is, off := x.message.IsUnionIndex(0, 0, 0)
+	if !is {
+		return &membuffers.ErrInvalidField{}
+	}
+	x.message.SetUint32InOffset(off, v)
+	return nil
+}
+
 func (x *MethodCallArgument) IsTypeStr() bool {
 	is, _ := x.message.IsUnionIndex(0, 0, 1)
 	return is
@@ -158,6 +171,15 @@ func (x *MethodCallArgument) TypeStr() string {
 	return x.message.GetStringInOffset(off)
 }
 
+func (x *MethodCallArgument) MutateTypeStr(v string) error {
+	is, off := x.message.IsUnionIndex(0, 0, 1)
+	if !is {
+		return &membuffers.ErrInvalidField{}
+	}
+	x.message.GetStringInOffset(off)
+	return nil
+}
+
 func (x *MethodCallArgument) IsTypeData() bool {
 	is, _ := x.message.IsUnionIndex(0, 0, 2)
 	return is
@@ -166,6 +188,15 @@ func (x *MethodCallArgument) IsTypeData() bool {
 func (x *MethodCallArgument) TypeData() []byte {
 	_, off := x.message.IsUnionIndex(0, 0, 2)
 	return x.message.GetBytesInOffset(off)
+}
+
+func (x *MethodCallArgument) MutateTypeData(v []byte) error {
+	is, off := x.message.IsUnionIndex(0, 0, 2)
+	if !is {
+		return &membuffers.ErrInvalidField{}
+	}
+	x.message.GetBytesInOffset(off)
+	return nil
 }
 
 func (x *MethodCallArgument) RawType() []byte {

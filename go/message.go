@@ -116,6 +116,10 @@ func (m *Message) GetUint8InOffset(off Offset) uint8 {
 	return GetUint8(m.Bytes[off:])
 }
 
+func (m *Message) SetUint8InOffset(off Offset, v uint8) {
+	WriteUint8(m.Bytes[off:], v)
+}
+
 func (m *Message) GetUint8(fieldNum int) uint8 {
 	if !m.lazyCalcOffsets() || fieldNum >= len(m.Offsets) {
 		return 0
@@ -124,8 +128,21 @@ func (m *Message) GetUint8(fieldNum int) uint8 {
 	return m.GetUint8InOffset(off)
 }
 
+func (m *Message) SetUint8(fieldNum int, v uint8) error {
+	if !m.lazyCalcOffsets() || fieldNum >= len(m.Offsets) {
+		return &ErrInvalidField{}
+	}
+	off := m.Offsets[fieldNum]
+	m.SetUint8InOffset(off, v)
+	return nil
+}
+
 func (m *Message) GetUint16InOffset(off Offset) uint16 {
 	return GetUint16(m.Bytes[off:])
+}
+
+func (m *Message) SetUint16InOffset(off Offset, v uint16) {
+	WriteUint16(m.Bytes[off:], v)
 }
 
 func (m *Message) GetUint16(fieldNum int) uint16 {
@@ -136,8 +153,21 @@ func (m *Message) GetUint16(fieldNum int) uint16 {
 	return m.GetUint16InOffset(off)
 }
 
+func (m *Message) SetUint16(fieldNum int, v uint16) error {
+	if !m.lazyCalcOffsets() || fieldNum >= len(m.Offsets) {
+		return &ErrInvalidField{}
+	}
+	off := m.Offsets[fieldNum]
+	m.SetUint16InOffset(off, v)
+	return nil
+}
+
 func (m *Message) GetUint32InOffset(off Offset) uint32 {
 	return GetUint32(m.Bytes[off:])
+}
+
+func (m *Message) SetUint32InOffset(off Offset, v uint32) {
+	WriteUint32(m.Bytes[off:], v)
 }
 
 func (m *Message) GetUint32(fieldNum int) uint32 {
@@ -148,8 +178,21 @@ func (m *Message) GetUint32(fieldNum int) uint32 {
 	return m.GetUint32InOffset(off)
 }
 
+func (m *Message) SetUint32(fieldNum int, v uint32) error {
+	if !m.lazyCalcOffsets() || fieldNum >= len(m.Offsets) {
+		return &ErrInvalidField{}
+	}
+	off := m.Offsets[fieldNum]
+	m.SetUint32InOffset(off, v)
+	return nil
+}
+
 func (m *Message) GetUint64InOffset(off Offset) uint64 {
 	return GetUint64(m.Bytes[off:])
+}
+
+func (m *Message) SetUint64InOffset(off Offset, v uint64) {
+	WriteUint64(m.Bytes[off:], v)
 }
 
 func (m *Message) GetUint64(fieldNum int) uint64 {
@@ -158,6 +201,15 @@ func (m *Message) GetUint64(fieldNum int) uint64 {
 	}
 	off := m.Offsets[fieldNum]
 	return m.GetUint64InOffset(off)
+}
+
+func (m *Message) SetUint64(fieldNum int, v uint64) error {
+	if !m.lazyCalcOffsets() || fieldNum >= len(m.Offsets) {
+		return &ErrInvalidField{}
+	}
+	off := m.Offsets[fieldNum]
+	m.SetUint64InOffset(off, v)
+	return nil
 }
 
 func (m *Message) GetMessageInOffset(off Offset) (buf []byte, size Offset) {
@@ -185,6 +237,17 @@ func (m *Message) GetBytesInOffset(off Offset) []byte {
 	return m.Bytes[off:off+contentSize]
 }
 
+func (m *Message) SetBytesInOffset(off Offset, v []byte) error {
+	contentSize := GetOffset(m.Bytes[off:])
+	if contentSize != Offset(len(v)) {
+		return &ErrSizeMismatch{}
+	}
+	off += FieldSizes[TypeBytes]
+	off = alignDynamicFieldContentOffset(off, TypeBytes)
+	copy(m.Bytes[off:], v)
+	return nil
+}
+
 func (m *Message) GetBytes(fieldNum int) []byte {
 	if !m.lazyCalcOffsets() || fieldNum >= len(m.Offsets) {
 		return []byte{}
@@ -193,14 +256,30 @@ func (m *Message) GetBytes(fieldNum int) []byte {
 	return m.GetBytesInOffset(off)
 }
 
+func (m *Message) SetBytes(fieldNum int, v []byte) error {
+	if !m.lazyCalcOffsets() || fieldNum >= len(m.Offsets) {
+		return &ErrInvalidField{}
+	}
+	off := m.Offsets[fieldNum]
+	return m.SetBytesInOffset(off, v)
+}
+
 func (m *Message) GetStringInOffset(off Offset) string {
 	b := m.GetBytesInOffset(off)
 	return byteSliceToString(b)
 }
 
+func (m *Message) SetStringInOffset(off Offset, v string) error {
+	return m.SetBytesInOffset(off, []byte(v))
+}
+
 func (m *Message) GetString(fieldNum int) string {
 	b := m.GetBytes(fieldNum)
 	return byteSliceToString(b)
+}
+
+func (m *Message) SetString(fieldNum int, v string) error {
+	return m.SetBytes(fieldNum, []byte(v))
 }
 
 func (m *Message) IsUnionIndex(fieldNum int, unionNum int, unionIndex uint16) (bool, Offset) {
@@ -357,3 +436,9 @@ func (m *Message) GetStringArrayIterator(fieldNum int) *Iterator {
 	off := m.Offsets[fieldNum]
 	return m.GetMessageArrayIteratorInOffset(off)
 }
+
+type ErrInvalidField struct {}
+func (e *ErrInvalidField) Error() string { return "invalid field" }
+
+type ErrSizeMismatch struct {}
+func (e *ErrSizeMismatch) Error() string { return "size mismatch" }
