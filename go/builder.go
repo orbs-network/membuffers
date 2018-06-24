@@ -1,28 +1,29 @@
 package membuffers
 
-type MessageWriter interface {
+type MessageBuilder interface {
 	Write(buf []byte)
 	GetSize() Offset
+	CalcRequiredSize() Offset
 }
 
-type Writer struct {
+type Builder struct {
 	Size Offset
 }
 
-func (w *Writer) Reset() {
+func (w *Builder) Reset() {
 	w.Size = 0
 }
 
-func (w *Writer) Write(buf []byte) {
+func (w *Builder) Write(buf []byte) {
 	// override me
 	w.Reset()
 }
 
-func (w *Writer) GetSize() Offset {
+func (w *Builder) GetSize() Offset {
 	return w.Size
 }
 
-func (w *Writer) WriteUint8(buf []byte, v uint8) {
+func (w *Builder) WriteUint8(buf []byte, v uint8) {
 	w.Size = alignOffsetToType(w.Size, TypeUint8)
 	if buf != nil {
 		WriteUint8(buf[w.Size:], v)
@@ -30,7 +31,7 @@ func (w *Writer) WriteUint8(buf []byte, v uint8) {
 	w.Size += FieldSizes[TypeUint8]
 }
 
-func (w *Writer) WriteUint16(buf []byte, v uint16) {
+func (w *Builder) WriteUint16(buf []byte, v uint16) {
 	w.Size = alignOffsetToType(w.Size, TypeUint16)
 	if buf != nil {
 		WriteUint16(buf[w.Size:], v)
@@ -38,7 +39,7 @@ func (w *Writer) WriteUint16(buf []byte, v uint16) {
 	w.Size += FieldSizes[TypeUint16]
 }
 
-func (w *Writer) WriteUint32(buf []byte, v uint32) {
+func (w *Builder) WriteUint32(buf []byte, v uint32) {
 	w.Size = alignOffsetToType(w.Size, TypeUint32)
 	if buf != nil {
 		WriteUint32(buf[w.Size:], v)
@@ -46,7 +47,7 @@ func (w *Writer) WriteUint32(buf []byte, v uint32) {
 	w.Size += FieldSizes[TypeUint32]
 }
 
-func (w *Writer) WriteUint64(buf []byte, v uint64) {
+func (w *Builder) WriteUint64(buf []byte, v uint64) {
 	w.Size = alignOffsetToType(w.Size, TypeUint64)
 	if buf != nil {
 		WriteUint64(buf[w.Size:], v)
@@ -54,7 +55,7 @@ func (w *Writer) WriteUint64(buf []byte, v uint64) {
 	w.Size += FieldSizes[TypeUint64]
 }
 
-func (w *Writer) WriteBytes(buf []byte, v []byte) {
+func (w *Builder) WriteBytes(buf []byte, v []byte) {
 	w.Size = alignOffsetToType(w.Size, TypeBytes)
 	if buf != nil {
 		WriteOffset(buf[w.Size:], Offset(len(v)))
@@ -67,11 +68,11 @@ func (w *Writer) WriteBytes(buf []byte, v []byte) {
 	w.Size += Offset(len(v))
 }
 
-func (w *Writer) WriteString(buf []byte, v string) {
+func (w *Builder) WriteString(buf []byte, v string) {
 	w.WriteBytes(buf, []byte(v))
 }
 
-func (w *Writer) WriteUnionIndex(buf []byte, unionIndex uint16) {
+func (w *Builder) WriteUnionIndex(buf []byte, unionIndex uint16) {
 	w.Size = alignOffsetToType(w.Size, TypeUnion)
 	if buf != nil {
 		WriteUnionType(buf[w.Size:], unionIndex)
@@ -79,7 +80,7 @@ func (w *Writer) WriteUnionIndex(buf []byte, unionIndex uint16) {
 	w.Size += FieldSizes[TypeUnion]
 }
 
-func (w *Writer) WriteUint8Array(buf []byte, v []uint8) {
+func (w *Builder) WriteUint8Array(buf []byte, v []uint8) {
 	w.Size = alignOffsetToType(w.Size, TypeUint8Array)
 	if buf != nil {
 		WriteOffset(buf[w.Size:], Offset(len(v)) * FieldSizes[TypeUint8])
@@ -91,7 +92,7 @@ func (w *Writer) WriteUint8Array(buf []byte, v []uint8) {
 	}
 }
 
-func (w *Writer) WriteUint16Array(buf []byte, v []uint16) {
+func (w *Builder) WriteUint16Array(buf []byte, v []uint16) {
 	w.Size = alignOffsetToType(w.Size, TypeUint16Array)
 	if buf != nil {
 		WriteOffset(buf[w.Size:], Offset(len(v)) * FieldSizes[TypeUint16])
@@ -103,7 +104,7 @@ func (w *Writer) WriteUint16Array(buf []byte, v []uint16) {
 	}
 }
 
-func (w *Writer) WriteUint32Array(buf []byte, v []uint32) {
+func (w *Builder) WriteUint32Array(buf []byte, v []uint32) {
 	w.Size = alignOffsetToType(w.Size, TypeUint32Array)
 	if buf != nil {
 		WriteOffset(buf[w.Size:], Offset(len(v)) * FieldSizes[TypeUint32])
@@ -115,7 +116,7 @@ func (w *Writer) WriteUint32Array(buf []byte, v []uint32) {
 	}
 }
 
-func (w *Writer) WriteUint64Array(buf []byte, v []uint64) {
+func (w *Builder) WriteUint64Array(buf []byte, v []uint64) {
 	w.Size = alignOffsetToType(w.Size, TypeUint64Array)
 	if buf != nil {
 		WriteOffset(buf[w.Size:], Offset(len(v)) * FieldSizes[TypeUint64])
@@ -127,7 +128,7 @@ func (w *Writer) WriteUint64Array(buf []byte, v []uint64) {
 	}
 }
 
-func (w *Writer) WriteBytesArray(buf []byte, v [][]byte) {
+func (w *Builder) WriteBytesArray(buf []byte, v [][]byte) {
 	w.Size = alignOffsetToType(w.Size, TypeBytesArray)
 	sizePlaceholderOffset := w.Size
 	w.Size += FieldSizes[TypeBytesArray]
@@ -142,7 +143,7 @@ func (w *Writer) WriteBytesArray(buf []byte, v [][]byte) {
 	}
 }
 
-func (w *Writer) WriteStringArray(buf []byte, v []string) {
+func (w *Builder) WriteStringArray(buf []byte, v []string) {
 	w.Size = alignOffsetToType(w.Size, TypeStringArray)
 	sizePlaceholderOffset := w.Size
 	w.Size += FieldSizes[TypeStringArray]
@@ -157,7 +158,7 @@ func (w *Writer) WriteStringArray(buf []byte, v []string) {
 	}
 }
 
-func (w *Writer) WriteMessage(buf []byte, v MessageWriter) {
+func (w *Builder) WriteMessage(buf []byte, v MessageBuilder) {
 	w.Size = alignOffsetToType(w.Size, TypeMessage)
 	sizePlaceholderOffset := w.Size
 	w.Size += FieldSizes[TypeMessage]
@@ -174,7 +175,7 @@ func (w *Writer) WriteMessage(buf []byte, v MessageWriter) {
 	}
 }
 
-func (w *Writer) WriteMessageArray(buf []byte, v []MessageWriter) {
+func (w *Builder) WriteMessageArray(buf []byte, v []MessageBuilder) {
 	w.Size = alignOffsetToType(w.Size, TypeMessageArray)
 	sizePlaceholderOffset := w.Size
 	w.Size += FieldSizes[TypeMessageArray]

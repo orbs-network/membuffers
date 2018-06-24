@@ -12,75 +12,80 @@ message Method {
 // reader
 
 type Method struct {
-	_Message membuffers.Message
+	message membuffers.Message
 }
 
 var m_Method_Scheme = []membuffers.FieldType{membuffers.TypeString,membuffers.TypeMessageArray}
 var m_Method_Unions = [][]membuffers.FieldType{{}}
 
-func ReadMethod(buf []byte) *Method {
+func MethodReader(buf []byte) *Method {
 	x := &Method{}
-	x._Message.Init(buf, membuffers.Offset(len(buf)), m_Method_Scheme, m_Method_Unions)
+	x.message.Init(buf, membuffers.Offset(len(buf)), m_Method_Scheme, m_Method_Unions)
 	return x
 }
 
-func (x *Method) _RawBuffer() []byte {
-	return x._Message.RawBuffer()
+func (x *Method) Raw() []byte {
+	return x.message.RawBuffer()
 }
 
 func (x *Method) Name() string {
-	return x._Message.GetString(0)
+	return x.message.GetString(0)
 }
 
-func (x *Method) _RawBuffer_Name() []byte {
-	return x._Message.RawBufferForField(0, 0)
+func (x *Method) RawName() []byte {
+	return x.message.RawBufferForField(0, 0)
 }
 
-func (x *Method) ArgIterator() *Method_ArgIterator {
-	return &Method_ArgIterator{_Iterator: x._Message.GetMessageArrayIterator(1)}
+func (x *Method) ArgIterator() *MethodArgIterator {
+	return &MethodArgIterator{iterator: x.message.GetMessageArrayIterator(1)}
 }
 
-type Method_ArgIterator struct {
-	_Iterator *membuffers.Iterator
+type MethodArgIterator struct {
+	iterator *membuffers.Iterator
 }
 
-func (i *Method_ArgIterator) HasNext() bool {
-	return i._Iterator.HasNext()
+func (i *MethodArgIterator) HasNext() bool {
+	return i.iterator.HasNext()
 }
 
-func (i *Method_ArgIterator) NextArg() *MethodCallArgument {
-	b, s := i._Iterator.NextMessage()
-	return ReadMethodCallArgument(b[:s])
+func (i *MethodArgIterator) NextArg() *MethodCallArgument {
+	b, s := i.iterator.NextMessage()
+	return MethodCallArgumentReader(b[:s])
 }
 
-func (x *Method) _RawBuffer_ArgArray() []byte {
-	return x._Message.RawBufferForField(1, 0)
+func (x *Method) RawArgArray() []byte {
+	return x.message.RawBufferForField(1, 0)
 }
 
-// writer
+// builder
 
-type MethodWriter struct {
-	_Writer membuffers.Writer
-	Name string
-	Arg []*MethodCallArgumentWriter
+type MethodBuilder struct {
+	builder membuffers.Builder
+	Name    string
+	Arg     []*MethodCallArgumentBuilder
 }
 
-func (w *MethodWriter) arg() []membuffers.MessageWriter {
-	res := make([]membuffers.MessageWriter, len(w.Arg))
+func (w *MethodBuilder) arg() []membuffers.MessageBuilder {
+	res := make([]membuffers.MessageBuilder, len(w.Arg))
 	for i, v := range w.Arg {
 		res[i] = v
 	}
 	return res
 }
 
-func (w *MethodWriter) Write(buf []byte) {
-	w._Writer.Reset()
-	w._Writer.WriteString(buf, w.Name)
-	w._Writer.WriteMessageArray(buf, w.arg())
+func (w *MethodBuilder) Write(buf []byte) {
+	w.builder.Reset()
+	w.builder.WriteString(buf, w.Name)
+	w.builder.WriteMessageArray(buf, w.arg())
 }
 
-func (w *MethodWriter) GetSize() membuffers.Offset {
-	return w._Writer.GetSize()
+func (w *MethodBuilder) GetSize() membuffers.Offset {
+	return w.builder.GetSize()
+}
+
+func (w *MethodBuilder) CalcRequiredSize() membuffers.Offset {
+	w.Write(nil)
+	return w.builder.GetSize()
 }
 
 /*
@@ -96,91 +101,96 @@ message MethodCallArgument {
 // reader
 
 type MethodCallArgument struct {
-	_Message membuffers.Message
+	message membuffers.Message
 }
 
 var m_MethodCallArgument_Scheme = []membuffers.FieldType{membuffers.TypeUnion}
 var m_MethodCallArgument_Unions = [][]membuffers.FieldType{{membuffers.TypeUint32,membuffers.TypeString,membuffers.TypeBytes}}
 
-func ReadMethodCallArgument(buf []byte) *MethodCallArgument {
+func MethodCallArgumentReader(buf []byte) *MethodCallArgument {
 	x := &MethodCallArgument{}
-	x._Message.Init(buf, membuffers.Offset(len(buf)), m_MethodCallArgument_Scheme, m_MethodCallArgument_Unions)
+	x.message.Init(buf, membuffers.Offset(len(buf)), m_MethodCallArgument_Scheme, m_MethodCallArgument_Unions)
 	return x
 }
 
-func (x *MethodCallArgument) _RawBuffer() []byte {
-	return x._Message.RawBuffer()
+func (x *MethodCallArgument) Raw() []byte {
+	return x.message.RawBuffer()
 }
 
-type MethodCallArgument_Type uint16
+type MethodCallArgumentType uint16
 
 const (
-	MethodCallArgument_Type_Num MethodCallArgument_Type = 0
-	MethodCallArgument_Type_Str MethodCallArgument_Type = 1
-	MethodCallArgument_Type_Data MethodCallArgument_Type = 2
+	MethodCallArgumentTypeNum  MethodCallArgumentType = 0
+	MethodCallArgumentTypeStr  MethodCallArgumentType = 1
+	MethodCallArgumentTypeData MethodCallArgumentType = 2
 )
 
-func (x *MethodCallArgument) Type() MethodCallArgument_Type {
-	return MethodCallArgument_Type(x._Message.GetUint16(0))
+func (x *MethodCallArgument) Type() MethodCallArgumentType {
+	return MethodCallArgumentType(x.message.GetUint16(0))
 }
 
-func (x *MethodCallArgument) IsType_Num() bool {
-	is, _ := x._Message.IsUnionIndex(0, 0, 0)
+func (x *MethodCallArgument) IsTypeNum() bool {
+	is, _ := x.message.IsUnionIndex(0, 0, 0)
 	return is
 }
 
-func (x *MethodCallArgument) Type_Num() uint32 {
-	_, off := x._Message.IsUnionIndex(0, 0, 0)
-	return x._Message.GetUint32InOffset(off)
+func (x *MethodCallArgument) TypeNum() uint32 {
+	_, off := x.message.IsUnionIndex(0, 0, 0)
+	return x.message.GetUint32InOffset(off)
 }
 
-func (x *MethodCallArgument) IsType_Str() bool {
-	is, _ := x._Message.IsUnionIndex(0, 0, 1)
+func (x *MethodCallArgument) IsTypeStr() bool {
+	is, _ := x.message.IsUnionIndex(0, 0, 1)
 	return is
 }
 
-func (x *MethodCallArgument) Type_Str() string {
-	_, off := x._Message.IsUnionIndex(0, 0, 1)
-	return x._Message.GetStringInOffset(off)
+func (x *MethodCallArgument) TypeStr() string {
+	_, off := x.message.IsUnionIndex(0, 0, 1)
+	return x.message.GetStringInOffset(off)
 }
 
-func (x *MethodCallArgument) IsType_Data() bool {
-	is, _ := x._Message.IsUnionIndex(0, 0, 2)
+func (x *MethodCallArgument) IsTypeData() bool {
+	is, _ := x.message.IsUnionIndex(0, 0, 2)
 	return is
 }
 
-func (x *MethodCallArgument) Type_Data() []byte {
-	_, off := x._Message.IsUnionIndex(0, 0, 2)
-	return x._Message.GetBytesInOffset(off)
+func (x *MethodCallArgument) TypeData() []byte {
+	_, off := x.message.IsUnionIndex(0, 0, 2)
+	return x.message.GetBytesInOffset(off)
 }
 
-func (x *MethodCallArgument) _RawBuffer_Type() []byte {
-	return x._Message.RawBufferForField(0, 0)
+func (x *MethodCallArgument) RawType() []byte {
+	return x.message.RawBufferForField(0, 0)
 }
 
-// writer
+// builder
 
-type MethodCallArgumentWriter struct {
-	_Writer membuffers.Writer
-	Num uint32
-	Str string
-	Data []byte
-	Type MethodCallArgument_Type
+type MethodCallArgumentBuilder struct {
+	builder membuffers.Builder
+	Num     uint32
+	Str     string
+	Data    []byte
+	Type    MethodCallArgumentType
 }
 
-func (w *MethodCallArgumentWriter) Write(buf []byte) {
-	w._Writer.Reset()
-	w._Writer.WriteUnionIndex(buf, uint16(w.Type))
+func (w *MethodCallArgumentBuilder) Write(buf []byte) {
+	w.builder.Reset()
+	w.builder.WriteUnionIndex(buf, uint16(w.Type))
 	switch w.Type {
-	case MethodCallArgument_Type_Num:
-		w._Writer.WriteUint32(buf, w.Num)
-	case MethodCallArgument_Type_Str:
-		w._Writer.WriteString(buf, w.Str)
-	case MethodCallArgument_Type_Data:
-		w._Writer.WriteBytes(buf, w.Data)
+	case MethodCallArgumentTypeNum:
+		w.builder.WriteUint32(buf, w.Num)
+	case MethodCallArgumentTypeStr:
+		w.builder.WriteString(buf, w.Str)
+	case MethodCallArgumentTypeData:
+		w.builder.WriteBytes(buf, w.Data)
 	}
 }
 
-func (w *MethodCallArgumentWriter) GetSize() membuffers.Offset {
-	return w._Writer.GetSize()
+func (w *MethodCallArgumentBuilder) GetSize() membuffers.Offset {
+	return w.builder.GetSize()
+}
+
+func (w *MethodCallArgumentBuilder) CalcRequiredSize() membuffers.Offset {
+	w.Write(nil)
+	return w.builder.GetSize()
 }

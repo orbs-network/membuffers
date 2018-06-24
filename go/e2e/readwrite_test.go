@@ -5,17 +5,18 @@ import (
 	"bytes"
 )
 
-func createNewTransaction() *TransactionWriter {
-	newTransaction := &TransactionWriter{
-		Data: &TransactionDataWriter{
+func TestReadWriteTransaction(t *testing.T) {
+	// write
+	builder := &TransactionBuilder{
+		Data: &TransactionDataBuilder{
 			ProtocolVersion: 0x01,
 			VirtualChain: 0x11223344,
-			Sender: []*TransactionSenderWriter{
-				&TransactionSenderWriter{
+			Sender: []*TransactionSenderBuilder{
+				&TransactionSenderBuilder{
 					Name: "johnny",
 					Friend: []string{"billy","jeff","alex"},
 				},
-				&TransactionSenderWriter{
+				&TransactionSenderBuilder{
 					Name: "rachel",
 					Friend: []string{"jessica","sara"},
 				},
@@ -24,17 +25,11 @@ func createNewTransaction() *TransactionWriter {
 		},
 		Signature: []byte{0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,},
 	}
-	return newTransaction
-}
+	buf := make([]byte, builder.CalcRequiredSize())
+	builder.Write(buf)
 
-func TestWriteTransaction(t *testing.T) {
-	// write
-	newTransaction := createNewTransaction()
-	newTransaction.Write(nil)
-	buf := make([]byte, newTransaction.GetSize())
-	newTransaction.Write(buf)
 	// read
-	transaction := ReadTransaction(buf)
+	transaction := TransactionReader(buf)
 	if transaction.Data().ProtocolVersion() != 0x01 {
 		t.Fatalf("ProtocolVersion: instead of expected got %v", transaction.Data().ProtocolVersion())
 	}
@@ -81,63 +76,58 @@ func TestWriteTransaction(t *testing.T) {
 	}
 }
 
-func createNewMethod() *MethodWriter {
-	newMethod := &MethodWriter{
+func TestReadWriteMethod(t *testing.T) {
+	// write
+	builder := &MethodBuilder{
 		Name: "MyMethod",
-		Arg: []*MethodCallArgumentWriter{
-			&MethodCallArgumentWriter{
-				Type: MethodCallArgument_Type_Num,
-				Num: 0x17,
+		Arg: []*MethodCallArgumentBuilder{
+			&MethodCallArgumentBuilder{
+				Type: MethodCallArgumentTypeNum,
+				Num:  0x17,
 			},
-			&MethodCallArgumentWriter{
-				Type: MethodCallArgument_Type_Str,
-				Str: "flower",
+			&MethodCallArgumentBuilder{
+				Type: MethodCallArgumentTypeStr,
+				Str:  "flower",
 			},
-			&MethodCallArgumentWriter{
-				Type: MethodCallArgument_Type_Data,
+			&MethodCallArgumentBuilder{
+				Type: MethodCallArgumentTypeData,
 				Data: []byte{0x01,0x02,0x03},
 			},
 		},
 	}
-	return newMethod
-}
+	buf := make([]byte, builder.CalcRequiredSize())
+	builder.Write(buf)
 
-func TestWriteMethod(t *testing.T) {
-	// write
-	newMethod := createNewMethod()
-	newMethod.Write(nil)
-	buf := make([]byte, newMethod.GetSize())
-	newMethod.Write(buf)
 	// read
-	method := ReadMethod(buf)
+	method := MethodReader(buf)
 	if method.Name() != "MyMethod" {
 		t.Fatalf("Name: instead of expected got %v", method.Name())
 	}
 	i := method.ArgIterator()
 	arg0 := i.NextArg()
-	if !arg0.IsType_Num() {
+	if !arg0.IsTypeNum() {
 		t.Fatalf("Arg0: is type is not num")
 	}
-	if arg0.IsType_Str() {
+	if arg0.IsTypeStr() {
 		t.Fatalf("Arg0: is type is str")
 	}
-	if arg0.Type() != MethodCallArgument_Type_Num {
+	if arg0.Type() != MethodCallArgumentTypeNum {
 		t.Fatalf("Arg0: type is not num")
 	}
-	if arg0.Type_Num() != 0x17 {
-		t.Fatalf("Arg0.Num: instead of expected got %v", arg0.Type_Num())
+	if arg0.TypeNum() != 0x17 {
+		t.Fatalf("Arg0.Num: instead of expected got %v", arg0.TypeNum())
 	}
 	arg1 := i.NextArg()
-	if !arg1.IsType_Str() {
+	if !arg1.IsTypeStr() {
 		t.Fatalf("Arg1: is type is not str")
 	}
-	if arg1.IsType_Num() {
+	if arg1.IsTypeNum() {
 		t.Fatalf("Arg1: is type is num")
 	}
-	if arg1.Type() != MethodCallArgument_Type_Str {
+	if arg1.Type() != MethodCallArgumentTypeStr {
 		t.Fatalf("Arg1: type is not str")
 	}
-	if arg1.Type_Str() != "flower" {
-		t.Fatalf("Arg1.Str: instead of expected got %v", arg1.Type_Str())
+	if arg1.TypeStr() != "flower" {
+		t.Fatalf("Arg1.Str: instead of expected got %v", arg1.TypeStr())
 	}
 }
