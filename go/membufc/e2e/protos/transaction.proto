@@ -1,0 +1,19 @@
+syntax = "proto3";
+package types;
+
+message Transaction {
+    TransactionData data = 1;
+    bytes signature = 2;
+}
+
+message TransactionData {
+    uint32 protocol_version = 1;
+    uint64 virtual_chain = 2;
+    repeated TransactionSender sender = 3;
+    uint64 time_stamp = 4;
+}
+
+message TransactionSender {
+    string name = 1;
+    repeated string friend = 2;
+}
