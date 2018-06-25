@@ -19,7 +19,7 @@ func (x *{{.MessageName}}) Is{{$UnionName}}{{.FieldName}}() bool {
 
 func (x *{{.MessageName}}) {{$UnionName}}{{.FieldName}}() {{.FieldGoType}} {
 	_, off := x.message.IsUnionIndex({{$ParentFieldIndex}}, {{$UnionNum}}, {{.FieldIndex}})
-	return x.message.Get{{.TypeAccessor}}InOffset(off)
+	return {{if .IsEnum}}{{.FieldGoType}}({{end}}x.message.Get{{.TypeAccessor}}InOffset(off){{if .IsEnum}}){{end}}
 }
 
 {{ if not .IsMessage -}}
@@ -28,7 +28,7 @@ func (x *{{.MessageName}}) Mutate{{$UnionName}}{{.FieldName}}(v {{.FieldGoType}}
 	if !is {
 		return &membuffers.ErrInvalidField{}
 	}
-	x.message.Set{{.TypeAccessor}}InOffset(off, v)
+	x.message.Set{{.TypeAccessor}}InOffset(off, {{if .IsEnum}}uint16({{end}}v){{if .IsEnum}}){{end}}
 	return nil
 }
 {{- end}}{{end}}

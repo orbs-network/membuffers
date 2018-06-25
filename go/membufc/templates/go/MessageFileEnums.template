@@ -1,0 +1,13 @@
+/////////////////////////////////////////////////////////////////////////////
+// enums
+
+{{range .Enums}}{{$EnumName := .Name -}}
+type {{.Name}} uint16
+
+const (
+{{- range .Values}}
+	{{$EnumName}}_{{.Name}} {{$EnumName}} = {{.Value -}}
+{{end}}
+)
+
+{{end}}

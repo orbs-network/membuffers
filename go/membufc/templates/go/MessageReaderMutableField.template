@@ -1,5 +1,5 @@
 func (x *{{.MessageName}}) {{.MessageField.FieldName}}() {{.MessageField.FieldGoType}} {
-	return x.message.Get{{.MessageField.TypeAccessor}}({{.MessageField.FieldIndex}})
+	return {{if .MessageField.IsEnum}}{{.MessageField.FieldGoType}}({{end}}x.message.Get{{.MessageField.TypeAccessor}}({{.MessageField.FieldIndex}}){{if .MessageField.IsEnum}}){{end}}
 }
 
 func (x *{{.MessageName}}) Raw{{.MessageField.FieldName}}() []byte {
@@ -7,6 +7,6 @@ func (x *{{.MessageName}}) Raw{{.MessageField.FieldName}}() []byte {
 }
 
 func (x *{{.MessageName}}) Mutate{{.MessageField.FieldName}}(v {{.MessageField.FieldGoType}}) error {
-	return x.message.Set{{.MessageField.TypeAccessor}}({{.MessageField.FieldIndex}}, v)
+	return x.message.Set{{.MessageField.TypeAccessor}}({{.MessageField.FieldIndex}}, {{if .MessageField.IsEnum}}uint16({{end}}v){{if .MessageField.IsEnum}}){{end}}
 }
 

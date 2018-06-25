@@ -25,6 +25,7 @@ func TestReadWriteTransaction(t *testing.T) {
 			TimeStamp: 0x445566778899,
 		},
 		Signature: []byte{0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,},
+		Type: types.NetworkType_RESERVED,
 	}
 	buf := make([]byte, builder.CalcRequiredSize())
 	err := builder.Write(buf)
@@ -45,6 +46,9 @@ func TestReadWriteTransaction(t *testing.T) {
 	}
 	if !bytes.Equal(transaction.Signature(), []byte{0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,}) {
 		t.Fatalf("Signature: instead of expected got %v", transaction.Signature())
+	}
+	if transaction.Type() != types.NetworkType_RESERVED {
+		t.Fatalf("Type: instead of expected got %v", transaction.Type())
 	}
 	senderCount := 0
 	for i := transaction.Data().SenderIterator(); i.HasNext(); {

@@ -11,7 +11,7 @@ func (i *{{.MessageName}}{{.MessageField.FieldName}}Iterator) HasNext() bool {
 }
 
 func (i *{{.MessageName}}{{.MessageField.FieldName}}Iterator) Next{{.MessageField.FieldName}}() {{.MessageField.FieldGoType}} {
-	return i.iterator.Next{{.MessageField.TypeAccessor}}()
+	return {{if .MessageField.IsEnum}}{{.MessageField.FieldGoType}}({{end}}i.iterator.Next{{.MessageField.TypeAccessor}}(){{if .MessageField.IsEnum}}){{end}}
 }
 
 func (x *{{.MessageName}}) Raw{{.MessageField.FieldName}}Array() []byte {

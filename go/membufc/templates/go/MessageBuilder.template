@@ -42,7 +42,7 @@ func (w *{{.MessageName}}Builder) Write(buf []byte) (err error) {
 		return
 	}
 	{{- else}}
-	w.builder.Write{{.TypeAccessor}}{{if .IsArray}}Array{{end}}(buf, w.{{.FieldName}}){{end}}{{end}}
+	w.builder.Write{{.TypeAccessor}}{{if .IsArray}}Array{{end}}(buf, {{if .IsEnum}}uint16({{end}}w.{{.FieldName}}){{if .IsEnum}}){{end}}{{end}}{{end}}
 	return nil
 }
 

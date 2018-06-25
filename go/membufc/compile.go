@@ -14,8 +14,9 @@ func convertFieldNameToGoCase(fieldName string) string {
 func compileProtoFile(w io.Writer, file pbparser.ProtoFile) {
 	addHeader(w, file.PackageName)
 	for _, m := range file.Messages {
-		addMessage(w, m)
+		addMessage(w, m, file)
 	}
+	addEnums(w, file.Enums)
 }
 
 func normalizeFieldsAndOneOfs(m *pbparser.MessageElement) {
@@ -54,74 +55,55 @@ func addHeader(w io.Writer, packageName string) {
 	})
 }
 
-func addMessage(w io.Writer, m pbparser.MessageElement) {
+func addEnums(w io.Writer, enums []pbparser.EnumElement) {
+	if len(enums) == 0 {
+		return
+	}
+	messageEnums, _ := getFileEnums(enums)
+	t := template.Must(template.ParseFiles("templates/go/MessageFileEnums.template"))
+	t.Execute(w, struct {
+		Enums []Enum
+	}{
+		Enums: messageEnums,
+	})
+}
+
+func addMessage(w io.Writer, m pbparser.MessageElement, file pbparser.ProtoFile) {
 	normalizeFieldsAndOneOfs(&m)
+	_, enumNameToIndex := getFileEnums(file.Enums)
 	t := template.Must(template.ParseFiles("templates/go/MessageHeader.template"))
 	t.Execute(w, struct {
 		MessageName string
 	}{
 		MessageName: m.Name,
 	})
-	addMessageScheme(w, m.Name, m.Fields, m.OneOfs)
-	addMessageUnions(w, m.Name, m.Fields, m.OneOfs)
-	addMessageReaderHeader(w, m.Name, m.Fields, m.OneOfs)
+	addMessageScheme(w, m.Name, m.Fields, m.OneOfs, enumNameToIndex)
+	addMessageUnions(w, m.Name, m.Fields, m.OneOfs, enumNameToIndex)
+	addMessageReaderHeader(w, m.Name, m.Fields, m.OneOfs, enumNameToIndex)
 	for _, field := range m.Fields {
-		addMessageReaderField(w, m.Name, field, m.OneOfs)
+		addMessageReaderField(w, m.Name, field, m.OneOfs, enumNameToIndex)
 	}
-	addMessageBuilder(w, m.Name, m.Fields, m.OneOfs)
+	addMessageBuilder(w, m.Name, m.Fields, m.OneOfs, enumNameToIndex)
 }
 
-func addMessageScheme(w io.Writer, messageName string, fields []pbparser.FieldElement, unions []pbparser.OneOfElement) {
-	fieldTypes := []string{}
+func addMessageScheme(w io.Writer, messageName string, fields []pbparser.FieldElement, unions []pbparser.OneOfElement, enumNameToIndex map[string]int) {
+	messageFields := []MessageField{}
 	for _, field := range fields {
-		if field.Label == "oneof" {
-			fieldTypes = append(fieldTypes, "TypeUnion")
-		}
-		if field.Label == "" || field.Label == "optional" || field.Label == "required" {
-			if field.Type.Category() == pbparser.ScalarDataTypeCategory {
-				types := map[string]string{
-					"bytes": "TypeBytes",
-					"string": "TypeString",
-					"uint8": "TypeUint8",
-					"uint16": "TypeUint16",
-					"uint32": "TypeUint32",
-					"uint64": "TypeUint64",
-				}
-				fieldTypes = append(fieldTypes, types[field.Type.Name()])
-			}
-			if field.Type.Category() == pbparser.NamedDataTypeCategory {
-				fieldTypes = append(fieldTypes, "TypeMessage")
-			}
-		}
-		if field.Label == "repeated" {
-			if field.Type.Category() == pbparser.ScalarDataTypeCategory {
-				types := map[string]string{
-					"bytes": "TypeBytesArray",
-					"string": "TypeStringArray",
-					"uint8": "TypeUint8Array",
-					"uint16": "TypeUint16Array",
-					"uint32": "TypeUint32Array",
-					"uint64": "TypeUint64Array",
-				}
-				fieldTypes = append(fieldTypes, types[field.Type.Name()])
-			}
-			if field.Type.Category() == pbparser.NamedDataTypeCategory {
-				fieldTypes = append(fieldTypes, "TypeMessageArray")
-			}
-		}
+		messageField := getMessageField(messageName, field, enumNameToIndex)
+		messageFields = append(messageFields, messageField)
 	}
 	t := template.Must(template.ParseFiles("templates/go/MessageScheme.template"))
 	t.Execute(w, struct {
 		MessageName string
-		FieldTypes []string
+		MessageFields []MessageField
 	}{
 		MessageName: messageName,
-		FieldTypes:  fieldTypes,
+		MessageFields: messageFields,
 	})
 }
 
-func addMessageUnions(w io.Writer, messageName string, fields []pbparser.FieldElement, unions []pbparser.OneOfElement) {
-	unionByIndex, _ := getMessageUnions(messageName, unions)
+func addMessageUnions(w io.Writer, messageName string, fields []pbparser.FieldElement, unions []pbparser.OneOfElement, enumNameToIndex map[string]int) {
+	unionByIndex, _ := getMessageUnions(messageName, unions, enumNameToIndex)
 	t := template.Must(template.ParseFiles("templates/go/MessageUnions.template"))
 	t.Execute(w, struct {
 		MessageName string
@@ -132,7 +114,7 @@ func addMessageUnions(w io.Writer, messageName string, fields []pbparser.FieldEl
 	})
 }
 
-func addMessageReaderHeader(w io.Writer, messageName string, fields []pbparser.FieldElement, unions []pbparser.OneOfElement) {
+func addMessageReaderHeader(w io.Writer, messageName string, fields []pbparser.FieldElement, unions []pbparser.OneOfElement, enumNameToIndex map[string]int) {
 	t := template.Must(template.ParseFiles("templates/go/MessageReaderHeader.template"))
 	t.Execute(w, struct {
 		MessageName string
@@ -141,10 +123,10 @@ func addMessageReaderHeader(w io.Writer, messageName string, fields []pbparser.F
 	})
 }
 
-func addMessageReaderField(w io.Writer, messageName string, field pbparser.FieldElement, unions []pbparser.OneOfElement) {
-	messageField := getMessageField(messageName, field)
+func addMessageReaderField(w io.Writer, messageName string, field pbparser.FieldElement, unions []pbparser.OneOfElement, enumNameToIndex map[string]int) {
+	messageField := getMessageField(messageName, field, enumNameToIndex)
 	if messageField.IsUnion {
-		unionByIndex, unionNameToIndex := getMessageUnions(messageName, unions)
+		unionByIndex, unionNameToIndex := getMessageUnions(messageName, unions, enumNameToIndex)
 		t := template.Must(template.ParseFiles("templates/go/MessageReaderUnionField.template"))
 		t.Execute(w, struct {
 			MessageName string
@@ -207,11 +189,12 @@ func addMessageReaderField(w io.Writer, messageName string, field pbparser.Field
 	}
 }
 
-func addMessageBuilder(w io.Writer, messageName string, fields []pbparser.FieldElement, unions []pbparser.OneOfElement) {
+func addMessageBuilder(w io.Writer, messageName string, fields []pbparser.FieldElement, unions []pbparser.OneOfElement, enumNameToIndex map[string]int) {
 	messageFields := []MessageField{}
-	unionByIndex, unionNameToIndex := getMessageUnions(messageName, unions)
+	unionByIndex, unionNameToIndex := getMessageUnions(messageName, unions, enumNameToIndex)
 	for _, field := range fields {
-		messageFields = append(messageFields, getMessageField(messageName, field))
+		messageField := getMessageField(messageName, field, enumNameToIndex)
+		messageFields = append(messageFields, messageField)
 	}
 	t := template.Must(template.ParseFiles("templates/go/MessageBuilder.template"))
 	t.Execute(w, struct {
@@ -227,13 +210,13 @@ func addMessageBuilder(w io.Writer, messageName string, fields []pbparser.FieldE
 	})
 }
 
-func getMessageUnions(messageName string, unions []pbparser.OneOfElement) ([][]MessageField, map[string]int) {
+func getMessageUnions(messageName string, unions []pbparser.OneOfElement, enumNameToIndex map[string]int) ([][]MessageField, map[string]int) {
 	unionByIndex := [][]MessageField{}
 	unionNameToIndex := make(map[string]int)
 	for _, oneOf := range unions {
 		messageFields := []MessageField{}
 		for _, field := range oneOf.Fields {
-			messageFields = append(messageFields, getMessageField(messageName, field))
+			messageFields = append(messageFields, getMessageField(messageName, field, enumNameToIndex))
 		}
 		unionNameToIndex[oneOf.Name] = len(unionByIndex)
 		unionByIndex = append(unionByIndex, messageFields)
@@ -247,14 +230,22 @@ type MessageField struct{
 	IsMessage bool
 	IsArray bool
 	IsUnion bool
+	IsEnum bool
 	TypeAccessor string
 	FieldIndex int
 	MessageName string
 }
 
-func getMessageField(messageName string, field pbparser.FieldElement) MessageField {
+func getMessageField(messageName string, field pbparser.FieldElement, enumNameToIndex map[string]int) (messageField MessageField) {
+	defer func() {
+		if _, ok := enumNameToIndex[messageField.FieldGoType]; ok {
+			messageField.IsEnum = true
+			messageField.IsMessage = false
+			messageField.TypeAccessor = "Uint16"
+		}
+	}()
 	if field.Label == "oneof" {
-		return MessageField{
+		messageField = MessageField{
 			FieldName:    convertFieldNameToGoCase(field.Name),
 			FieldGoType:  messageName + convertFieldNameToGoCase(field.Name),
 			IsMessage:    false,
@@ -264,6 +255,7 @@ func getMessageField(messageName string, field pbparser.FieldElement) MessageFie
 			FieldIndex:   field.Tag,
 			MessageName:  messageName,
 		}
+		return
 	}
 	if field.Label == "" || field.Label == "optional" || field.Label == "required" {
 		if field.Type.Category() == pbparser.ScalarDataTypeCategory {
@@ -283,7 +275,7 @@ func getMessageField(messageName string, field pbparser.FieldElement) MessageFie
 				"uint32": "Uint32",
 				"uint64": "Uint64",
 			}
-			return MessageField{
+			messageField = MessageField{
 				FieldName:    convertFieldNameToGoCase(field.Name),
 				FieldGoType:  goTypes[field.Type.Name()],
 				IsMessage:    false,
@@ -293,9 +285,10 @@ func getMessageField(messageName string, field pbparser.FieldElement) MessageFie
 				FieldIndex:   field.Tag,
 				MessageName:  messageName,
 			}
+			return
 		}
 		if field.Type.Category() == pbparser.NamedDataTypeCategory {
-			return MessageField{
+			messageField = MessageField{
 				FieldName:    convertFieldNameToGoCase(field.Name),
 				FieldGoType:  field.Type.Name(),
 				IsMessage:    true,
@@ -305,6 +298,7 @@ func getMessageField(messageName string, field pbparser.FieldElement) MessageFie
 				FieldIndex:   field.Tag,
 				MessageName:  messageName,
 			}
+			return
 		}
 	}
 	if field.Label == "repeated" {
@@ -325,7 +319,7 @@ func getMessageField(messageName string, field pbparser.FieldElement) MessageFie
 				"uint32": "Uint32",
 				"uint64": "Uint64",
 			}
-			return MessageField{
+			messageField = MessageField{
 				FieldName:    convertFieldNameToGoCase(field.Name),
 				FieldGoType:  goTypes[field.Type.Name()],
 				IsMessage:    false,
@@ -335,9 +329,10 @@ func getMessageField(messageName string, field pbparser.FieldElement) MessageFie
 				FieldIndex:   field.Tag,
 				MessageName:  messageName,
 			}
+			return
 		}
 		if field.Type.Category() == pbparser.NamedDataTypeCategory {
-			return MessageField{
+			messageField = MessageField{
 				FieldName:    convertFieldNameToGoCase(field.Name),
 				FieldGoType:  field.Type.Name(),
 				IsMessage:    true,
@@ -347,7 +342,38 @@ func getMessageField(messageName string, field pbparser.FieldElement) MessageFie
 				FieldIndex:   field.Tag,
 				MessageName:  messageName,
 			}
+			return
 		}
 	}
 	return MessageField{}
+}
+
+func getFileEnums(enums []pbparser.EnumElement) ([]Enum, map[string]int) {
+	enumByIndex := []Enum{}
+	enumNameToIndex := make(map[string]int)
+	for _, enum := range enums {
+		enumNameToIndex[enum.Name] = len(enumByIndex)
+		values := []EnumValue{}
+		for _, value := range enum.EnumConstants {
+			values = append(values, EnumValue{
+				Name: value.Name,
+				Value: value.Tag,
+			})
+		}
+		enumByIndex = append(enumByIndex, Enum{
+			Name: enum.Name,
+			Values: values,
+		})
+	}
+	return enumByIndex, enumNameToIndex
+}
+
+type Enum struct{
+	Name string
+	Values []EnumValue
+}
+
+type EnumValue struct{
+	Name string
+	Value int
 }

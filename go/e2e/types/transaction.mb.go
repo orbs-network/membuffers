@@ -8,6 +8,7 @@ import (
 message Transaction {
 	TransactionData data = 1;
 	bytes signature = 2;
+	NetworkType type = 3;
 }
 */
 
@@ -17,7 +18,7 @@ type Transaction struct {
 	message membuffers.Message
 }
 
-var m_Transaction_Scheme = []membuffers.FieldType{membuffers.TypeMessage,membuffers.TypeBytes}
+var m_Transaction_Scheme = []membuffers.FieldType{membuffers.TypeMessage,membuffers.TypeBytes,membuffers.TypeUint16}
 var m_Transaction_Unions = [][]membuffers.FieldType{}
 
 func TransactionReader(buf []byte) *Transaction {
@@ -55,12 +56,25 @@ func (x *Transaction) MutateSignature(v []byte) error {
 	return x.message.SetBytes(1, v)
 }
 
+func (x *Transaction) Type() NetworkType {
+	return NetworkType(x.message.GetUint16(2))
+}
+
+func (x *Transaction) RawType() []byte {
+	return x.message.RawBufferForField(2, 0)
+}
+
+func (x *Transaction) MutateType(v NetworkType) error {
+	return x.message.SetUint16(2, uint16(v))
+}
+
 // builder
 
 type TransactionBuilder struct {
 	builder   membuffers.Builder
 	Data      *TransactionDataBuilder
 	Signature []byte
+	Type      NetworkType
 }
 
 func (w *TransactionBuilder) Write(buf []byte) (err error) {
@@ -78,6 +92,7 @@ func (w *TransactionBuilder) Write(buf []byte) (err error) {
 		return
 	}
 	w.builder.WriteBytes(buf, w.Signature)
+	w.builder.WriteUint16(buf, uint16(w.Type))
 	return nil
 }
 
@@ -337,3 +352,13 @@ func (w *TransactionSenderBuilder) CalcRequiredSize() membuffers.Offset {
 	w.Write(nil)
 	return w.builder.GetSize()
 }
+
+// enums
+
+type NetworkType uint16
+
+const (
+	NetworkType_MAIN_NET NetworkType = 0
+	NetworkType_TEST_NET NetworkType = 1
+	NetworkType_RESERVED NetworkType = 2
+)

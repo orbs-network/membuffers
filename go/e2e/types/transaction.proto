@@ -4,6 +4,7 @@ package types;
 message Transaction {
     TransactionData data = 1;
     bytes signature = 2;
+    NetworkType type = 3;
 }
 
 message TransactionData {
@@ -16,4 +17,10 @@ message TransactionData {
 message TransactionSender {
     string name = 1;
     repeated string friend = 2;
+}
+
+enum NetworkType {
+    MAIN_NET = 0;
+    TEST_NET = 1;
+    RESERVED = 2;
 }
