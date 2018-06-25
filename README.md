@@ -68,14 +68,14 @@ This standalone library was originally created as part of the [ORBS](https://www
 
     ```go
     transaction := types.TransactionReader(buf)
+    // validate format
+    if !transaction.IsValid() {
+      fmt.Println("serialized data is invalid")
+    }
     // check hash
     calculated := md5.Sum(transaction.RawData())
     if !bytes.Equal(calculated, transaction.Hash()) {
       fmt.Println("hash mismatch")
-    }
-    // validate format
-    if !transaction.IsValid() {
-      fmt.Println("serialized data is invalid")
     }
     // access fields
     ver := transaction.Data().ProtocolVersion()
