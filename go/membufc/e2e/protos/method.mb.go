@@ -1,13 +1,12 @@
+// AUTO GENERATED FILE (by membufc proto compiler)
 package types
 
-import "github.com/orbs-network/membuffers/go"
+import (
+	"github.com/orbs-network/membuffers/go"
+)
 
-/*
-message Method {
-	string name = 1;
-	repeated MethodCallArgument arg = 2;
-}
-*/
+/////////////////////////////////////////////////////////////////////////////
+// message Method
 
 // reader
 
@@ -15,7 +14,7 @@ type Method struct {
 	message membuffers.Message
 }
 
-var m_Method_Scheme = []membuffers.FieldType{membuffers.TypeString,membuffers.TypeMessageArray}
+var m_Method_Scheme = []membuffers.FieldType{membuffers.TypeString,membuffers.TypeMessageArray,}
 var m_Method_Unions = [][]membuffers.FieldType{}
 
 func MethodReader(buf []byte) *Method {
@@ -31,7 +30,6 @@ func (x *Method) IsValid() bool {
 func (x *Method) Raw() []byte {
 	return x.message.RawBuffer()
 }
-
 func (x *Method) Name() string {
 	return x.message.GetString(0)
 }
@@ -69,11 +67,11 @@ func (x *Method) RawArgArray() []byte {
 
 type MethodBuilder struct {
 	builder membuffers.Builder
-	Name    string
-	Arg     []*MethodCallArgumentBuilder
+	Name string
+	Arg []*MethodCallArgumentBuilder
 }
 
-func (w *MethodBuilder) arg() []membuffers.MessageBuilder {
+func (w *MethodBuilder) arrayOfArg() []membuffers.MessageBuilder {
 	res := make([]membuffers.MessageBuilder, len(w.Arg))
 	for i, v := range w.Arg {
 		res[i] = v
@@ -92,7 +90,7 @@ func (w *MethodBuilder) Write(buf []byte) (err error) {
 	}()
 	w.builder.Reset()
 	w.builder.WriteString(buf, w.Name)
-	err = w.builder.WriteMessageArray(buf, w.arg())
+	err = w.builder.WriteMessageArray(buf, w.arrayOfArg())
 	if err != nil {
 		return
 	}
@@ -114,15 +112,8 @@ func (w *MethodBuilder) CalcRequiredSize() membuffers.Offset {
 	return w.builder.GetSize()
 }
 
-/*
-message MethodCallArgument {
-	oneof type {
-		uint32 num = 1;
-		string str = 2;
-		bytes data = 3;
-	}
-}
-*/
+/////////////////////////////////////////////////////////////////////////////
+// message MethodCallArgument
 
 // reader
 
@@ -130,8 +121,8 @@ type MethodCallArgument struct {
 	message membuffers.Message
 }
 
-var m_MethodCallArgument_Scheme = []membuffers.FieldType{membuffers.TypeUnion}
-var m_MethodCallArgument_Unions = [][]membuffers.FieldType{{membuffers.TypeUint32,membuffers.TypeString,membuffers.TypeBytes}}
+var m_MethodCallArgument_Scheme = []membuffers.FieldType{membuffers.TypeUnion,}
+var m_MethodCallArgument_Unions = [][]membuffers.FieldType{{membuffers.TypeUint32,membuffers.TypeString,membuffers.TypeBytes,}}
 
 func MethodCallArgumentReader(buf []byte) *MethodCallArgument {
 	x := &MethodCallArgument{}
@@ -146,12 +137,11 @@ func (x *MethodCallArgument) IsValid() bool {
 func (x *MethodCallArgument) Raw() []byte {
 	return x.message.RawBuffer()
 }
-
 type MethodCallArgumentType uint16
 
 const (
-	MethodCallArgumentTypeNum  MethodCallArgumentType = 0
-	MethodCallArgumentTypeStr  MethodCallArgumentType = 1
+	MethodCallArgumentTypeNum MethodCallArgumentType = 0
+	MethodCallArgumentTypeStr MethodCallArgumentType = 1
 	MethodCallArgumentTypeData MethodCallArgumentType = 2
 )
 
@@ -193,7 +183,7 @@ func (x *MethodCallArgument) MutateTypeStr(v string) error {
 	if !is {
 		return &membuffers.ErrInvalidField{}
 	}
-	x.message.GetStringInOffset(off)
+	x.message.SetStringInOffset(off, v)
 	return nil
 }
 
@@ -212,7 +202,7 @@ func (x *MethodCallArgument) MutateTypeData(v []byte) error {
 	if !is {
 		return &membuffers.ErrInvalidField{}
 	}
-	x.message.GetBytesInOffset(off)
+	x.message.SetBytesInOffset(off, v)
 	return nil
 }
 
@@ -224,10 +214,10 @@ func (x *MethodCallArgument) RawType() []byte {
 
 type MethodCallArgumentBuilder struct {
 	builder membuffers.Builder
-	Num     uint32
-	Str     string
-	Data    []byte
-	Type    MethodCallArgumentType
+	Type MethodCallArgumentType
+	Num uint32
+	Str string
+	Data []byte
 }
 
 func (w *MethodCallArgumentBuilder) Write(buf []byte) (err error) {
@@ -266,3 +256,4 @@ func (w *MethodCallArgumentBuilder) CalcRequiredSize() membuffers.Offset {
 	w.Write(nil)
 	return w.builder.GetSize()
 }
+

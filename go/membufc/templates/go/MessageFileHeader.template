@@ -4,3 +4,4 @@ package {{.PackageName}}
 import (
 	"github.com/orbs-network/membuffers/go"
 )
+

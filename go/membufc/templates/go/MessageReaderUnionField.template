@@ -1,0 +1,39 @@
+type {{.MessageName}}{{.UnionName}} uint16
+{{$UnionName := .UnionName}}{{$UnionNum := .UnionNum}}{{$ParentFieldIndex := .FieldIndex}}
+const (
+{{- range .UnionFields}}
+	{{.MessageName}}{{$UnionName}}{{.FieldName}} {{.MessageName}}{{$UnionName}} = {{.FieldIndex -}}
+{{end}}
+)
+
+func (x *{{.MessageName}}) {{.UnionName}}() {{.MessageName}}{{.UnionName}} {
+	return {{.MessageName}}{{.UnionName}}(x.message.GetUint16({{.FieldIndex}}))
+}
+
+{{- range .UnionFields}}
+
+func (x *{{.MessageName}}) Is{{$UnionName}}{{.FieldName}}() bool {
+	is, _ := x.message.IsUnionIndex({{$ParentFieldIndex}}, {{$UnionNum}}, {{.FieldIndex}})
+	return is
+}
+
+func (x *{{.MessageName}}) {{$UnionName}}{{.FieldName}}() {{.FieldGoType}} {
+	_, off := x.message.IsUnionIndex({{$ParentFieldIndex}}, {{$UnionNum}}, {{.FieldIndex}})
+	return x.message.Get{{.TypeAccessor}}InOffset(off)
+}
+
+{{ if not .IsMessage -}}
+func (x *{{.MessageName}}) Mutate{{$UnionName}}{{.FieldName}}(v {{.FieldGoType}}) error {
+	is, off := x.message.IsUnionIndex({{$ParentFieldIndex}}, {{$UnionNum}}, {{.FieldIndex}})
+	if !is {
+		return &membuffers.ErrInvalidField{}
+	}
+	x.message.Set{{.TypeAccessor}}InOffset(off, v)
+	return nil
+}
+{{- end}}{{end}}
+
+func (x *{{.MessageName}}) Raw{{.UnionName}}() []byte {
+	return x.message.RawBufferForField({{.FieldIndex}}, {{.UnionNum}})
+}
+

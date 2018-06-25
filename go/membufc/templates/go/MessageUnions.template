@@ -1,2 +1,2 @@
-var m_{{.MessageName}}_Unions = [][]membuffers.FieldType{{`{{}}`}}
+var m_{{.MessageName}}_Unions = [][]membuffers.FieldType{{`{`}}{{range .UnionByIndex}}{{`{`}}{{range .}}membuffers.Type{{.TypeAccessor}},{{end}}{{`}`}}{{end}}{{`}`}}
 

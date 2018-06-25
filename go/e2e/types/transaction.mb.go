@@ -18,7 +18,7 @@ type Transaction struct {
 }
 
 var m_Transaction_Scheme = []membuffers.FieldType{membuffers.TypeMessage,membuffers.TypeBytes}
-var m_Transaction_Unions = [][]membuffers.FieldType{{}}
+var m_Transaction_Unions = [][]membuffers.FieldType{}
 
 func TransactionReader(buf []byte) *Transaction {
 	x := &Transaction{}
@@ -112,7 +112,7 @@ type TransactionData struct {
 }
 
 var m_TransactionData_Scheme = []membuffers.FieldType{membuffers.TypeUint32,membuffers.TypeUint64,membuffers.TypeMessageArray,membuffers.TypeUint64}
-var m_TransactionData_Unions = [][]membuffers.FieldType{{}}
+var m_TransactionData_Unions = [][]membuffers.FieldType{}
 
 func TransactionDataReader(buf []byte) *TransactionData {
 	x := &TransactionData{}
@@ -252,7 +252,7 @@ type TransactionSender struct {
 }
 
 var m_TransactionSender_Scheme = []membuffers.FieldType{membuffers.TypeString,membuffers.TypeStringArray}
-var m_TransactionSender_Unions = [][]membuffers.FieldType{{}}
+var m_TransactionSender_Unions = [][]membuffers.FieldType{}
 
 func TransactionSenderReader(buf []byte) *TransactionSender {
 	x := &TransactionSender{}
