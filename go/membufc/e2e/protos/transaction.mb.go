@@ -13,8 +13,8 @@ type Transaction struct {
 	message membuffers.Message
 }
 
-var m_Transaction_Scheme = []membuffers.FieldType{ membuffers.TypeMessage,membuffers.TypeBytes, }
-var m_Transaction_Unions = [][]membuffers.FieldType{ {} }
+var m_Transaction_Scheme = []membuffers.FieldType{membuffers.TypeMessage,membuffers.TypeBytes,}
+var m_Transaction_Unions = [][]membuffers.FieldType{{}}
 
 func TransactionReader(buf []byte) *Transaction {
 	x := &Transaction{}
@@ -56,7 +56,6 @@ type TransactionBuilder struct {
 	builder membuffers.Builder
 	Data *TransactionDataBuilder
 	Signature []byte
-	
 }
 
 func (w *TransactionBuilder) Write(buf []byte) (err error) {
@@ -73,9 +72,7 @@ func (w *TransactionBuilder) Write(buf []byte) (err error) {
 	if err != nil {
 		return
 	}
-	
 	w.builder.WriteBytes(buf, w.Signature)
-	
 	return nil
 }
 
@@ -103,8 +100,8 @@ type TransactionData struct {
 	message membuffers.Message
 }
 
-var m_TransactionData_Scheme = []membuffers.FieldType{ membuffers.TypeUint32,membuffers.TypeUint64,membuffers.TypeMessageArray,membuffers.TypeUint64, }
-var m_TransactionData_Unions = [][]membuffers.FieldType{ {} }
+var m_TransactionData_Scheme = []membuffers.FieldType{membuffers.TypeUint32,membuffers.TypeUint64,membuffers.TypeMessageArray,membuffers.TypeUint64,}
+var m_TransactionData_Unions = [][]membuffers.FieldType{{}}
 
 func TransactionDataReader(buf []byte) *TransactionData {
 	x := &TransactionData{}
@@ -184,7 +181,6 @@ type TransactionDataBuilder struct {
 	VirtualChain uint64
 	Sender []*TransactionSenderBuilder
 	TimeStamp uint64
-	
 }
 
 func (w *TransactionDataBuilder) arrayOfSender() []membuffers.MessageBuilder {
@@ -211,9 +207,7 @@ func (w *TransactionDataBuilder) Write(buf []byte) (err error) {
 	if err != nil {
 		return
 	}
-	
 	w.builder.WriteUint64(buf, w.TimeStamp)
-	
 	return nil
 }
 
@@ -241,8 +235,8 @@ type TransactionSender struct {
 	message membuffers.Message
 }
 
-var m_TransactionSender_Scheme = []membuffers.FieldType{ membuffers.TypeString,membuffers.TypeStringArray, }
-var m_TransactionSender_Unions = [][]membuffers.FieldType{ {} }
+var m_TransactionSender_Scheme = []membuffers.FieldType{membuffers.TypeString,membuffers.TypeStringArray,}
+var m_TransactionSender_Unions = [][]membuffers.FieldType{{}}
 
 func TransactionSenderReader(buf []byte) *TransactionSender {
 	x := &TransactionSender{}
@@ -295,7 +289,6 @@ type TransactionSenderBuilder struct {
 	builder membuffers.Builder
 	Name string
 	Friend []string
-	
 }
 
 func (w *TransactionSenderBuilder) Write(buf []byte) (err error) {
@@ -310,7 +303,6 @@ func (w *TransactionSenderBuilder) Write(buf []byte) (err error) {
 	w.builder.Reset()
 	w.builder.WriteString(buf, w.Name)
 	w.builder.WriteStringArray(buf, w.Friend)
-	
 	return nil
 }
 

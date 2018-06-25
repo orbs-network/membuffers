@@ -2,9 +2,8 @@
 
 type {{.MessageName}}Builder struct {
 	builder membuffers.Builder
-	{{range .MessageFields}}{{.FieldName}} {{if .IsArray}}[]{{end}}{{if .IsMessage}}*{{.FieldGoType}}Builder{{else}}{{.FieldGoType}}{{end}}
-	{{end}}
-}
+{{range .MessageFields}}	{{.FieldName}} {{if .IsArray}}[]{{end}}{{if .IsMessage}}*{{.FieldGoType}}Builder{{else}}{{.FieldGoType}}{{end}}
+{{end}}}
 {{range .MessageFields}}{{if and .IsMessage .IsArray}}
 func (w *{{.MessageName}}Builder) arrayOf{{.FieldName}}() []membuffers.MessageBuilder {
 	res := make([]membuffers.MessageBuilder, len(w.{{.FieldName}}))
@@ -23,13 +22,11 @@ func (w *{{.MessageName}}Builder) Write(buf []byte) (err error) {
 			err = &membuffers.ErrBufferOverrun{}
 		}
 	}()
-	w.builder.Reset()
-	{{range .MessageFields}}{{if .IsMessage}}err = w.builder.WriteMessage{{if .IsArray}}Array{{end}}(buf, w.{{if .IsArray}}arrayOf{{.FieldName}}(){{else}}{{.FieldName}}{{end}})
+	w.builder.Reset(){{range .MessageFields}}
+	{{if .IsMessage}}err = w.builder.WriteMessage{{if .IsArray}}Array{{end}}(buf, w.{{if .IsArray}}arrayOf{{.FieldName}}(){{else}}{{.FieldName}}{{end}})
 	if err != nil {
 		return
-	}
-	{{else}}w.builder.Write{{.TypeAccessor}}{{if .IsArray}}Array{{end}}(buf, w.{{.FieldName}}){{end}}
-	{{end}}
+	}{{else}}w.builder.Write{{.TypeAccessor}}{{if .IsArray}}Array{{end}}(buf, w.{{.FieldName}}){{end}}{{end}}
 	return nil
 }
 
