@@ -1,0 +1,21 @@
+func (x *{{.MessageName}}) {{.MessageField.FieldName}}Iterator() *{{.MessageName}}{{.MessageField.FieldName}}Iterator {
+	return &{{.MessageName}}{{.MessageField.FieldName}}Iterator{iterator: x.message.GetMessageArrayIterator({{.MessageField.FieldIndex}})}
+}
+
+type {{.MessageName}}{{.MessageField.FieldName}}Iterator struct {
+	iterator *membuffers.Iterator
+}
+
+func (i *{{.MessageName}}{{.MessageField.FieldName}}Iterator) HasNext() bool {
+	return i.iterator.HasNext()
+}
+
+func (i *{{.MessageName}}{{.MessageField.FieldName}}Iterator) Next{{.MessageField.FieldName}}() *{{.MessageField.FieldGoType}} {
+	b, s := i.iterator.NextMessage()
+	return {{.MessageField.FieldGoType}}Reader(b[:s])
+}
+
+func (x *{{.MessageName}}) Raw{{.MessageField.FieldName}}Array() []byte {
+	return x.message.RawBufferForField({{.MessageField.FieldIndex}}, 0)
+}
+

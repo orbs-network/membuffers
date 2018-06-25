@@ -1,12 +1,12 @@
-func (x *{{.MessageName}}) {{.FieldName}}() {{.FieldGoType}} {
-	return x.message.Get{{.TypeAccessor}}({{.FieldIndex}})
+func (x *{{.MessageName}}) {{.MessageField.FieldName}}() {{.MessageField.FieldGoType}} {
+	return x.message.Get{{.MessageField.TypeAccessor}}({{.MessageField.FieldIndex}})
 }
 
-func (x *{{.MessageName}}) Raw{{.FieldName}}() []byte {
-	return x.message.RawBufferForField({{.FieldIndex}}, 0)
+func (x *{{.MessageName}}) Raw{{.MessageField.FieldName}}() []byte {
+	return x.message.RawBufferForField({{.MessageField.FieldIndex}}, 0)
 }
 
-func (x *{{.MessageName}}) Mutate{{.FieldName}}(v {{.FieldGoType}}) error {
-	return x.message.Set{{.TypeAccessor}}({{.FieldIndex}}, v)
+func (x *{{.MessageName}}) Mutate{{.MessageField.FieldName}}(v {{.MessageField.FieldGoType}}) error {
+	return x.message.Set{{.MessageField.TypeAccessor}}({{.MessageField.FieldIndex}}, v)
 }
 

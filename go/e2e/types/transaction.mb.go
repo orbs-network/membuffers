@@ -280,19 +280,19 @@ func (x *TransactionSender) MutateName(v string) error {
 	return x.message.SetString(0, v)
 }
 
-func (x *TransactionSender) FriendIterator() *TransactionSender_FriendIterator {
-	return &TransactionSender_FriendIterator{iterator: x.message.GetStringArrayIterator(1)}
+func (x *TransactionSender) FriendIterator() *TransactionSenderFriendIterator {
+	return &TransactionSenderFriendIterator{iterator: x.message.GetStringArrayIterator(1)}
 }
 
-type TransactionSender_FriendIterator struct {
+type TransactionSenderFriendIterator struct {
 	iterator *membuffers.Iterator
 }
 
-func (i *TransactionSender_FriendIterator) HasNext() bool {
+func (i *TransactionSenderFriendIterator) HasNext() bool {
 	return i.iterator.HasNext()
 }
 
-func (i *TransactionSender_FriendIterator) NextFriend() string {
+func (i *TransactionSenderFriendIterator) NextFriend() string {
 	return i.iterator.NextString()
 }
 
