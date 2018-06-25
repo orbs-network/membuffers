@@ -74,7 +74,7 @@ This standalone library was originally created as part of the [ORBS](https://www
       fmt.Println("hash mismatch")
     }
     // validate format
-    if !transaction.IsValud() {
+    if !transaction.IsValid() {
       fmt.Println("serialized data is invalid")
     }
     // access fields
