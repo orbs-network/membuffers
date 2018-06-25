@@ -29,14 +29,14 @@ This standalone library was originally created as part of the [ORBS](https://www
     package types;
     
     message Transaction {
-        TransactionData data = 1;
-        bytes hash = 2;
+       TransactionData data = 1;
+       bytes hash = 2;
     }
     
     message TransactionData {
-        uint32 protocol_version = 1;
-        uint64 sender_account = 2;
-        string contract_method = 3;
+       uint32 protocol_version = 1;
+       uint64 sender_account = 2;
+       string contract_method = 3;
     }
     ```
     
@@ -50,17 +50,17 @@ This standalone library was originally created as part of the [ORBS](https://www
 
     ```go
     builder := &types.TransactionBuilder{
-        Data: &types.TransactionDataBuilder{
-            ProtocolVersion: 0x01,
-            SenderAccount: 0x11223344,
-            ContractMethod: "ZincToken.Transfer",
-        },
-        Hash: []byte{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,},
+      Data: &types.TransactionDataBuilder{
+        ProtocolVersion: 0x01,
+        SenderAccount: 0x11223344,
+        ContractMethod: "ZincToken.Transfer",
+      },
+      Hash: []byte{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,},
     }
     buf := make([]byte, builder.CalcRequiredSize())
     err := builder.Write(buf)
     if err != nil {
-        fmt.Println("serialization error")
+      fmt.Println("serialization error")
     }
     ```
 
@@ -71,11 +71,11 @@ This standalone library was originally created as part of the [ORBS](https://www
     // check hash
     calculated := md5.Sum(transaction.RawData())
     if !bytes.Equal(calculated, transaction.Hash()) {
-        fmt.Println("hash mismatch")
+      fmt.Println("hash mismatch")
     }
     // validate format
     if !transaction.IsValud() {
-        fmt.Println("serialized data is invalid")
+      fmt.Println("serialized data is invalid")
     }
     // access fields
     ver := transaction.Data().ProtocolVersion()
@@ -90,7 +90,7 @@ This standalone library was originally created as part of the [ORBS](https://www
     calculated := md5.Sum(transaction.RawData())
     err := transaction.MutateHash(calculated)
     if err != nil {
-        fmt.Println("mutation error")
+      fmt.Println("mutation error")
     }
     ```
 
@@ -261,13 +261,13 @@ message TransactionData {
 Initialized to the following values:
 ```go
 &types.TransactionBuilder{
-    Data: &types.TransactionDataBuilder{
-        ProtocolVersion: 0x01,
-        SenderAccount: 0x11223344,
-        ContractMethod: "abc",
-    },
-    Hash: []byte{0x55,0x56,0x57,0x58,0x59,},
-    }
+  Data: &types.TransactionDataBuilder{
+    ProtocolVersion: 0x01,
+    SenderAccount: 0x11223344,
+    ContractMethod: "abc",
+  },
+  Hash: []byte{0x55,0x56,0x57,0x58,0x59,},
+}
 ```
 
 Will produce the following encoding over the wire (total of 29 bytes):
