@@ -83,12 +83,14 @@ func main() {
 			fmt.Println("ERROR:", err.Error())
 			os.Exit(1)
 		}
-		f, err := os.Create(outputFileForPath(path))
+		outPath := outputFileForPath(path)
+		f, err := os.Create(outPath)
 		if err != nil {
 			fmt.Println("ERROR:", err.Error())
 			os.Exit(1)
 		}
 		defer f.Close()
 		compileProtoFile(f, protoFile)
+		fmt.Println("Created file:", outPath)
 	}
 }
