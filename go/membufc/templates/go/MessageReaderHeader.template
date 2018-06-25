@@ -1,0 +1,13 @@
+func {{.MessageName}}Reader(buf []byte) *{{.MessageName}} {
+	x := &{{.MessageName}}{}
+	x.message.Init(buf, membuffers.Offset(len(buf)), m_{{.MessageName}}_Scheme, m_{{.MessageName}}_Unions)
+	return x
+}
+
+func (x *{{.MessageName}}) IsValid() bool {
+	return x.message.IsValid()
+}
+
+func (x *{{.MessageName}}) Raw() []byte {
+	return x.message.RawBuffer()
+}

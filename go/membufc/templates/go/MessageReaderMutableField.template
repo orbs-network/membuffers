@@ -1,0 +1,12 @@
+func (x *{{.MessageName}}) {{.FieldName}}() {{.FieldGoType}} {
+	return x.message.Get{{.TypeAccessor}}({{.FieldIndex}})
+}
+
+func (x *{{.MessageName}}) Raw{{.FieldName}}() []byte {
+	return x.message.RawBufferForField({{.FieldIndex}}, 0)
+}
+
+func (x *{{.MessageName}}) Mutate{{.FieldName}}(v {{.FieldGoType}}) error {
+	return x.message.Set{{.TypeAccessor}}({{.FieldIndex}}, v)
+}
+

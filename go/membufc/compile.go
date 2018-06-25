@@ -3,8 +3,8 @@ package main
 import (
 	"github.com/tallstoat/pbparser"
 	"io"
-	"fmt"
 	"sort"
+	"text/template"
 )
 
 func convertFieldNameToGoCase(fieldName string) string {
@@ -28,29 +28,22 @@ func fixFields(m pbparser.MessageElement) {
 }
 
 func addHeader(w io.Writer, packageName string) {
-	fmt.Fprintf(w, `// AUTO GENERATED FILE (by membufc proto compiler)
-package %s
-`, packageName)
-	fmt.Fprintf(w, `
-import (
-	"github.com/orbs-network/membuffers/go"
-)
-`)
+	t := template.Must(template.ParseFiles("templates/go/MessageFileHeader.template"))
+	t.Execute(w, struct {
+		PackageName string
+	}{
+		PackageName: packageName,
+	})
 }
 
 func addMessage(w io.Writer, m pbparser.MessageElement) {
 	fixFields(m)
-	fmt.Fprintf(w, `
-/////////////////////////////////////////////////////////////////////////////
-// message %s
-
-// reader
-
-type %s struct {
-	message membuffers.Message
-}
-
-`, m.Name, m.Name)
+	t := template.Must(template.ParseFiles("templates/go/MessageHeader.template"))
+	t.Execute(w, struct {
+		MessageName string
+	}{
+		MessageName: m.Name,
+	})
 	addMessageScheme(w, m.Name, m.Fields)
 	addMessageUnions(w, m.Name, m.Fields)
 	addMessageReaderStart(w, m.Name, m.Fields)
@@ -60,7 +53,7 @@ type %s struct {
 }
 
 func addMessageScheme(w io.Writer, name string, fields []pbparser.FieldElement) {
-	fmt.Fprintf(w, "var m_%s_Scheme = []membuffers.FieldType{", name)
+	fieldTypes := []string{}
 	for _, field := range fields {
 		if field.Label == "" || field.Label == "optional" || field.Label == "required" {
 			if field.Type.Category() == pbparser.ScalarDataTypeCategory {
@@ -72,10 +65,10 @@ func addMessageScheme(w io.Writer, name string, fields []pbparser.FieldElement) 
 					"uint32": "TypeUint32",
 					"uint64": "TypeUint64",
 				}
-				fmt.Fprintf(w, "membuffers.%s,", types[field.Type.Name()])
+				fieldTypes = append(fieldTypes, types[field.Type.Name()])
 			}
 			if field.Type.Category() == pbparser.NamedDataTypeCategory {
-				fmt.Fprintf(w, "membuffers.TypeMessage,")
+				fieldTypes = append(fieldTypes, "TypeMessage")
 			}
 		}
 		if field.Label == "repeated" {
@@ -88,36 +81,39 @@ func addMessageScheme(w io.Writer, name string, fields []pbparser.FieldElement) 
 					"uint32": "TypeUint32Array",
 					"uint64": "TypeUint64Array",
 				}
-				fmt.Fprintf(w, "membuffers.%s,", types[field.Type.Name()])
+				fieldTypes = append(fieldTypes, types[field.Type.Name()])
 			}
 			if field.Type.Category() == pbparser.NamedDataTypeCategory {
-				fmt.Fprintf(w, "membuffers.TypeMessageArray,")
+				fieldTypes = append(fieldTypes, "TypeMessageArray")
 			}
 		}
 	}
-	fmt.Fprintf(w, "}\n")
+	t := template.Must(template.ParseFiles("templates/go/MessageScheme.template"))
+	t.Execute(w, struct {
+		MessageName string
+		FieldTypes []string
+	}{
+		MessageName: name,
+		FieldTypes: fieldTypes,
+	})
 }
 
 func addMessageUnions(w io.Writer, name string, fields []pbparser.FieldElement) {
-	fmt.Fprintf(w, "var m_%s_Unions = [][]membuffers.FieldType{{}}\n", name)
+	t := template.Must(template.ParseFiles("templates/go/MessageUnions.template"))
+	t.Execute(w, struct {
+		MessageName string
+	}{
+		MessageName: name,
+	})
 }
 
 func addMessageReaderStart(w io.Writer, name string, fields []pbparser.FieldElement) {
-	fmt.Fprintf(w, `
-func %sReader(buf []byte) *%s {
-	x := &%s{}
-	x.message.Init(buf, membuffers.Offset(len(buf)), m_%s_Scheme, m_%s_Unions)
-	return x
-}
-
-func (x *%s) IsValid() bool {
-	return x.message.IsValid()
-}
-
-func (x *%s) Raw() []byte {
-	return x.message.RawBuffer()
-}
-`, name, name, name, name, name, name, name)
+	t := template.Must(template.ParseFiles("templates/go/MessageReaderHeader.template"))
+	t.Execute(w, struct {
+		MessageName string
+	}{
+		MessageName: name,
+	})
 }
 
 func addMessageReaderField(w io.Writer, name string, field pbparser.FieldElement) {
@@ -139,31 +135,34 @@ func addMessageReaderField(w io.Writer, name string, field pbparser.FieldElement
 				"uint32": "Uint32",
 				"uint64": "Uint64",
 			}
-			fmt.Fprintf(w, `
-func (x *%s) %s() %s {
-	return x.message.Get%s(%d)
-}
-
-func (x *%s) Raw%s() []byte {
-	return x.message.RawBufferForField(%d, 0)
-}
-
-func (x *%s) Mutate%s(v %s) error {
-	return x.message.Set%s(%d, v)
-}
-`, name, convertFieldNameToGoCase(field.Name), goTypes[field.Type.Name()], accessor[field.Type.Name()], field.Tag, name, convertFieldNameToGoCase(field.Name), field.Tag, name, convertFieldNameToGoCase(field.Name), goTypes[field.Type.Name()], accessor[field.Type.Name()], field.Tag)
+			t := template.Must(template.ParseFiles("templates/go/MessageReaderMutableField.template"))
+			t.Execute(w, struct {
+				MessageName string
+				FieldName string
+				FieldGoType string
+				TypeAccessor string
+				FieldIndex int
+			}{
+				MessageName: name,
+				FieldName: convertFieldNameToGoCase(field.Name),
+				FieldGoType: goTypes[field.Type.Name()],
+				TypeAccessor: accessor[field.Type.Name()],
+				FieldIndex: field.Tag,
+			})
 		}
 		if field.Type.Category() == pbparser.NamedDataTypeCategory {
-			fmt.Fprintf(w, `
-func (x *%s) %s() *%s {
-	b, s := x.message.GetMessage(%d)
-	return %sReader(b[:s])
-}
-
-func (x *%s) Raw%s() []byte {
-	return x.message.RawBufferForField(%d, 0)
-}
-`, name, convertFieldNameToGoCase(field.Name), field.Type.Name(), field.Tag, field.Type.Name(), name, convertFieldNameToGoCase(field.Name), field.Tag)
+			t := template.Must(template.ParseFiles("templates/go/MessageReaderMessageField.template"))
+			t.Execute(w, struct {
+				MessageName string
+				FieldName string
+				FieldGoType string
+				FieldIndex int
+			}{
+				MessageName: name,
+				FieldName: convertFieldNameToGoCase(field.Name),
+				FieldGoType: field.Type.Name(),
+				FieldIndex: field.Tag,
+			})
 		}
 	}
 }

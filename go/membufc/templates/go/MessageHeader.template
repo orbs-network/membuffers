@@ -1,0 +1,9 @@
+/////////////////////////////////////////////////////////////////////////////
+// message {{.MessageName}}
+
+// reader
+
+type {{.MessageName}} struct {
+	message membuffers.Message
+}
+

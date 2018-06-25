@@ -1,0 +1,9 @@
+func (x *{{.MessageName}}) {{.FieldName}}() *{{.FieldGoType}} {
+    b, s := x.message.GetMessage({{.FieldIndex}})
+    return {{.FieldGoType}}Reader(b[:s])
+}
+
+func (x *{{.MessageName}}) Raw{{.FieldName}}() []byte {
+	return x.message.RawBufferForField({{.FieldIndex}}, 0)
+}
+
