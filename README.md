@@ -172,7 +172,7 @@ This standalone library was originally created as part of the [ORBS](https://www
 
 ###### Strengths of Flatbuffers
 * Flatbuffers currently has wider language support.
-* Flatbuffers messages are memory mapped for fast direct access (although the Go implementation doesn't take advantage of that).
+* Flatbuffers messages are memory mapped for fast direct access (although the Go implementation [doesn't](https://github.com/google/flatbuffers/blob/bed19a5340c12fda7e03d0abe0f34304a3e27590/go/encode.go#L56) take advantage of that).
 * Flatbuffers is backed by Google.
 
 #### [Cap'n Proto](https://capnproto.org/)
@@ -186,12 +186,12 @@ This standalone library was originally created as part of the [ORBS](https://www
 * *Self-contained fields* - Cap'n Proto fields are not self-contained so they cannot be hashed directly from wire format.
 * *Almost human readable* - Cap'n Proto encoding format is complex and not easily readable by humans or quick and dirty scripts.
 
-###### Strengths of Flatbuffers
+###### Strengths of Cap'n Proto
 * Cap'n Proto currently has wider language support.
-* Cap'n Proto messages are memory mapped for fast direct access (although the Go implementation doesn't take advantage of that).
+* Cap'n Proto messages are memory mapped for fast direct access (although the Go implementation [doesn't](https://github.com/capnproto/go-capnproto2/blob/1a91d13193ec7bcc8fa758b4edfaf8cc807e6180/capn.go#L66) take advantage of that).
 * Cap'n Proto is a relatively popular project with a large community.
 
-## Wire format
+## MemBuffers wire format
 
 #### Alignment
 
