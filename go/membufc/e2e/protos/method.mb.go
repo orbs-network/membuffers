@@ -30,6 +30,7 @@ func (x *Method) IsValid() bool {
 func (x *Method) Raw() []byte {
 	return x.message.RawBuffer()
 }
+
 func (x *Method) Name() string {
 	return x.message.GetString(0)
 }
@@ -137,6 +138,7 @@ func (x *MethodCallArgument) IsValid() bool {
 func (x *MethodCallArgument) Raw() []byte {
 	return x.message.RawBuffer()
 }
+
 type MethodCallArgumentType uint16
 
 const (

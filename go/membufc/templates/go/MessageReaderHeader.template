@@ -11,3 +11,4 @@ func (x *{{.MessageName}}) IsValid() bool {
 func (x *{{.MessageName}}) Raw() []byte {
 	return x.message.RawBuffer()
 }
+

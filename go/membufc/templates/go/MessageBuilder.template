@@ -36,13 +36,13 @@ func (w *{{.MessageName}}Builder) Write(buf []byte) (err error) {
 		w.builder.Write{{.TypeAccessor}}(buf, w.{{.FieldName}})
 	{{- end}}
 	}
-	{{else if .IsMessage}}
+	{{- else if .IsMessage}}
 	err = w.builder.WriteMessage{{if .IsArray}}Array{{end}}(buf, w.{{if .IsArray}}arrayOf{{.FieldName}}(){{else}}{{.FieldName}}{{end}})
 	if err != nil {
 		return
 	}
-	{{else}}
-	w.builder.Write{{.TypeAccessor}}{{if .IsArray}}Array{{end}}(buf, w.{{.FieldName}}){{end}}{{end -}}
+	{{- else}}
+	w.builder.Write{{.TypeAccessor}}{{if .IsArray}}Array{{end}}(buf, w.{{.FieldName}}){{end}}{{end}}
 	return nil
 }
 

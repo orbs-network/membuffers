@@ -15,7 +15,7 @@ type Transaction struct {
 }
 
 var m_Transaction_Scheme = []membuffers.FieldType{membuffers.TypeMessage,membuffers.TypeBytes,}
-var m_Transaction_Unions = [][]membuffers.FieldType{{}}
+var m_Transaction_Unions = [][]membuffers.FieldType{}
 
 func TransactionReader(buf []byte) *Transaction {
 	x := &Transaction{}
@@ -30,6 +30,7 @@ func (x *Transaction) IsValid() bool {
 func (x *Transaction) Raw() []byte {
 	return x.message.RawBuffer()
 }
+
 func (x *Transaction) Data() *TransactionData {
 	b, s := x.message.GetMessage(0)
 	return TransactionDataReader(b[:s])
@@ -102,7 +103,7 @@ type TransactionData struct {
 }
 
 var m_TransactionData_Scheme = []membuffers.FieldType{membuffers.TypeUint32,membuffers.TypeUint64,membuffers.TypeMessageArray,membuffers.TypeUint64,}
-var m_TransactionData_Unions = [][]membuffers.FieldType{{}}
+var m_TransactionData_Unions = [][]membuffers.FieldType{}
 
 func TransactionDataReader(buf []byte) *TransactionData {
 	x := &TransactionData{}
@@ -117,6 +118,7 @@ func (x *TransactionData) IsValid() bool {
 func (x *TransactionData) Raw() []byte {
 	return x.message.RawBuffer()
 }
+
 func (x *TransactionData) ProtocolVersion() uint32 {
 	return x.message.GetUint32(0)
 }
@@ -237,7 +239,7 @@ type TransactionSender struct {
 }
 
 var m_TransactionSender_Scheme = []membuffers.FieldType{membuffers.TypeString,membuffers.TypeStringArray,}
-var m_TransactionSender_Unions = [][]membuffers.FieldType{{}}
+var m_TransactionSender_Unions = [][]membuffers.FieldType{}
 
 func TransactionSenderReader(buf []byte) *TransactionSender {
 	x := &TransactionSender{}
@@ -252,6 +254,7 @@ func (x *TransactionSender) IsValid() bool {
 func (x *TransactionSender) Raw() []byte {
 	return x.message.RawBuffer()
 }
+
 func (x *TransactionSender) Name() string {
 	return x.message.GetString(0)
 }
