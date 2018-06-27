@@ -113,8 +113,7 @@ This standalone library was originally created as part of the [ORBS](https://www
 1. Get the library into your Go workspace:
  
      ```sh
-     go get github.com/orbs-network/membuffers/go
-     cd `go env GOPATH`/src/github.com/orbs-network/membuffers/go
+     go get github.com/orbs-network/membuffers/go/...
      ```
 
 * Install the `membufc` compiler:

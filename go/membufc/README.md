@@ -1,6 +1,8 @@
 # membufc Compiler
 
-There instructions are relevant only to people trying to build the `membufc` compiler from source.
+These instructions are relevant only if you're trying to build the `membufc` compiler from source.
+
+If you don't want to build from source, install the compiler with `brew install orbs-network/membuffers/membufc`.
 
 ## Building
 
