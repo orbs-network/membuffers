@@ -5,16 +5,20 @@ import (
 	"io"
 	"sort"
 	"text/template"
+	"fmt"
+	"os"
+	"path"
+	"strings"
 )
 
 func convertFieldNameToGoCase(fieldName string) string {
 	return ToCamel(fieldName)
 }
 
-func compileProtoFile(w io.Writer, file pbparser.ProtoFile) {
-	addHeader(w, file.PackageName)
+func compileProtoFile(w io.Writer, file pbparser.ProtoFile, dependencyData map[string]dependencyData) {
+	addHeader(w, &file, dependencyData)
 	for _, m := range file.Messages {
-		addMessage(w, m, file)
+		addMessage(w, m, &file)
 	}
 	addEnums(w, file.Enums)
 }
@@ -46,12 +50,46 @@ func normalizeFieldsAndOneOfs(m *pbparser.MessageElement) {
 	}
 }
 
-func addHeader(w io.Writer, packageName string) {
+func addEnumsFromImports(file *pbparser.ProtoFile, dependencyData map[string]dependencyData) {
+	for _, dep := range dependencyData {
+		importedFile, err := pbparser.ParseFile(dep.path)
+		if err != nil {
+			fmt.Println("ERROR:", "imported file cannot be parsed: %s", dep.path)
+			os.Exit(1)
+		}
+		for i, enum := range importedFile.Enums {
+			importedFile.Enums[i].Name = path.Base(path.Dir(dep.path)) + "." + enum.Name
+		}
+		file.Enums = append(file.Enums, importedFile.Enums...)
+	}
+}
+
+func addHeader(w io.Writer, file *pbparser.ProtoFile, dependencyData map[string]dependencyData) {
+	var goPackage string
+	for _, option := range file.Options {
+		if option.Name == "go_package" {
+			goPackage = option.Value
+		}
+	}
+	if len(file.Dependencies) > 0 && len(goPackage) == 0 {
+		fmt.Println("ERROR:", "option go_package not provided, required when we have imports")
+		os.Exit(1)
+	}
+	addEnumsFromImports(file, dependencyData)
+	imports := []string{}
+	for _, dependency := range file.Dependencies {
+		relative := dependencyData[dependency].relative
+		imports = append(imports, path.Dir(path.Clean(goPackage + "/" + relative + "/" + dependency)))
+	}
 	t := template.Must(template.ParseFiles("templates/go/MessageFileHeader.template"))
 	t.Execute(w, struct {
 		PackageName string
+		Imports []string
+		HasMessages bool
 	}{
-		PackageName: packageName,
+		PackageName: file.PackageName,
+		Imports: imports,
+		HasMessages: len(file.Messages) > 0,
 	})
 }
 
@@ -68,7 +106,7 @@ func addEnums(w io.Writer, enums []pbparser.EnumElement) {
 	})
 }
 
-func addMessage(w io.Writer, m pbparser.MessageElement, file pbparser.ProtoFile) {
+func addMessage(w io.Writer, m pbparser.MessageElement, file *pbparser.ProtoFile) {
 	normalizeFieldsAndOneOfs(&m)
 	_, enumNameToIndex := getFileEnums(file.Enums)
 	t := template.Must(template.ParseFiles("templates/go/MessageHeader.template"))
@@ -360,10 +398,13 @@ func getFileEnums(enums []pbparser.EnumElement) ([]Enum, map[string]int) {
 				Value: value.Tag,
 			})
 		}
-		enumByIndex = append(enumByIndex, Enum{
-			Name: enum.Name,
-			Values: values,
-		})
+		// only add here enums from this package
+		if !strings.Contains(enum.Name, ".") {
+			enumByIndex = append(enumByIndex, Enum{
+				Name: enum.Name,
+				Values: values,
+			})
+		}
 	}
 	return enumByIndex, enumNameToIndex
 }

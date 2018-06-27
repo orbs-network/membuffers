@@ -2,6 +2,9 @@
 package {{.PackageName}}
 
 import (
-	"github.com/orbs-network/membuffers/go"
+{{if .HasMessages}}	"github.com/orbs-network/membuffers/go"
+{{end -}}
+{{range .Imports}}	"{{.}}"
+{{end -}}
 )
 

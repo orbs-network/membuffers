@@ -1,0 +1,11 @@
+syntax = "proto3";
+package dep2;
+option go_package = "github.com/orbs-network/membuffers/go/membufc/e2e/protos/dep2";
+
+import "dep1/dependency1.proto";
+import "dep1/dep11/dependency11.proto";
+
+message Dependent {
+    dep1.DependencyMessage a = 1;
+    dep11.DependencyEnum b = 2;
+}

@@ -1,0 +1,8 @@
+syntax = "proto3";
+package dep11;
+option go_package = "github.com/orbs-network/membuffers/membufc/go/e2e/protos/dep1/dep11";
+
+enum DependencyEnum {
+    OPTION_A = 0;
+    OPTION_B = 1;
+}

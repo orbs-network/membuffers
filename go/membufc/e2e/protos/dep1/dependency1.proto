@@ -1,0 +1,7 @@
+syntax = "proto3";
+package dep1;
+option go_package = "github.com/orbs-network/membuffers/go/membufc/e2e/protos/dep1";
+
+message DependencyMessage {
+    uint32 field = 1;
+}

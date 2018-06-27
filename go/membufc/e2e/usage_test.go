@@ -5,6 +5,8 @@ import (
 	"bytes"
 	"github.com/orbs-network/membuffers/go/membufc/e2e/protos"
 	"crypto/md5"
+	"github.com/orbs-network/membuffers/go/membufc/e2e/protos/dep2"
+	"github.com/orbs-network/membuffers/go/membufc/e2e/protos/dep1/dep11"
 )
 
 func hashBytes(buffer []byte) []byte {
@@ -156,5 +158,24 @@ func TestReadWriteMethod(t *testing.T) {
 	}
 	if arg1.TypeStr() != "flower" {
 		t.Fatalf("Arg1.Str: instead of expected got %v", arg1.TypeStr())
+	}
+}
+
+func TestReadWriteWithImports(t *testing.T) {
+	// write
+	builder := &dep2.DependentBuilder{}
+	buf := make([]byte, builder.CalcRequiredSize())
+	err := builder.Write(buf)
+	if err != nil {
+		t.Fatalf("error while writing in builder")
+	}
+
+	// read
+	dependent := dep2.DependentReader(buf)
+	if dependent.A().Field() != 0 {
+		t.Fatalf("A.Field: is not empty")
+	}
+	if dependent.B() != dep11.DependencyEnum_OPTION_A {
+		t.Fatalf("B: is not DependencyEnum_OPTION_A")
 	}
 }

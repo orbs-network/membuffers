@@ -5,6 +5,9 @@ import (
 	"strings"
 	"fmt"
 	"github.com/tallstoat/pbparser"
+	"io"
+	"errors"
+	"path"
 )
 
 type config struct {
@@ -78,19 +81,50 @@ func main() {
 		}
 	}
 	for _, path := range conf.files {
-		protoFile, err := pbparser.ParseFile(path)
+		in, err := os.Open(path)
+		if err != nil {
+			fmt.Println("ERROR:", err.Error())
+			os.Exit(1)
+		}
+		p := importProvider{protoFile: path, moduleToRelative: make(map[string]dependencyData)}
+		protoFile, err := pbparser.Parse(in, &p)
 		if err != nil {
 			fmt.Println("ERROR:", err.Error())
 			os.Exit(1)
 		}
 		outPath := outputFileForPath(path)
-		f, err := os.Create(outPath)
+		out, err := os.Create(outPath)
 		if err != nil {
 			fmt.Println("ERROR:", err.Error())
 			os.Exit(1)
 		}
-		defer f.Close()
-		compileProtoFile(f, protoFile)
+		defer out.Close()
+		compileProtoFile(out, protoFile, p.moduleToRelative)
 		fmt.Println("Created file:", outPath)
 	}
+}
+
+type dependencyData struct {
+	relative string
+	path string
+}
+type importProvider struct {
+	protoFile string
+	moduleToRelative map[string]dependencyData
+}
+func (i *importProvider) Provide(module string) (io.Reader, error) {
+	basePath := path.Dir(i.protoFile) + "/"
+	relativePath := ""
+	attempts := []string{}
+	for nesting := 0; nesting < 5; nesting++ {
+		attemptPath := basePath + relativePath + module
+		f, err := os.Open(attemptPath)
+		if err == nil {
+			i.moduleToRelative[module] = dependencyData{relative: relativePath, path: attemptPath}
+			return f, nil
+		}
+		attempts = append(attempts, attemptPath)
+		relativePath = "../" + relativePath
+	}
+	return nil, errors.New(fmt.Sprintf("import %s not found, looked at %v", module, attempts))
 }
