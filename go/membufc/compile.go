@@ -9,7 +9,24 @@ import (
 	"os"
 	"path"
 	"strings"
+	"github.com/gobuffalo/packr"
 )
+
+var box = packr.NewBox("./templates/go")
+
+func templateByBoxName(name string) *template.Template {
+	s, err := box.MustString(name)
+	if err != nil {
+		fmt.Println("ERROR:", err.Error())
+		os.Exit(1)
+	}
+	t, err := template.New(name).Parse(s)
+	if err != nil {
+		fmt.Println("ERROR:", err.Error())
+		os.Exit(1)
+	}
+	return t
+}
 
 func convertFieldNameToGoCase(fieldName string) string {
 	return ToCamel(fieldName)
@@ -81,7 +98,7 @@ func addHeader(w io.Writer, file *pbparser.ProtoFile, dependencyData map[string]
 		relative := dependencyData[dependency].relative
 		imports = append(imports, path.Dir(path.Clean(goPackage + "/" + relative + "/" + dependency)))
 	}
-	t := template.Must(template.ParseFiles("templates/go/MessageFileHeader.template"))
+	t := templateByBoxName("MessageFileHeader.template")
 	t.Execute(w, struct {
 		PackageName string
 		Imports []string
@@ -98,7 +115,7 @@ func addEnums(w io.Writer, enums []pbparser.EnumElement) {
 		return
 	}
 	messageEnums, _ := getFileEnums(enums)
-	t := template.Must(template.ParseFiles("templates/go/MessageFileEnums.template"))
+	t := templateByBoxName("MessageFileEnums.template")
 	t.Execute(w, struct {
 		Enums []Enum
 	}{
@@ -109,7 +126,7 @@ func addEnums(w io.Writer, enums []pbparser.EnumElement) {
 func addMessage(w io.Writer, m pbparser.MessageElement, file *pbparser.ProtoFile) {
 	normalizeFieldsAndOneOfs(&m)
 	_, enumNameToIndex := getFileEnums(file.Enums)
-	t := template.Must(template.ParseFiles("templates/go/MessageHeader.template"))
+	t := templateByBoxName("MessageHeader.template")
 	t.Execute(w, struct {
 		MessageName string
 	}{
@@ -130,7 +147,7 @@ func addMessageScheme(w io.Writer, messageName string, fields []pbparser.FieldEl
 		messageField := getMessageField(messageName, field, enumNameToIndex)
 		messageFields = append(messageFields, messageField)
 	}
-	t := template.Must(template.ParseFiles("templates/go/MessageScheme.template"))
+	t := templateByBoxName("MessageScheme.template")
 	t.Execute(w, struct {
 		MessageName string
 		MessageFields []MessageField
@@ -142,7 +159,7 @@ func addMessageScheme(w io.Writer, messageName string, fields []pbparser.FieldEl
 
 func addMessageUnions(w io.Writer, messageName string, fields []pbparser.FieldElement, unions []pbparser.OneOfElement, enumNameToIndex map[string]int) {
 	unionByIndex, _ := getMessageUnions(messageName, unions, enumNameToIndex)
-	t := template.Must(template.ParseFiles("templates/go/MessageUnions.template"))
+	t := templateByBoxName("MessageUnions.template")
 	t.Execute(w, struct {
 		MessageName string
 		UnionByIndex [][]MessageField
@@ -153,7 +170,7 @@ func addMessageUnions(w io.Writer, messageName string, fields []pbparser.FieldEl
 }
 
 func addMessageReaderHeader(w io.Writer, messageName string, fields []pbparser.FieldElement, unions []pbparser.OneOfElement, enumNameToIndex map[string]int) {
-	t := template.Must(template.ParseFiles("templates/go/MessageReaderHeader.template"))
+	t := templateByBoxName("MessageReaderHeader.template")
 	t.Execute(w, struct {
 		MessageName string
 	}{
@@ -165,7 +182,7 @@ func addMessageReaderField(w io.Writer, messageName string, field pbparser.Field
 	messageField := getMessageField(messageName, field, enumNameToIndex)
 	if messageField.IsUnion {
 		unionByIndex, unionNameToIndex := getMessageUnions(messageName, unions, enumNameToIndex)
-		t := template.Must(template.ParseFiles("templates/go/MessageReaderUnionField.template"))
+		t := templateByBoxName("MessageReaderUnionField.template")
 		t.Execute(w, struct {
 			MessageName string
 			UnionName string
@@ -182,7 +199,7 @@ func addMessageReaderField(w io.Writer, messageName string, field pbparser.Field
 		return
 	}
 	if !messageField.IsMessage && !messageField.IsArray {
-		t := template.Must(template.ParseFiles("templates/go/MessageReaderMutableField.template"))
+		t := templateByBoxName("MessageReaderMutableField.template")
 		t.Execute(w, struct {
 			MessageName string
 			MessageField MessageField
@@ -193,7 +210,7 @@ func addMessageReaderField(w io.Writer, messageName string, field pbparser.Field
 		return
 	}
 	if messageField.IsMessage && !messageField.IsArray {
-		t := template.Must(template.ParseFiles("templates/go/MessageReaderMessageField.template"))
+		t := templateByBoxName("MessageReaderMessageField.template")
 		t.Execute(w, struct {
 			MessageName string
 			MessageField MessageField
@@ -204,7 +221,7 @@ func addMessageReaderField(w io.Writer, messageName string, field pbparser.Field
 		return
 	}
 	if !messageField.IsMessage && messageField.IsArray {
-		t := template.Must(template.ParseFiles("templates/go/MessageReaderMutableArrayField.template"))
+		t := templateByBoxName("MessageReaderMutableArrayField.template")
 		t.Execute(w, struct {
 			MessageName string
 			MessageField MessageField
@@ -215,7 +232,7 @@ func addMessageReaderField(w io.Writer, messageName string, field pbparser.Field
 		return
 	}
 	if messageField.IsMessage && messageField.IsArray {
-		t := template.Must(template.ParseFiles("templates/go/MessageReaderMessageArrayField.template"))
+		t := templateByBoxName("MessageReaderMessageArrayField.template")
 		t.Execute(w, struct {
 			MessageName string
 			MessageField MessageField
@@ -234,7 +251,7 @@ func addMessageBuilder(w io.Writer, messageName string, fields []pbparser.FieldE
 		messageField := getMessageField(messageName, field, enumNameToIndex)
 		messageFields = append(messageFields, messageField)
 	}
-	t := template.Must(template.ParseFiles("templates/go/MessageBuilder.template"))
+	t := templateByBoxName("MessageBuilder.template")
 	t.Execute(w, struct {
 		MessageName string
 		MessageFields []MessageField

@@ -120,10 +120,11 @@ This standalone library was originally created as part of the [ORBS](https://www
 * Install the `membufc` compiler:
 
     ```sh
-    cd ./membufc
-    go install
+    brew install orbs-network/membuffers/membufc
     ```
     > Verify with `membufc --version`
+    
+    > To compile the compiler from source look [here](go/membufc/README.md).
     
 ## Test
 
