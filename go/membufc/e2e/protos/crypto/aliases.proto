@@ -1,0 +1,16 @@
+syntax = "proto3";
+package crypto;
+
+// NOTE: inline files must be in packages having only inline files
+
+option inline = true;
+
+message sha256 {
+    option inline_type = "bytes";
+    bytes value = 1;
+}
+
+message md5 {
+    option inline_type = "bytes";
+    bytes value = 1;
+}

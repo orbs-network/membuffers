@@ -1,0 +1,11 @@
+syntax = "proto3";
+package types;
+option go_package = "github.com/orbs-network/membuffers/go/membufc/e2e/protos";
+
+import "protos/crypto/aliases.proto";
+
+message FileRecord {
+    bytes data = 1;
+    crypto.sha256 hash = 2;
+    repeated crypto.md5 another_hash = 3;
+}

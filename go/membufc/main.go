@@ -98,6 +98,9 @@ func main() {
 			fmt.Println("ERROR:", err.Error())
 			os.Exit(1)
 		}
+		if isInlineFile(&protoFile) {
+			continue
+		}
 		outPath := outputFileForPath(path, ".mb.go")
 		out, err := os.Create(outPath)
 		if err != nil {
@@ -144,4 +147,13 @@ func (i *importProvider) Provide(module string) (io.Reader, error) {
 		relativePath = "../" + relativePath
 	}
 	return nil, errors.New(fmt.Sprintf("import %s not found, looked at %v", module, attempts))
+}
+
+func isInlineFile(file *pbparser.ProtoFile) bool {
+	for _, option := range file.Options {
+		if option.Name == "inline" && option.Value == "true" {
+			return true
+		}
+	}
+	return false
 }

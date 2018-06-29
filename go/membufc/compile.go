@@ -13,6 +13,7 @@ import (
 )
 
 var box = packr.NewBox("./templates/go")
+var inlineTypes = make(map[string]string)
 
 func templateByBoxName(name string) *template.Template {
 	s, err := box.MustString(name)
@@ -77,6 +78,29 @@ func normalizeFieldsAndOneOfs(m *pbparser.MessageElement) {
 	}
 }
 
+func addInlineFromImports(file *pbparser.ProtoFile, dependencyData map[string]dependencyData) {
+	for _, dep := range dependencyData {
+		importedFile, err := pbparser.ParseFile(dep.path)
+		if err != nil {
+			fmt.Println("ERROR:", "imported file cannot be parsed: %s", dep.path)
+			os.Exit(1)
+		}
+		for _, option := range importedFile.Options {
+			if option.Name == "inline" && option.Value == "true" {
+				for _, m := range importedFile.Messages {
+					if len(m.Options) == 1 && m.Options[0].Name == "inline_type" {
+						if importedFile.PackageName != file.PackageName {
+							inlineTypes[importedFile.PackageName + "." + m.Name] = m.Options[0].Value
+						} else {
+							inlineTypes[m.Name] = m.Options[0].Value
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
 func addEnumsFromImports(file *pbparser.ProtoFile, dependencyData map[string]dependencyData) {
 	for _, dep := range dependencyData {
 		importedFile, err := pbparser.ParseFile(dep.path)
@@ -111,9 +135,13 @@ func addHeader(w io.Writer, file *pbparser.ProtoFile, dependencyData map[string]
 		fmt.Println("ERROR:", "option go_package not provided, required when we have imports")
 		os.Exit(1)
 	}
+	addInlineFromImports(file, dependencyData)
 	addEnumsFromImports(file, dependencyData)
 	imports := []string{}
 	for _, dependency := range file.Dependencies {
+		if isInlineFileByPath(dependencyData[dependency].path) {
+			continue
+		}
 		relative := dependencyData[dependency].relative
 		imports = append(imports, path.Dir(path.Clean(goPackage + "/" + relative + "/" + dependency)))
 	}
@@ -377,8 +405,15 @@ func getMessageField(messageName string, field pbparser.FieldElement, enumNameTo
 		}
 		return
 	}
+	if inlineType, isInline := inlineTypes[field.Type.Name()]; isInline {
+		newType, err := pbparser.NewScalarDataType(inlineType)
+		if err == nil {
+			field.Type = newType
+		}
+	}
 	if field.Label == "" || field.Label == "optional" || field.Label == "required" {
 		if field.Type.Category() == pbparser.ScalarDataTypeCategory {
+
 			goTypes := map[string]string{
 				"bytes":  "[]byte",
 				"string": "string",
@@ -494,6 +529,15 @@ func getFileEnums(enums []pbparser.EnumElement) ([]Enum, map[string]int) {
 		}
 	}
 	return enumByIndex, enumNameToIndex
+}
+
+func isInlineFileByPath(path string) bool {
+	file, err := pbparser.ParseFile(path)
+	if err != nil {
+		fmt.Println("ERROR:", "imported file cannot be parsed: %s", path)
+		os.Exit(1)
+	}
+	return isInlineFile(&file)
 }
 
 type Enum struct{
