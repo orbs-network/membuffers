@@ -1,0 +1,9 @@
+/////////////////////////////////////////////////////////////////////////////
+// service {{.ServiceName}}
+
+type {{.ServiceName}} interface {
+{{- range .Methods}}
+	{{.Name}}(*{{.Input}}) (*{{.Output}}, error)
+{{- end}}
+}
+

@@ -1,0 +1,24 @@
+syntax = "proto3";
+package types;
+option go_package = "github.com/orbs-network/membuffers/go/membufc/e2e/protos";
+
+service StateStorage {
+    rpc WriteKey (WriteKeyInput) returns (WriteKeyOutput);
+    rpc ReadKey (ReadKeyInput) returns (ReadKeyOutput);
+}
+
+message WriteKeyInput {
+    string key = 1;
+    uint32 value = 2;
+}
+
+message WriteKeyOutput {
+}
+
+message ReadKeyInput {
+    string key = 1;
+}
+
+message ReadKeyOutput {
+    uint32 value = 1;
+}

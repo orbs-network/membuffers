@@ -1,0 +1,7 @@
+// AUTO GENERATED FILE (by membufc proto compiler)
+package {{.PackageName}}
+
+import (
+	"github.com/maraino/go-mock"
+)
+

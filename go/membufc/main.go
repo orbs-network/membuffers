@@ -12,6 +12,7 @@ import (
 
 type config struct {
 	language string
+	mock bool
 	files []string
 }
 
@@ -35,6 +36,10 @@ func handleFlag(flag string) {
 		conf.language = "go"
 	case "-g":
 		conf.language = "go"
+	case "-m":
+		conf.mock = true
+	case "--mock":
+		conf.mock = true
 	default:
 		fmt.Println("ERROR: Unknown command line flag:", flag)
 		displayUsage()
@@ -52,6 +57,7 @@ func displayUsage() {
 	fmt.Println("  -v, --version    Show version info and exit.")
 	fmt.Println("  -h, --help       Show this usage text and exit.")
 	fmt.Println("  -g, --go         Set output file language to Go.")
+	fmt.Println("  -m, --mock       Generate mocks for services as well.")
 	os.Exit(0)
 }
 
@@ -62,9 +68,9 @@ func assertFileExists(path string) {
 	}
 }
 
-func outputFileForPath(path string) string {
+func outputFileForPath(path string, suffix string) string {
 	parts := strings.Split(path, ".")
-	return strings.Join(parts[0:len(parts)-1], ".") + ".mb.go"
+	return strings.Join(parts[0:len(parts)-1], ".") + suffix
 }
 
 func main() {
@@ -92,7 +98,7 @@ func main() {
 			fmt.Println("ERROR:", err.Error())
 			os.Exit(1)
 		}
-		outPath := outputFileForPath(path)
+		outPath := outputFileForPath(path, ".mb.go")
 		out, err := os.Create(outPath)
 		if err != nil {
 			fmt.Println("ERROR:", err.Error())
@@ -101,6 +107,17 @@ func main() {
 		defer out.Close()
 		compileProtoFile(out, protoFile, p.moduleToRelative)
 		fmt.Println("Created file:", outPath)
+		if len(protoFile.Services) > 0 && conf.mock {
+			outPath := outputFileForPath(path, "_mock.mb.go")
+			out, err := os.Create(outPath)
+			if err != nil {
+				fmt.Println("ERROR:", err.Error())
+				os.Exit(1)
+			}
+			defer out.Close()
+			compileMockFile(out, protoFile, p.moduleToRelative)
+			fmt.Println("Created mock file:", outPath)
+		}
 	}
 }
 

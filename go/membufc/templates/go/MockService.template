@@ -1,0 +1,18 @@
+/////////////////////////////////////////////////////////////////////////////
+// service {{.ServiceName}}{{$ServiceName := .ServiceName}}
+
+type Mock{{.ServiceName}} struct {
+	mock.Mock
+}
+
+{{range .Methods -}}
+func (s *Mock{{$ServiceName}}) {{.Name}}(input *{{.Input}}) (*{{.Output}}, error) {
+	ret := s.Called(input)
+	if out := ret.Get(0); out != nil {
+		return out.(*{{.Output}}), ret.Error(1)
+	} else {
+		return nil, ret.Error(1)
+	}
+}
+
+{{end}}

@@ -32,8 +32,18 @@ func convertFieldNameToGoCase(fieldName string) string {
 	return ToCamel(fieldName)
 }
 
+func compileMockFile(w io.Writer, file pbparser.ProtoFile, dependencyData map[string]dependencyData) {
+	addMockHeader(w, &file, dependencyData)
+	for _, s := range file.Services {
+		addMockService(w, s, &file)
+	}
+}
+
 func compileProtoFile(w io.Writer, file pbparser.ProtoFile, dependencyData map[string]dependencyData) {
 	addHeader(w, &file, dependencyData)
+	for _, s := range file.Services {
+		addService(w, s, &file)
+	}
 	for _, m := range file.Messages {
 		addMessage(w, m, &file)
 	}
@@ -81,6 +91,15 @@ func addEnumsFromImports(file *pbparser.ProtoFile, dependencyData map[string]dep
 	}
 }
 
+func addMockHeader(w io.Writer, file *pbparser.ProtoFile, dependencyData map[string]dependencyData) {
+	t := templateByBoxName("MockFileHeader.template")
+	t.Execute(w, struct {
+		PackageName string
+	}{
+		PackageName: file.PackageName,
+	})
+}
+
 func addHeader(w io.Writer, file *pbparser.ProtoFile, dependencyData map[string]dependencyData) {
 	var goPackage string
 	for _, option := range file.Options {
@@ -120,6 +139,52 @@ func addEnums(w io.Writer, enums []pbparser.EnumElement) {
 		Enums []Enum
 	}{
 		Enums: messageEnums,
+	})
+}
+
+type ServiceMethod struct{
+	Name string
+	Input string
+	Output string
+}
+
+func addMockService(w io.Writer, s pbparser.ServiceElement, file *pbparser.ProtoFile) {
+	methods := []ServiceMethod{}
+	for _, rpc := range s.RPCs {
+		method := ServiceMethod{
+			Name: rpc.Name,
+			Input: rpc.RequestType.Name(),
+			Output: rpc.ResponseType.Name(),
+		}
+		methods = append(methods, method)
+	}
+	t := templateByBoxName("MockService.template")
+	t.Execute(w, struct {
+		ServiceName string
+		Methods []ServiceMethod
+	}{
+		ServiceName: s.Name,
+		Methods: methods,
+	})
+}
+
+func addService(w io.Writer, s pbparser.ServiceElement, file *pbparser.ProtoFile) {
+	methods := []ServiceMethod{}
+	for _, rpc := range s.RPCs {
+		method := ServiceMethod{
+			Name: rpc.Name,
+			Input: rpc.RequestType.Name(),
+			Output: rpc.ResponseType.Name(),
+		}
+		methods = append(methods, method)
+	}
+	t := templateByBoxName("MessageService.template")
+	t.Execute(w, struct {
+		ServiceName string
+		Methods []ServiceMethod
+	}{
+		ServiceName: s.Name,
+		Methods: methods,
 	})
 }
 
@@ -329,6 +394,11 @@ func getMessageField(messageName string, field pbparser.FieldElement, enumNameTo
 				"uint16": "Uint16",
 				"uint32": "Uint32",
 				"uint64": "Uint64",
+			}
+			_, ok := accessor[field.Type.Name()]
+			if !ok {
+				fmt.Println("ERROR: unsupported primitive type:", field.Type.Name())
+				os.Exit(1)
 			}
 			messageField = MessageField{
 				FieldName:    convertFieldNameToGoCase(field.Name),
