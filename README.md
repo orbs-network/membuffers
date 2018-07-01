@@ -94,6 +94,27 @@ This standalone library was originally created as part of the [ORBS](https://www
     }
     ```
 
+6. Quick build for convenience (combines 3+4):
+
+    ```go
+    transaction := (&types.TransactionBuilder{
+      Data: &types.TransactionDataBuilder{
+        ProtocolVersion: 0x01,
+        SenderAccount: 0x11223344,
+        ContractMethod: "ZincToken.Transfer",
+      },
+      Hash: []byte{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,},
+    }).Build()
+    // validate format
+    if !transaction.IsValid() {   
+      fmt.Println("serialized data is invalid")
+    }
+    // access fields
+    ver := transaction.Data().ProtocolVersion()
+    sender := transaction.Data().SenderAccount()
+    contract := transaction.Data().ContractMethod
+    ```
+
 ## Installation
 
 #### Prerequisites

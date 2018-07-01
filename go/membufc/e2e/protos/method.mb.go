@@ -113,6 +113,14 @@ func (w *MethodBuilder) CalcRequiredSize() membuffers.Offset {
 	return w.builder.GetSize()
 }
 
+func (w *MethodBuilder) Build() *Method {
+	buf := make([]byte, w.CalcRequiredSize())
+	if w.Write(buf) != nil {
+		return nil
+	}
+	return MethodReader(buf)
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // message MethodCallArgument
 
@@ -257,5 +265,13 @@ func (w *MethodCallArgumentBuilder) CalcRequiredSize() membuffers.Offset {
 	}
 	w.Write(nil)
 	return w.builder.GetSize()
+}
+
+func (w *MethodCallArgumentBuilder) Build() *MethodCallArgument {
+	buf := make([]byte, w.CalcRequiredSize())
+	if w.Write(buf) != nil {
+		return nil
+	}
+	return MethodCallArgumentReader(buf)
 }
 

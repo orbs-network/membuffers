@@ -61,3 +61,11 @@ func (w *{{.MessageName}}Builder) CalcRequiredSize() membuffers.Offset {
 	return w.builder.GetSize()
 }
 
+func (w *{{.MessageName}}Builder) Build() *{{.MessageName}} {
+	buf := make([]byte, w.CalcRequiredSize())
+	if w.Write(buf) != nil {
+		return nil
+	}
+	return {{.MessageName}}Reader(buf)
+}
+

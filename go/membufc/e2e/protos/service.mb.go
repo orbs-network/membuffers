@@ -101,6 +101,14 @@ func (w *WriteKeyInputBuilder) CalcRequiredSize() membuffers.Offset {
 	return w.builder.GetSize()
 }
 
+func (w *WriteKeyInputBuilder) Build() *WriteKeyInput {
+	buf := make([]byte, w.CalcRequiredSize())
+	if w.Write(buf) != nil {
+		return nil
+	}
+	return WriteKeyInputReader(buf)
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // message WriteKeyOutput
 
@@ -159,6 +167,14 @@ func (w *WriteKeyOutputBuilder) CalcRequiredSize() membuffers.Offset {
 	}
 	w.Write(nil)
 	return w.builder.GetSize()
+}
+
+func (w *WriteKeyOutputBuilder) Build() *WriteKeyOutput {
+	buf := make([]byte, w.CalcRequiredSize())
+	if w.Write(buf) != nil {
+		return nil
+	}
+	return WriteKeyOutputReader(buf)
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -235,6 +251,14 @@ func (w *ReadKeyInputBuilder) CalcRequiredSize() membuffers.Offset {
 	return w.builder.GetSize()
 }
 
+func (w *ReadKeyInputBuilder) Build() *ReadKeyInput {
+	buf := make([]byte, w.CalcRequiredSize())
+	if w.Write(buf) != nil {
+		return nil
+	}
+	return ReadKeyInputReader(buf)
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // message ReadKeyOutput
 
@@ -307,5 +331,13 @@ func (w *ReadKeyOutputBuilder) CalcRequiredSize() membuffers.Offset {
 	}
 	w.Write(nil)
 	return w.builder.GetSize()
+}
+
+func (w *ReadKeyOutputBuilder) Build() *ReadKeyOutput {
+	buf := make([]byte, w.CalcRequiredSize())
+	if w.Write(buf) != nil {
+		return nil
+	}
+	return ReadKeyOutputReader(buf)
 }
 

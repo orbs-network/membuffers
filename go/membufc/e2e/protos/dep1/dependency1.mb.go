@@ -79,3 +79,11 @@ func (w *DependencyMessageBuilder) CalcRequiredSize() membuffers.Offset {
 	return w.builder.GetSize()
 }
 
+func (w *DependencyMessageBuilder) Build() *DependencyMessage {
+	buf := make([]byte, w.CalcRequiredSize())
+	if w.Write(buf) != nil {
+		return nil
+	}
+	return DependencyMessageReader(buf)
+}
+

@@ -107,6 +107,14 @@ func (w *TransactionBuilder) CalcRequiredSize() membuffers.Offset {
 	return w.builder.GetSize()
 }
 
+func (w *TransactionBuilder) Build() *Transaction {
+	buf := make([]byte, w.CalcRequiredSize())
+	if w.Write(buf) != nil {
+		return nil
+	}
+	return TransactionReader(buf)
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // message TransactionData
 
@@ -243,6 +251,14 @@ func (w *TransactionDataBuilder) CalcRequiredSize() membuffers.Offset {
 	return w.builder.GetSize()
 }
 
+func (w *TransactionDataBuilder) Build() *TransactionData {
+	buf := make([]byte, w.CalcRequiredSize())
+	if w.Write(buf) != nil {
+		return nil
+	}
+	return TransactionDataReader(buf)
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // message TransactionSender
 
@@ -337,6 +353,14 @@ func (w *TransactionSenderBuilder) CalcRequiredSize() membuffers.Offset {
 	}
 	w.Write(nil)
 	return w.builder.GetSize()
+}
+
+func (w *TransactionSenderBuilder) Build() *TransactionSender {
+	buf := make([]byte, w.CalcRequiredSize())
+	if w.Write(buf) != nil {
+		return nil
+	}
+	return TransactionSenderReader(buf)
 }
 
 /////////////////////////////////////////////////////////////////////////////

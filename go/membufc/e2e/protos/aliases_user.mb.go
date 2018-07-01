@@ -115,3 +115,11 @@ func (w *FileRecordBuilder) CalcRequiredSize() membuffers.Offset {
 	return w.builder.GetSize()
 }
 
+func (w *FileRecordBuilder) Build() *FileRecord {
+	buf := make([]byte, w.CalcRequiredSize())
+	if w.Write(buf) != nil {
+		return nil
+	}
+	return FileRecordReader(buf)
+}
+

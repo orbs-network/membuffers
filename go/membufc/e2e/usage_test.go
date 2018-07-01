@@ -179,3 +179,41 @@ func TestReadWriteWithImports(t *testing.T) {
 		t.Fatalf("B: is not DependencyEnum_OPTION_A")
 	}
 }
+
+func TestQuickBuildTransaction(t *testing.T) {
+	transaction := (&types.TransactionBuilder{
+		Data: &types.TransactionDataBuilder{
+			ProtocolVersion: 0x01,
+			VirtualChain: 0x11223344,
+			Sender: []*types.TransactionSenderBuilder{
+				&types.TransactionSenderBuilder{
+					Name: "johnny",
+					Friend: []string{"billy","jeff","alex"},
+				},
+				&types.TransactionSenderBuilder{
+					Name: "rachel",
+					Friend: []string{"jessica","sara"},
+				},
+			},
+			TimeStamp: 0x445566778899,
+		},
+		Signature: []byte{0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,},
+		Type: types.NetworkType_RESERVED,
+	}).Build()
+
+	if transaction.Data().ProtocolVersion() != 0x01 {
+		t.Fatalf("ProtocolVersion: instead of expected got %v", transaction.Data().ProtocolVersion())
+	}
+	if transaction.Data().VirtualChain() != 0x11223344 {
+		t.Fatalf("VirtualChain: instead of expected got %v", transaction.Data().VirtualChain())
+	}
+	if transaction.Data().TimeStamp() != 0x445566778899 {
+		t.Fatalf("TimeStamp: instead of expected got %v", transaction.Data().TimeStamp())
+	}
+	if !bytes.Equal(transaction.Signature(), []byte{0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,}) {
+		t.Fatalf("Signature: instead of expected got %v", transaction.Signature())
+	}
+	if transaction.Type() != types.NetworkType_RESERVED {
+		t.Fatalf("Type: instead of expected got %v", transaction.Type())
+	}
+}

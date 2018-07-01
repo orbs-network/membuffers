@@ -95,6 +95,14 @@ func (w *DependentBuilder) CalcRequiredSize() membuffers.Offset {
 	return w.builder.GetSize()
 }
 
+func (w *DependentBuilder) Build() *Dependent {
+	buf := make([]byte, w.CalcRequiredSize())
+	if w.Write(buf) != nil {
+		return nil
+	}
+	return DependentReader(buf)
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // enums
 

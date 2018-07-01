@@ -1,6 +1,8 @@
 package types
 
-import "github.com/orbs-network/membuffers/go"
+import (
+	"github.com/orbs-network/membuffers/go"
+)
 
 /*
 message Method {
@@ -112,6 +114,14 @@ func (w *MethodBuilder) CalcRequiredSize() membuffers.Offset {
 	}
 	w.Write(nil)
 	return w.builder.GetSize()
+}
+
+func (w *MethodBuilder) Build() *Method {
+	buf := make([]byte, w.CalcRequiredSize())
+	if w.Write(buf) != nil {
+		return nil
+	}
+	return MethodReader(buf)
 }
 
 /*
@@ -265,4 +275,12 @@ func (w *MethodCallArgumentBuilder) CalcRequiredSize() membuffers.Offset {
 	}
 	w.Write(nil)
 	return w.builder.GetSize()
+}
+
+func (w *MethodCallArgumentBuilder) Build() *MethodCallArgument {
+	buf := make([]byte, w.CalcRequiredSize())
+	if w.Write(buf) != nil {
+		return nil
+	}
+	return MethodCallArgumentReader(buf)
 }
