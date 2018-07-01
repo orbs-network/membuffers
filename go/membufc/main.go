@@ -47,7 +47,7 @@ func handleFlag(flag string) {
 }
 
 func displayVersion() {
-	fmt.Println("membufc 0.0.1")
+	fmt.Println("membufc 0.0.2")
 	os.Exit(0)
 }
 
