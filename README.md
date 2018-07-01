@@ -80,7 +80,7 @@ This standalone library was originally created as part of the [ORBS](https://www
     // access fields
     ver := transaction.Data().ProtocolVersion()
     sender := transaction.Data().SenderAccount()
-    contract := transaction.Data().ContractMethod
+    contract := transaction.Data().ContractMethod()
     ```
     
 5. Mutate fields as needed:
@@ -112,7 +112,7 @@ This standalone library was originally created as part of the [ORBS](https://www
     // access fields
     ver := transaction.Data().ProtocolVersion()
     sender := transaction.Data().SenderAccount()
-    contract := transaction.Data().ContractMethod
+    contract := transaction.Data().ContractMethod()
     ```
 
 ## Installation
