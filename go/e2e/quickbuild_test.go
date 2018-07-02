@@ -24,7 +24,7 @@ func TestQuickBuildTransaction(t *testing.T) {
 			TimeStamp: 0x445566778899,
 		},
 		Signature: []byte{0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,},
-		Type: types.NetworkType_RESERVED,
+		Type: types.NETWORK_TYPE_RESERVED,
 	}).Build()
 
 	if transaction.Data().ProtocolVersion() != 0x01 {
@@ -39,7 +39,7 @@ func TestQuickBuildTransaction(t *testing.T) {
 	if !bytes.Equal(transaction.Signature(), []byte{0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,}) {
 		t.Fatalf("Signature: instead of expected got %v", transaction.Signature())
 	}
-	if transaction.Type() != types.NetworkType_RESERVED {
+	if transaction.Type() != types.NETWORK_TYPE_RESERVED {
 		t.Fatalf("Type: instead of expected got %v", transaction.Type())
 	}
 	senderCount := 0

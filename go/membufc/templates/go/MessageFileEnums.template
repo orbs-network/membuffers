@@ -6,7 +6,7 @@ type {{.Name}} uint16
 
 const (
 {{- range .Values}}
-	{{$EnumName}}_{{.Name}} {{$EnumName}} = {{.Value -}}
+	{{.Name}} {{$EnumName}} = {{.Value -}}
 {{end}}
 )
 

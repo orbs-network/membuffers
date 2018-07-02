@@ -33,7 +33,7 @@ func TestReadWriteTransaction(t *testing.T) {
 			TimeStamp: 0x445566778899,
 		},
 		Signature: []byte{0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,},
-		Type: types.NetworkType_RESERVED,
+		Type: types.NETWORK_TYPE_RESERVED,
 	}
 	buf := make([]byte, builder.CalcRequiredSize())
 	err := builder.Write(buf)
@@ -55,7 +55,7 @@ func TestReadWriteTransaction(t *testing.T) {
 	if !bytes.Equal(transaction.Signature(), []byte{0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,}) {
 		t.Fatalf("Signature: instead of expected got %v", transaction.Signature())
 	}
-	if transaction.Type() != types.NetworkType_RESERVED {
+	if transaction.Type() != types.NETWORK_TYPE_RESERVED {
 		t.Fatalf("Type: instead of expected got %v", transaction.Type())
 	}
 	senderCount := 0
@@ -175,8 +175,11 @@ func TestReadWriteWithImports(t *testing.T) {
 	if dependent.A().Field() != 0 {
 		t.Fatalf("A.Field: is not empty")
 	}
-	if dependent.B() != dep11.DependencyEnum_OPTION_A {
+	if dependent.B() != dep11.DEPENDENCY_ENUM_OPTION_A {
 		t.Fatalf("B: is not DependencyEnum_OPTION_A")
+	}
+	if dependent.C().Field() != "" {
+		t.Fatalf("C.Field: is not empty")
 	}
 }
 
@@ -198,7 +201,7 @@ func TestQuickBuildTransaction(t *testing.T) {
 			TimeStamp: 0x445566778899,
 		},
 		Signature: []byte{0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,},
-		Type: types.NetworkType_RESERVED,
+		Type: types.NETWORK_TYPE_RESERVED,
 	}).Build()
 
 	if transaction.Data().ProtocolVersion() != 0x01 {
@@ -213,7 +216,7 @@ func TestQuickBuildTransaction(t *testing.T) {
 	if !bytes.Equal(transaction.Signature(), []byte{0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,}) {
 		t.Fatalf("Signature: instead of expected got %v", transaction.Signature())
 	}
-	if transaction.Type() != types.NetworkType_RESERVED {
+	if transaction.Type() != types.NETWORK_TYPE_RESERVED {
 		t.Fatalf("Type: instead of expected got %v", transaction.Type())
 	}
 }

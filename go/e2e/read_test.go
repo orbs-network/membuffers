@@ -45,7 +45,7 @@ func TestReadPrimitives(t *testing.T) {
 		t.Fatalf("TimeStamp: instead of expected got %v", ts)
 	}
 	tt := transaction.Type()
-	if tt != types.NetworkType_TEST_NET {
+	if tt != types.NETWORK_TYPE_TEST_NET {
 		t.Fatalf("Type: instead of expected got %v", tt)
 	}
 }

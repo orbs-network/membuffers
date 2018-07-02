@@ -20,7 +20,7 @@ message TransactionSender {
 }
 
 enum NetworkType {
-    MAIN_NET = 0;
-    TEST_NET = 1;
-    RESERVED = 2;
+    NETWORK_TYPE_MAIN_NET = 0;
+    NETWORK_TYPE_TEST_NET = 1;
+    NETWORK_TYPE_RESERVED = 2;
 }

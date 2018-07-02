@@ -382,7 +382,7 @@ func (w *TransactionSenderBuilder) Build() *TransactionSender {
 type NetworkType uint16
 
 const (
-	NetworkType_MAIN_NET NetworkType = 0
-	NetworkType_TEST_NET NetworkType = 1
-	NetworkType_RESERVED NetworkType = 2
+	NETWORK_TYPE_MAIN_NET NetworkType = 0
+	NETWORK_TYPE_TEST_NET NetworkType = 1
+	NETWORK_TYPE_RESERVED NetworkType = 2
 )

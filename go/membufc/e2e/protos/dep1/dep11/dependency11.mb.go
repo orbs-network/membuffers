@@ -10,7 +10,7 @@ import (
 type DependencyEnum uint16
 
 const (
-	DependencyEnum_OPTION_A DependencyEnum = 0
-	DependencyEnum_OPTION_B DependencyEnum = 1
+	DEPENDENCY_ENUM_OPTION_A DependencyEnum = 0
+	DEPENDENCY_ENUM_OPTION_B DependencyEnum = 1
 )
 
