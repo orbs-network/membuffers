@@ -4,7 +4,7 @@ import (
 	"os"
 	"strings"
 	"fmt"
-	"github.com/tallstoat/pbparser"
+	"github.com/orbs-network/pbparser"
 	"io"
 	"errors"
 	"path"
@@ -47,7 +47,7 @@ func handleFlag(flag string) {
 }
 
 func displayVersion() {
-	fmt.Println("membufc 0.0.2")
+	fmt.Println("membufc 0.0.3")
 	os.Exit(0)
 }
 
@@ -87,6 +87,7 @@ func main() {
 		}
 	}
 	for _, path := range conf.files {
+		fmt.Println("Compiling file:\t", path)
 		in, err := os.Open(path)
 		if err != nil {
 			fmt.Println("ERROR:", err.Error())
@@ -99,6 +100,7 @@ func main() {
 			os.Exit(1)
 		}
 		if isInlineFile(&protoFile) {
+			fmt.Println()
 			continue
 		}
 		outPath := outputFileForPath(path, ".mb.go")
@@ -109,7 +111,7 @@ func main() {
 		}
 		defer out.Close()
 		compileProtoFile(out, protoFile, p.moduleToRelative)
-		fmt.Println("Created file:", outPath)
+		fmt.Println("Created file:\t", outPath)
 		if len(protoFile.Services) > 0 && conf.mock {
 			outPath := outputFileForPath(path, "_mock.mb.go")
 			out, err := os.Create(outPath)
@@ -119,8 +121,9 @@ func main() {
 			}
 			defer out.Close()
 			compileMockFile(out, protoFile, p.moduleToRelative)
-			fmt.Println("Created mock file:", outPath)
+			fmt.Println("Created mock file:\t", outPath)
 		}
+		fmt.Println()
 	}
 }
 
@@ -140,7 +143,9 @@ func (i *importProvider) Provide(module string) (io.Reader, error) {
 		attemptPath := basePath + relativePath + module
 		f, err := os.Open(attemptPath)
 		if err == nil {
-			i.moduleToRelative[module] = dependencyData{relative: relativePath, path: attemptPath}
+			if i.moduleToRelative != nil {
+				i.moduleToRelative[module] = dependencyData{relative: relativePath, path: attemptPath}
+			}
 			return f, nil
 		}
 		attempts = append(attempts, attemptPath)
