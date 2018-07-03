@@ -4,7 +4,7 @@ type {{.MessageName}}Builder struct {
 	builder membuffers.Builder
 {{range .MessageFields}}	{{.FieldName}} {{if .IsArray}}[]{{end}}{{if .IsMessage}}*{{.FieldGoType}}Builder{{else}}{{.FieldGoType}}{{end}}
 {{end -}}
-{{range .UnionByIndex}}{{range .}}	{{.FieldName}} {{.FieldGoType}}
+{{range .UnionByIndex}}{{range .}}	{{.FieldName}} {{if .IsMessage}}*{{.FieldGoType}}Builder{{else}}{{.FieldGoType}}{{end}}
 {{end}}{{end -}}
 }
 {{range .MessageFields}}{{if and .IsMessage .IsArray}}

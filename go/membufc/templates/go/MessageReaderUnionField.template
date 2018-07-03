@@ -17,12 +17,12 @@ func (x *{{.MessageName}}) Is{{$UnionName}}{{.FieldName}}() bool {
 	return is
 }
 
+{{if not .IsMessage -}}
 func (x *{{.MessageName}}) {{$UnionName}}{{.FieldName}}() {{.FieldGoType}} {
 	_, off := x.message.IsUnionIndex({{$ParentFieldIndex}}, {{$UnionNum}}, {{.FieldIndex}})
 	return {{if .IsEnum}}{{.FieldGoType}}({{end}}x.message.Get{{.TypeAccessor}}InOffset(off){{if .IsEnum}}){{end}}
 }
 
-{{ if not .IsMessage -}}
 func (x *{{.MessageName}}) Mutate{{$UnionName}}{{.FieldName}}(v {{.FieldGoType}}) error {
 	is, off := x.message.IsUnionIndex({{$ParentFieldIndex}}, {{$UnionNum}}, {{.FieldIndex}})
 	if !is {
@@ -31,7 +31,13 @@ func (x *{{.MessageName}}) Mutate{{$UnionName}}{{.FieldName}}(v {{.FieldGoType}}
 	x.message.Set{{.TypeAccessor}}InOffset(off, {{if .IsEnum}}uint16({{end}}v){{if .IsEnum}}){{end}}
 	return nil
 }
-{{- end}}{{end}}
+{{- else -}}
+func (x *{{.MessageName}}) {{$UnionName}}{{.FieldName}}() *{{.FieldGoType}} {
+	_, off := x.message.IsUnionIndex({{$ParentFieldIndex}}, {{$UnionNum}}, {{.FieldIndex}})
+	b, s := x.message.GetMessageInOffset(off)
+	return {{.FieldGoType}}Reader(b[:s])
+}
+{{- end -}}{{end}}
 
 func (x *{{.MessageName}}) Raw{{.UnionName}}() []byte {
 	return x.message.RawBufferForField({{.FieldIndex}}, {{.UnionNum}})
