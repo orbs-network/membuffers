@@ -36,14 +36,14 @@ func convertFieldNameToGoCase(fieldName string) string {
 func compileMockFile(w io.Writer, file pbparser.ProtoFile, dependencyData map[string]dependencyData) {
 	addMockHeader(w, &file, dependencyData)
 	for _, s := range file.Services {
-		addMockService(w, s, &file)
+		addMockService(w, file.PackageName, s, &file)
 	}
 }
 
 func compileProtoFile(w io.Writer, file pbparser.ProtoFile, dependencyData map[string]dependencyData) {
 	addHeader(w, &file, dependencyData)
 	for _, s := range file.Services {
-		addService(w, s, &file)
+		addService(w, file.PackageName, s, &file)
 	}
 	for _, m := range file.Messages {
 		addMessage(w, file.PackageName, m, &file)
@@ -186,13 +186,13 @@ type ServiceMethod struct{
 	Output string
 }
 
-func addMockService(w io.Writer, s pbparser.ServiceElement, file *pbparser.ProtoFile) {
+func addMockService(w io.Writer, packageName string, s pbparser.ServiceElement, file *pbparser.ProtoFile) {
 	methods := []ServiceMethod{}
 	for _, rpc := range s.RPCs {
 		method := ServiceMethod{
 			Name: rpc.Name,
-			Input: rpc.RequestType.Name(),
-			Output: rpc.ResponseType.Name(),
+			Input: removeLocalPackagePrefix(packageName, rpc.RequestType.Name()),
+			Output: removeLocalPackagePrefix(packageName, rpc.ResponseType.Name()),
 		}
 		methods = append(methods, method)
 	}
@@ -206,13 +206,13 @@ func addMockService(w io.Writer, s pbparser.ServiceElement, file *pbparser.Proto
 	})
 }
 
-func addService(w io.Writer, s pbparser.ServiceElement, file *pbparser.ProtoFile) {
+func addService(w io.Writer, packageName string, s pbparser.ServiceElement, file *pbparser.ProtoFile) {
 	methods := []ServiceMethod{}
 	for _, rpc := range s.RPCs {
 		method := ServiceMethod{
 			Name: rpc.Name,
-			Input: rpc.RequestType.Name(),
-			Output: rpc.ResponseType.Name(),
+			Input: removeLocalPackagePrefix(packageName, rpc.RequestType.Name()),
+			Output: removeLocalPackagePrefix(packageName, rpc.ResponseType.Name()),
 		}
 		methods = append(methods, method)
 	}
