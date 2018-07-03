@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/tallstoat/pbparser"
+	"github.com/orbs-network/pbparser"
 	"io"
 	"sort"
 	"text/template"
@@ -46,7 +46,7 @@ func compileProtoFile(w io.Writer, file pbparser.ProtoFile, dependencyData map[s
 		addService(w, s, &file)
 	}
 	for _, m := range file.Messages {
-		addMessage(w, m, &file)
+		addMessage(w, file.PackageName, m, &file)
 	}
 	addEnums(w, file.Enums)
 }
@@ -80,9 +80,9 @@ func normalizeFieldsAndOneOfs(m *pbparser.MessageElement) {
 
 func addInlineFromImports(file *pbparser.ProtoFile, dependencyData map[string]dependencyData) {
 	for _, dep := range dependencyData {
-		importedFile, err := pbparser.ParseFile(dep.path)
+		importedFile, err := parseImportedFile(dep.path)
 		if err != nil {
-			fmt.Println("ERROR:", "imported file cannot be parsed: %s", dep.path)
+			fmt.Println("ERROR:", "imported file cannot be parsed:", dep.path, "\n", err)
 			os.Exit(1)
 		}
 		for _, option := range importedFile.Options {
@@ -103,9 +103,9 @@ func addInlineFromImports(file *pbparser.ProtoFile, dependencyData map[string]de
 
 func addEnumsFromImports(file *pbparser.ProtoFile, dependencyData map[string]dependencyData) {
 	for _, dep := range dependencyData {
-		importedFile, err := pbparser.ParseFile(dep.path)
+		importedFile, err := parseImportedFile(dep.path)
 		if err != nil {
-			fmt.Println("ERROR:", "imported file cannot be parsed: %s", dep.path)
+			fmt.Println("ERROR:", "imported file cannot be parsed:", dep.path, "\n", err)
 			os.Exit(1)
 		}
 		for i, enum := range importedFile.Enums {
@@ -143,7 +143,10 @@ func addHeader(w io.Writer, file *pbparser.ProtoFile, dependencyData map[string]
 			continue
 		}
 		relative := dependencyData[dependency].relative
-		imports = append(imports, path.Dir(path.Clean(goPackage + "/" + relative + "/" + dependency)))
+		packageImport := path.Dir(path.Clean(goPackage + "/" + relative + "/" + dependency))
+		if packageImport != goPackage {
+			imports = append(imports, packageImport)
+		}
 	}
 	t := templateByBoxName("MessageFileHeader.template")
 	t.Execute(w, struct {
@@ -216,7 +219,7 @@ func addService(w io.Writer, s pbparser.ServiceElement, file *pbparser.ProtoFile
 	})
 }
 
-func addMessage(w io.Writer, m pbparser.MessageElement, file *pbparser.ProtoFile) {
+func addMessage(w io.Writer, packageName string, m pbparser.MessageElement, file *pbparser.ProtoFile) {
 	normalizeFieldsAndOneOfs(&m)
 	_, enumNameToIndex := getFileEnums(file.Enums)
 	t := templateByBoxName("MessageHeader.template")
@@ -225,19 +228,19 @@ func addMessage(w io.Writer, m pbparser.MessageElement, file *pbparser.ProtoFile
 	}{
 		MessageName: m.Name,
 	})
-	addMessageScheme(w, m.Name, m.Fields, m.OneOfs, enumNameToIndex)
-	addMessageUnions(w, m.Name, m.Fields, m.OneOfs, enumNameToIndex)
+	addMessageScheme(w, packageName, m.Name, m.Fields, m.OneOfs, enumNameToIndex)
+	addMessageUnions(w, packageName, m.Name, m.Fields, m.OneOfs, enumNameToIndex)
 	addMessageReaderHeader(w, m.Name, m.Fields, m.OneOfs, enumNameToIndex)
 	for _, field := range m.Fields {
-		addMessageReaderField(w, m.Name, field, m.OneOfs, enumNameToIndex)
+		addMessageReaderField(w, packageName, m.Name, field, m.OneOfs, enumNameToIndex)
 	}
-	addMessageBuilder(w, m.Name, m.Fields, m.OneOfs, enumNameToIndex)
+	addMessageBuilder(w, packageName, m.Name, m.Fields, m.OneOfs, enumNameToIndex)
 }
 
-func addMessageScheme(w io.Writer, messageName string, fields []pbparser.FieldElement, unions []pbparser.OneOfElement, enumNameToIndex map[string]int) {
+func addMessageScheme(w io.Writer, packageName string, messageName string, fields []pbparser.FieldElement, unions []pbparser.OneOfElement, enumNameToIndex map[string]int) {
 	messageFields := []MessageField{}
 	for _, field := range fields {
-		messageField := getMessageField(messageName, field, enumNameToIndex)
+		messageField := getMessageField(packageName, messageName, field, enumNameToIndex)
 		messageFields = append(messageFields, messageField)
 	}
 	t := templateByBoxName("MessageScheme.template")
@@ -250,8 +253,8 @@ func addMessageScheme(w io.Writer, messageName string, fields []pbparser.FieldEl
 	})
 }
 
-func addMessageUnions(w io.Writer, messageName string, fields []pbparser.FieldElement, unions []pbparser.OneOfElement, enumNameToIndex map[string]int) {
-	unionByIndex, _ := getMessageUnions(messageName, unions, enumNameToIndex)
+func addMessageUnions(w io.Writer, packageName string, messageName string, fields []pbparser.FieldElement, unions []pbparser.OneOfElement, enumNameToIndex map[string]int) {
+	unionByIndex, _ := getMessageUnions(packageName, messageName, unions, enumNameToIndex)
 	t := templateByBoxName("MessageUnions.template")
 	t.Execute(w, struct {
 		MessageName string
@@ -271,10 +274,10 @@ func addMessageReaderHeader(w io.Writer, messageName string, fields []pbparser.F
 	})
 }
 
-func addMessageReaderField(w io.Writer, messageName string, field pbparser.FieldElement, unions []pbparser.OneOfElement, enumNameToIndex map[string]int) {
-	messageField := getMessageField(messageName, field, enumNameToIndex)
+func addMessageReaderField(w io.Writer, packageName string, messageName string, field pbparser.FieldElement, unions []pbparser.OneOfElement, enumNameToIndex map[string]int) {
+	messageField := getMessageField(packageName, messageName, field, enumNameToIndex)
 	if messageField.IsUnion {
-		unionByIndex, unionNameToIndex := getMessageUnions(messageName, unions, enumNameToIndex)
+		unionByIndex, unionNameToIndex := getMessageUnions(packageName, messageName, unions, enumNameToIndex)
 		t := templateByBoxName("MessageReaderUnionField.template")
 		t.Execute(w, struct {
 			MessageName string
@@ -337,11 +340,11 @@ func addMessageReaderField(w io.Writer, messageName string, field pbparser.Field
 	}
 }
 
-func addMessageBuilder(w io.Writer, messageName string, fields []pbparser.FieldElement, unions []pbparser.OneOfElement, enumNameToIndex map[string]int) {
+func addMessageBuilder(w io.Writer, packageName string, messageName string, fields []pbparser.FieldElement, unions []pbparser.OneOfElement, enumNameToIndex map[string]int) {
 	messageFields := []MessageField{}
-	unionByIndex, unionNameToIndex := getMessageUnions(messageName, unions, enumNameToIndex)
+	unionByIndex, unionNameToIndex := getMessageUnions(packageName, messageName, unions, enumNameToIndex)
 	for _, field := range fields {
-		messageField := getMessageField(messageName, field, enumNameToIndex)
+		messageField := getMessageField(packageName, messageName, field, enumNameToIndex)
 		messageFields = append(messageFields, messageField)
 	}
 	t := templateByBoxName("MessageBuilder.template")
@@ -358,13 +361,13 @@ func addMessageBuilder(w io.Writer, messageName string, fields []pbparser.FieldE
 	})
 }
 
-func getMessageUnions(messageName string, unions []pbparser.OneOfElement, enumNameToIndex map[string]int) ([][]MessageField, map[string]int) {
+func getMessageUnions(packageName string, messageName string, unions []pbparser.OneOfElement, enumNameToIndex map[string]int) ([][]MessageField, map[string]int) {
 	unionByIndex := [][]MessageField{}
 	unionNameToIndex := make(map[string]int)
 	for _, oneOf := range unions {
 		messageFields := []MessageField{}
 		for _, field := range oneOf.Fields {
-			messageFields = append(messageFields, getMessageField(messageName, field, enumNameToIndex))
+			messageFields = append(messageFields, getMessageField(packageName, messageName, field, enumNameToIndex))
 		}
 		unionNameToIndex[oneOf.Name] = len(unionByIndex)
 		unionByIndex = append(unionByIndex, messageFields)
@@ -384,7 +387,7 @@ type MessageField struct{
 	MessageName string
 }
 
-func getMessageField(messageName string, field pbparser.FieldElement, enumNameToIndex map[string]int) (messageField MessageField) {
+func getMessageField(packageName string, messageName string, field pbparser.FieldElement, enumNameToIndex map[string]int) (messageField MessageField) {
 	defer func() {
 		if _, ok := enumNameToIndex[messageField.FieldGoType]; ok {
 			messageField.IsEnum = true
@@ -450,7 +453,7 @@ func getMessageField(messageName string, field pbparser.FieldElement, enumNameTo
 		if field.Type.Category() == pbparser.NamedDataTypeCategory {
 			messageField = MessageField{
 				FieldName:    convertFieldNameToGoCase(field.Name),
-				FieldGoType:  field.Type.Name(),
+				FieldGoType:  removeLocalPackagePrefix(packageName, field.Type.Name()),
 				IsMessage:    true,
 				IsArray:      false,
 				IsUnion:      false,
@@ -494,7 +497,7 @@ func getMessageField(messageName string, field pbparser.FieldElement, enumNameTo
 		if field.Type.Category() == pbparser.NamedDataTypeCategory {
 			messageField = MessageField{
 				FieldName:    convertFieldNameToGoCase(field.Name),
-				FieldGoType:  field.Type.Name(),
+				FieldGoType:  removeLocalPackagePrefix(packageName, field.Type.Name()),
 				IsMessage:    true,
 				IsArray:      true,
 				IsUnion:      false,
@@ -506,6 +509,10 @@ func getMessageField(messageName string, field pbparser.FieldElement, enumNameTo
 		}
 	}
 	return MessageField{}
+}
+
+func removeLocalPackagePrefix(localPackageName string, fieldGoType string) string {
+	return strings.TrimPrefix(fieldGoType, localPackageName + ".")
 }
 
 func getFileEnums(enums []pbparser.EnumElement) ([]Enum, map[string]int) {
@@ -532,9 +539,9 @@ func getFileEnums(enums []pbparser.EnumElement) ([]Enum, map[string]int) {
 }
 
 func isInlineFileByPath(path string) bool {
-	file, err := pbparser.ParseFile(path)
+	file, err := parseImportedFile(path)
 	if err != nil {
-		fmt.Println("ERROR:", "imported file cannot be parsed: %s", path)
+		fmt.Println("ERROR:", "imported file cannot be parsed:", path, "\n", err)
 		os.Exit(1)
 	}
 	return isInlineFile(&file)
@@ -548,4 +555,13 @@ type Enum struct{
 type EnumValue struct{
 	Name string
 	Value int
+}
+
+func parseImportedFile(path string) (pbparser.ProtoFile, error) {
+	in, err := os.Open(path)
+	if err != nil {
+		return pbparser.ProtoFile{}, err
+	}
+	p := importProvider{protoFile: path, moduleToRelative: nil}
+	return pbparser.Parse(in, &p)
 }

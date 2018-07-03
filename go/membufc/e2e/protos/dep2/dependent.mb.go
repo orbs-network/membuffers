@@ -16,7 +16,7 @@ type Dependent struct {
 	message membuffers.Message
 }
 
-var m_Dependent_Scheme = []membuffers.FieldType{membuffers.TypeMessage,membuffers.TypeUint16,}
+var m_Dependent_Scheme = []membuffers.FieldType{membuffers.TypeMessage,membuffers.TypeUint16,membuffers.TypeMessage,}
 var m_Dependent_Unions = [][]membuffers.FieldType{}
 
 func DependentReader(buf []byte) *Dependent {
@@ -54,12 +54,22 @@ func (x *Dependent) MutateB(v dep11.DependencyEnum) error {
 	return x.message.SetUint16(1, uint16(v))
 }
 
+func (x *Dependent) C() *SamePackageDependencyMessage {
+	b, s := x.message.GetMessage(2)
+	return SamePackageDependencyMessageReader(b[:s])
+}
+
+func (x *Dependent) RawC() []byte {
+	return x.message.RawBufferForField(2, 0)
+}
+
 // builder
 
 type DependentBuilder struct {
 	builder membuffers.Builder
 	A *dep1.DependencyMessageBuilder
 	B dep11.DependencyEnum
+	C *SamePackageDependencyMessageBuilder
 }
 
 func (w *DependentBuilder) Write(buf []byte) (err error) {
@@ -77,6 +87,10 @@ func (w *DependentBuilder) Write(buf []byte) (err error) {
 		return
 	}
 	w.builder.WriteUint16(buf, uint16(w.B))
+	err = w.builder.WriteMessage(buf, w.C)
+	if err != nil {
+		return
+	}
 	return nil
 }
 

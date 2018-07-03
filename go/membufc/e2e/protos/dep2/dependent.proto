@@ -4,8 +4,10 @@ option go_package = "github.com/orbs-network/membuffers/go/membufc/e2e/protos/de
 
 import "dep1/dependency1.proto";
 import "dep1/dep11/dependency11.proto";
+import "dep2/dependency2.proto";
 
 message Dependent {
     dep1.DependencyMessage a = 1;
     dep11.DependencyEnum b = 2;
+    dep2.SamePackageDependencyMessage c = 3;
 }
