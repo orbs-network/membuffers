@@ -109,7 +109,14 @@ func addEnumsFromImports(file *pbparser.ProtoFile, dependencyData map[string]dep
 			os.Exit(1)
 		}
 		for i, enum := range importedFile.Enums {
-			importedFile.Enums[i].Name = path.Base(path.Dir(dep.path)) + "." + enum.Name
+			importedFile.Enums[i].Documentation = "imported"
+			importedPackageName := path.Base(path.Dir(dep.path))
+			if importedPackageName != file.PackageName {
+				importedFile.Enums[i].Name = importedPackageName + "." + enum.Name
+			} else {
+				importedFile.Enums[i].Name = enum.Name
+			}
+
 		}
 		file.Enums = append(file.Enums, importedFile.Enums...)
 	}
@@ -528,7 +535,7 @@ func getFileEnums(enums []pbparser.EnumElement) ([]Enum, map[string]int) {
 			})
 		}
 		// only add here enums from this package
-		if !strings.Contains(enum.Name, ".") {
+		if enum.Documentation != "imported" {
 			enumByIndex = append(enumByIndex, Enum{
 				Name: enum.Name,
 				Values: values,
