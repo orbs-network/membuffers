@@ -6,6 +6,7 @@ go run *.go ./e2e/protos/dep2/dependent.proto
 go run *.go -m ./e2e/protos/service.proto
 go run *.go ./e2e/protos/crypto/aliases.proto
 go run *.go ./e2e/protos/aliases_user.proto
+go run *.go ./e2e/protos/unions.proto
 go test ./e2e
 
 rm  `find . -name "*.mb.go"`

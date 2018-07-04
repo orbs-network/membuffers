@@ -1,0 +1,20 @@
+syntax = "proto3";
+package types;
+
+message ExampleMessage {
+    string str = 1;
+}
+
+enum ExampleEnum {
+    EXAMPLE_ENUM_OPTION_A = 0;
+    EXAMPLE_ENUM_OPTION_B = 1;
+    EXAMPLE_ENUM_OPTION_C = 2;
+}
+
+message ComplexUnion {
+    oneof option {
+        uint32 num = 1;
+        ExampleMessage msg = 2;
+        ExampleEnum enu = 3;
+    }
+}
