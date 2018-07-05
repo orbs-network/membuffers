@@ -162,7 +162,7 @@ func addHeader(w io.Writer, file *pbparser.ProtoFile, dependencyData map[string]
 		HasMessages bool
 	}{
 		PackageName: file.PackageName,
-		Imports: imports,
+		Imports: unique(imports),
 		HasMessages: len(file.Messages) > 0,
 	})
 }
@@ -597,4 +597,16 @@ func parseImportedFile(path string) (pbparser.ProtoFile, error) {
 	}
 	p := importProvider{protoFile: path, moduleToRelative: nil}
 	return pbparser.Parse(in, &p)
+}
+
+func unique(slice []string) []string {
+	keys := make(map[string]bool)
+	list := []string{}
+	for _, entry := range slice {
+		if _, value := keys[entry]; !value {
+			keys[entry] = true
+			list = append(list, entry)
+		}
+	}
+	return list
 }
