@@ -41,6 +41,7 @@ If you don't want to build from source, install the compiler with `brew install 
     ```
     > Verify with `membufc --version`
 
+&nbsp;
 ## Extensions to Protobuf schema with options
 
 The `membufc` compiler supports several useful extensions to the standard [Protobuf v3 schema](https://developers.google.com/protocol-buffers/docs/reference/proto3-spec) by utilizing `option` fields.
