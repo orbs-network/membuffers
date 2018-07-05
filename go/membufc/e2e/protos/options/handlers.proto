@@ -1,0 +1,21 @@
+syntax = "proto3";
+package options;
+option go_package = "github.com/orbs-network/membuffers/go/membufc/e2e/protos/options";
+
+import "options/handlers/handlers.proto";
+
+service ExampleService {
+    // implements interfaces for handling callbacks from other services
+    option implement_handler = "handlers.ServicesINeedFromOthersHandler";
+    // registration methods for external handlers that wish to receive callbacks
+    option register_handler = "handlers.ServicesIProvideToOthersHandler";
+    // methods
+    rpc ExampleMethod (ExampleMethodInput) returns (ExampleMethodOutput);
+}
+
+message ExampleMethodInput {
+    string arg = 1;
+}
+
+message ExampleMethodOutput {
+}

@@ -1,0 +1,15 @@
+syntax = "proto3";
+package handlers;
+option go_package = "github.com/orbs-network/membuffers/go/membufc/e2e/protos/options/handlers";
+
+service ServicesINeedFromOthersHandler {
+    rpc SomeMethodINeedFromOthers (SomeMessage) returns (SomeMessage);
+}
+
+service ServicesIProvideToOthersHandler {
+    rpc SomeMethodIProvideToOthers (SomeMessage) returns (SomeMessage);
+}
+
+message SomeMessage {
+    string str = 1;
+}

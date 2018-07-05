@@ -2,8 +2,14 @@
 // service {{.ServiceName}}
 
 type {{.ServiceName}} interface {
+{{- range .ImplementHandlers}}
+	{{.ImportName}}
+{{- end}}
 {{- range .Methods}}
 	{{.Name}}(*{{.Input}}) (*{{.Output}}, error)
+{{- end}}
+{{- range .RegisterHandlers}}
+	Register{{.CleanName}}({{.ImportName}})
 {{- end}}
 }
 

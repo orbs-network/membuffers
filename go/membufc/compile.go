@@ -206,6 +206,18 @@ func addMockService(w io.Writer, packageName string, s pbparser.ServiceElement, 
 	})
 }
 
+type NameWithAndWithoutImport struct {
+	CleanName string
+	ImportName string
+}
+func getNameWithAndWithoutImport(name string) NameWithAndWithoutImport {
+	parts := strings.Split(name, ".")
+	return NameWithAndWithoutImport{
+		CleanName: parts[len(parts)-1],
+		ImportName: name,
+	}
+}
+
 func addService(w io.Writer, packageName string, s pbparser.ServiceElement, file *pbparser.ProtoFile) {
 	methods := []ServiceMethod{}
 	for _, rpc := range s.RPCs {
@@ -216,13 +228,27 @@ func addService(w io.Writer, packageName string, s pbparser.ServiceElement, file
 		}
 		methods = append(methods, method)
 	}
+	registerHandlers := []NameWithAndWithoutImport{}
+	implementHandlers := []NameWithAndWithoutImport{}
+	for _, option := range s.Options {
+		if option.Name == "register_handler" {
+			registerHandlers = append(registerHandlers, getNameWithAndWithoutImport(option.Value))
+		}
+		if option.Name == "implement_handler" {
+			implementHandlers = append(implementHandlers, getNameWithAndWithoutImport(option.Value))
+		}
+	}
 	t := templateByBoxName("MessageService.template")
 	t.Execute(w, struct {
 		ServiceName string
 		Methods []ServiceMethod
+		RegisterHandlers []NameWithAndWithoutImport
+		ImplementHandlers []NameWithAndWithoutImport
 	}{
 		ServiceName: s.Name,
 		Methods: methods,
+		RegisterHandlers: registerHandlers,
+		ImplementHandlers: implementHandlers,
 	})
 }
 
