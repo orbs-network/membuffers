@@ -3,6 +3,7 @@ package options
 
 import (
 	"github.com/maraino/go-mock"
+	"github.com/orbs-network/membuffers/go/membufc/e2e/protos/options/handlers"
 )
 
 /////////////////////////////////////////////////////////////////////////////
@@ -10,6 +11,7 @@ import (
 
 type MockExampleService struct {
 	mock.Mock
+	handlers.MockServicesINeedFromOthersHandler
 }
 
 func (s *MockExampleService) ExampleMethod(input *ExampleMethodInput) (*ExampleMethodOutput, error) {
@@ -19,5 +21,9 @@ func (s *MockExampleService) ExampleMethod(input *ExampleMethodInput) (*ExampleM
 	} else {
 		return nil, ret.Error(1)
 	}
+}
+
+func (s *MockExampleService) RegisterServicesIProvideToOthersHandler(handler handlers.ServicesIProvideToOthersHandler) {
+	s.Called(handler)
 }
 

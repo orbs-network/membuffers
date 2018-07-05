@@ -11,8 +11,8 @@ import (
 
 type ExampleService interface {
 	handlers.ServicesINeedFromOthersHandler
-	ExampleMethod(*ExampleMethodInput) (*ExampleMethodOutput, error)
-	RegisterServicesIProvideToOthersHandler(handlers.ServicesIProvideToOthersHandler)
+	ExampleMethod(input *ExampleMethodInput) (*ExampleMethodOutput, error)
+	RegisterServicesIProvideToOthersHandler(handler handlers.ServicesIProvideToOthersHandler)
 }
 
 /////////////////////////////////////////////////////////////////////////////

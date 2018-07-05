@@ -3,5 +3,7 @@ package {{.PackageName}}
 
 import (
 	"github.com/maraino/go-mock"
+{{range .Imports}}	"{{.}}"
+{{end -}}
 )
 

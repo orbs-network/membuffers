@@ -9,14 +9,14 @@ import (
 // service ServicesINeedFromOthersHandler
 
 type ServicesINeedFromOthersHandler interface {
-	SomeMethodINeedFromOthers(*SomeMessage) (*SomeMessage, error)
+	SomeMethodINeedFromOthers(input *SomeMessage) (*SomeMessage, error)
 }
 
 /////////////////////////////////////////////////////////////////////////////
 // service ServicesIProvideToOthersHandler
 
 type ServicesIProvideToOthersHandler interface {
-	SomeMethodIProvideToOthers(*SomeMessage) (*SomeMessage, error)
+	SomeMethodIProvideToOthers(input *SomeMessage) (*SomeMessage, error)
 }
 
 /////////////////////////////////////////////////////////////////////////////

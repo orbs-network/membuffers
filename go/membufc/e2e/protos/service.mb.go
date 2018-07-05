@@ -9,8 +9,8 @@ import (
 // service StateStorage
 
 type StateStorage interface {
-	WriteKey(*WriteKeyInput) (*WriteKeyOutput, error)
-	ReadKey(*ReadKeyInput) (*ReadKeyOutput, error)
+	WriteKey(input *WriteKeyInput) (*WriteKeyOutput, error)
+	ReadKey(input *ReadKeyInput) (*ReadKeyOutput, error)
 }
 
 /////////////////////////////////////////////////////////////////////////////

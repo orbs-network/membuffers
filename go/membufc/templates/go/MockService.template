@@ -3,6 +3,9 @@
 
 type Mock{{.ServiceName}} struct {
 	mock.Mock
+{{- range .ImplementHandlers}}
+	{{.MockImportName}}
+{{- end}}
 }
 
 {{range .Methods -}}
@@ -13,6 +16,12 @@ func (s *Mock{{$ServiceName}}) {{.Name}}(input *{{.Input}}) (*{{.Output}}, error
 	} else {
 		return nil, ret.Error(1)
 	}
+}
+
+{{end}}
+{{- range .RegisterHandlers -}}
+func (s *Mock{{$ServiceName}}) Register{{.CleanName}}(handler {{.ImportName}}) {
+	s.Called(handler)
 }
 
 {{end}}

@@ -6,10 +6,10 @@ type {{.ServiceName}} interface {
 	{{.ImportName}}
 {{- end}}
 {{- range .Methods}}
-	{{.Name}}(*{{.Input}}) (*{{.Output}}, error)
+	{{.Name}}(input *{{.Input}}) (*{{.Output}}, error)
 {{- end}}
 {{- range .RegisterHandlers}}
-	Register{{.CleanName}}({{.ImportName}})
+	Register{{.CleanName}}(handler {{.ImportName}})
 {{- end}}
 }
 

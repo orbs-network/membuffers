@@ -123,12 +123,55 @@ func addEnumsFromImports(file *pbparser.ProtoFile, dependencyData map[string]dep
 }
 
 func addMockHeader(w io.Writer, file *pbparser.ProtoFile, dependencyData map[string]dependencyData) {
+	var goPackage string
+	implementHandlers := []NameWithAndWithoutImport{}
+	for _, option := range file.Options {
+		if option.Name == "go_package" {
+			goPackage = option.Value
+		}
+	}
+	for _, service := range file.Services {
+		for _, option := range service.Options {
+			if option.Name == "implement_handler" {
+				implementHandlers = append(implementHandlers, getNameWithAndWithoutImport(option.Value))
+			}
+		}
+	}
+	imports := []string{}
+	for _, dependency := range file.Dependencies {
+		if !doesFileContainImplementHandler(dependencyData[dependency].path, implementHandlers) {
+			continue
+		}
+		relative := dependencyData[dependency].relative
+		packageImport := path.Dir(path.Clean(goPackage + "/" + relative + "/" + dependency))
+		if packageImport != goPackage {
+			imports = append(imports, packageImport)
+		}
+	}
 	t := templateByBoxName("MockFileHeader.template")
 	t.Execute(w, struct {
 		PackageName string
+		Imports []string
 	}{
 		PackageName: file.PackageName,
+		Imports: unique(imports),
 	})
+}
+
+func doesFileContainImplementHandler(path string, implementHandlers []NameWithAndWithoutImport) bool {
+	file, err := parseImportedFile(path)
+	if err != nil {
+		fmt.Println("ERROR:", "imported file cannot be parsed:", path, "\n", err)
+		os.Exit(1)
+	}
+	for _, implementHandler := range implementHandlers {
+		for _, service := range file.Services {
+			if implementHandler.CleanName == service.Name {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 func addHeader(w io.Writer, file *pbparser.ProtoFile, dependencyData map[string]dependencyData) {
@@ -196,25 +239,45 @@ func addMockService(w io.Writer, packageName string, s pbparser.ServiceElement, 
 		}
 		methods = append(methods, method)
 	}
+	registerHandlers := []NameWithAndWithoutImport{}
+	implementHandlers := []NameWithAndWithoutImport{}
+	for _, option := range s.Options {
+		if option.Name == "register_handler" {
+			registerHandlers = append(registerHandlers, getNameWithAndWithoutImport(option.Value))
+		}
+		if option.Name == "implement_handler" {
+			implementHandlers = append(implementHandlers, getNameWithAndWithoutImport(option.Value))
+		}
+	}
 	t := templateByBoxName("MockService.template")
 	t.Execute(w, struct {
 		ServiceName string
 		Methods []ServiceMethod
+		RegisterHandlers []NameWithAndWithoutImport
+		ImplementHandlers []NameWithAndWithoutImport
 	}{
 		ServiceName: s.Name,
 		Methods: methods,
+		RegisterHandlers: registerHandlers,
+		ImplementHandlers: implementHandlers,
 	})
 }
 
 type NameWithAndWithoutImport struct {
 	CleanName string
 	ImportName string
+	MockImportName string
 }
 func getNameWithAndWithoutImport(name string) NameWithAndWithoutImport {
 	parts := strings.Split(name, ".")
+	packagePrefix := ""
+	if len(parts) == 2 {
+		packagePrefix = parts[0] + "."
+	}
 	return NameWithAndWithoutImport{
 		CleanName: parts[len(parts)-1],
 		ImportName: name,
+		MockImportName: packagePrefix + "Mock" + parts[len(parts)-1],
 	}
 }
 
