@@ -46,7 +46,7 @@ If you don't want to build from source, install the compiler with `brew install 
 
 The `membufc` compiler supports several useful extensions to the standard [Protobuf v3 schema](https://developers.google.com/protocol-buffers/docs/reference/proto3-spec) by utilizing `option` fields.
 
-#### Inline types (aliases)
+### Inline types (aliases)
 
 Inline types are new names that behave as aliases to standard system types. You can view them as `messages` with a single field which are inlined whenever appearing in a different `message`.
 
@@ -82,7 +82,7 @@ message FileRecord {
 
 You can see a working example of this feature in the compiler [test suite](e2e/inline_test.go) and [test protos](e2e/protos/aliases_user.proto).
 
-#### Service listener pattern
+### Service listener pattern
 
 Circular dependencies between services are often resolved with a listener pattern where one of the services extracts its callback methods into a separate service and the other service exposes a registration method for the listener.
 
