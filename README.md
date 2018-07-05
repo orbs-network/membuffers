@@ -309,6 +309,22 @@ Will produce the following encoding over the wire (total of 29 bytes):
 * Always add new fields at the end of the schema.
 * Keep the numeric tag of fields sequential.
 
+## Extensions to Protobuf schema
+
+MemBuffers supports proto definitions using standard [Protobuf v3 schema](https://developers.google.com/protocol-buffers/docs/reference/proto3-spec). MemBuffers supports several extensions to the standard schema that you may find useful:  
+
+* Primitive types `uint8` and `uint16`
+  
+  These are not needed in Protobuf because Protobuf packs integers to their smallest form. Since MemBuffers does not pack fields, these primitives are supported explicitly. Choose the appropriate size of integers to reduce the overall size of your messages.
+
+* Inline types (aliases) with `option inline`
+
+  Inline types are new names that behave as aliases to standard system types. You can view them as `messages` with a single field which are inlined whenever appearing in a different `message`. Read more about `option` extensions under `membufc` compiler [documentation](go/membufc/README.md).
+
+* Service listener pattern with `option implement` and `option register`
+
+  Circular dependencies between services are often resolved with a listener pattern where one of the services extracts its callback methods into a separate service and the other service exposes a registration method for the listener. Read more about `option` extensions under `membufc` compiler [documentation](go/membufc/README.md).    
+
 ## License
 
 MIT
