@@ -119,7 +119,7 @@ syntax = "proto3";
 package notifier;
 
 service Notifier {
-    // RegisterListener (NotificaitonListener) returns ();
+    // RegisterListener (NotificationListener) returns ();
     rpc SendNotification (SNInput) returns (SNOutput);
 }
 ```
@@ -129,7 +129,7 @@ service Notifier {
 syntax = "proto3";
 package listener;
 
-service NotificaitonListener {
+service NotificationListener {
     rpc NotificationReceived (NRInput) returns (NROutput);
 }
 ```
@@ -140,7 +140,7 @@ syntax = "proto3";
 package consumer;
 
 service Consumer {
-    // implements NotificaitonListener
+    // implements NotificationListener
     rpc AnotherMethod (AMInput) returns (AMOutput);
 }
 ```
@@ -155,7 +155,7 @@ This pattern can be implemented using `option` schema extensions this way:
  package notifier;
  
  service Notifier {
-     option register_handler = "listener.NotificaitonListener";
+     option register_handler = "listener.NotificationListener";
      rpc SendNotification (SNInput) returns (SNOutput);
  }
  ```
@@ -165,7 +165,7 @@ This pattern can be implemented using `option` schema extensions this way:
  syntax = "proto3";
  package listener;
  
- service NotificaitonListener {
+ service NotificationListener {
      rpc NotificationReceived (NRInput) returns (NROutput);
  }
  ```
@@ -176,7 +176,7 @@ This pattern can be implemented using `option` schema extensions this way:
  package consumer;
  
  service Consumer {
-     option implement_handler = "listener.NotificaitonListener";
+     option implement_handler = "listener.NotificationListener";
      rpc AnotherMethod (AMInput) returns (AMOutput);
  }
  ```
