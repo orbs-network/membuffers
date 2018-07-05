@@ -52,7 +52,7 @@ Inline types are new names that behave as aliases to standard system types. You 
 
 Consider the following example which aliases the type `sha256` for type `bytes`:
 
-**crypto/aliases.proto:**
+##### crypto/aliases.proto:
 ```proto
 syntax = "proto3";
 package crypto;
@@ -67,7 +67,7 @@ message sha256 {
 }
 ```
 
-**file_record.proto:**
+##### file_record.proto:
 ```proto
 syntax = "proto3";
 package files;
@@ -88,7 +88,7 @@ Circular dependencies between services are often resolved with a listener patter
 
 Consider these two services:
 
-**notifier.proto:**
+##### notifier.proto:
 ```proto
 syntax = "proto3";
 package notifier;
@@ -98,7 +98,7 @@ service Notifier {
 }
 ```
 
-**consumer.proto:**
+##### consumer.proto:
 ```proto
 syntax = "proto3";
 package consumer;
@@ -113,7 +113,7 @@ The service Consumer uses service Notifier to send a notification by calling `No
 
 This is a circular dependency between the services, that we may want to break. One of the common solutions is extracting the callback into a new listener interface:
 
-**notifier.proto:**
+##### notifier.proto:
 ```proto
 syntax = "proto3";
 package notifier;
@@ -124,7 +124,7 @@ service Notifier {
 }
 ```
 
-**notification_listener.proto:**
+##### notification_listener.proto:
 ```proto
 syntax = "proto3";
 package listener;
@@ -134,7 +134,7 @@ service NotificaitonListener {
 }
 ```
 
-**consumer.proto:**
+##### consumer.proto:
 ```proto
 syntax = "proto3";
 package consumer;
@@ -149,7 +149,7 @@ Now, service Consumer relies on service Notifier (we broke the other direction) 
 
 This pattern can be implemented using `option` schema extensions this way:
 
- **notifier.proto:**
+##### notifier.proto:
  ```proto
  syntax = "proto3";
  package notifier;
@@ -160,7 +160,7 @@ This pattern can be implemented using `option` schema extensions this way:
  }
  ```
  
- **notification_listener.proto:**
+##### notification_listener.proto:
  ```proto
  syntax = "proto3";
  package listener;
@@ -170,7 +170,7 @@ This pattern can be implemented using `option` schema extensions this way:
  }
  ```
  
- **consumer.proto:**
+##### consumer.proto:
  ```proto
  syntax = "proto3";
  package consumer;
