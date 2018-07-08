@@ -10,6 +10,8 @@ import (
 	"path"
 )
 
+const MEMBUFC_VERSION = "0.0.11"
+
 type config struct {
 	language string
 	mock bool
@@ -47,7 +49,7 @@ func handleFlag(flag string) {
 }
 
 func displayVersion() {
-	fmt.Println("membufc 0.0.10")
+	fmt.Println("membufc " + MEMBUFC_VERSION)
 	os.Exit(0)
 }
 
@@ -110,7 +112,7 @@ func main() {
 			os.Exit(1)
 		}
 		defer out.Close()
-		compileProtoFile(out, protoFile, p.moduleToRelative)
+		compileProtoFile(out, protoFile, p.moduleToRelative, MEMBUFC_VERSION)
 		fmt.Println("Created file:\t", outPath)
 		if len(protoFile.Services) > 0 && conf.mock {
 			outPath := outputFileForPath(path, "_mock.mb.go")
@@ -120,7 +122,7 @@ func main() {
 				os.Exit(1)
 			}
 			defer out.Close()
-			compileMockFile(out, protoFile, p.moduleToRelative)
+			compileMockFile(out, protoFile, p.moduleToRelative, MEMBUFC_VERSION)
 			fmt.Println("Created mock file:\t", outPath)
 		}
 		fmt.Println()

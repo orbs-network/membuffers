@@ -1,4 +1,4 @@
-// AUTO GENERATED FILE (by membufc proto compiler)
+// AUTO GENERATED FILE (by membufc proto compiler v0.0.11)
 package types
 
 import (
@@ -14,12 +14,12 @@ type Method struct {
 	message membuffers.Message
 }
 
-var m_Method_Scheme = []membuffers.FieldType{membuffers.TypeString,membuffers.TypeMessageArray,}
-var m_Method_Unions = [][]membuffers.FieldType{}
+var _Method_Scheme = []membuffers.FieldType{membuffers.TypeString,membuffers.TypeMessageArray,}
+var _Method_Unions = [][]membuffers.FieldType{}
 
 func MethodReader(buf []byte) *Method {
 	x := &Method{}
-	x.message.Init(buf, membuffers.Offset(len(buf)), m_Method_Scheme, m_Method_Unions)
+	x.message.Init(buf, membuffers.Offset(len(buf)), _Method_Scheme, _Method_Unions)
 	return x
 }
 
@@ -130,12 +130,12 @@ type MethodCallArgument struct {
 	message membuffers.Message
 }
 
-var m_MethodCallArgument_Scheme = []membuffers.FieldType{membuffers.TypeUnion,}
-var m_MethodCallArgument_Unions = [][]membuffers.FieldType{{membuffers.TypeUint32,membuffers.TypeString,membuffers.TypeBytes,}}
+var _MethodCallArgument_Scheme = []membuffers.FieldType{membuffers.TypeUnion,}
+var _MethodCallArgument_Unions = [][]membuffers.FieldType{{membuffers.TypeUint32,membuffers.TypeString,membuffers.TypeBytes,}}
 
 func MethodCallArgumentReader(buf []byte) *MethodCallArgument {
 	x := &MethodCallArgument{}
-	x.message.Init(buf, membuffers.Offset(len(buf)), m_MethodCallArgument_Scheme, m_MethodCallArgument_Unions)
+	x.message.Init(buf, membuffers.Offset(len(buf)), _MethodCallArgument_Scheme, _MethodCallArgument_Unions)
 	return x
 }
 

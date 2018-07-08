@@ -1,4 +1,4 @@
-// AUTO GENERATED FILE (by membufc proto compiler)
+// AUTO GENERATED FILE (by membufc proto compiler v0.0.11)
 package types
 
 import (
@@ -14,12 +14,12 @@ type Transaction struct {
 	message membuffers.Message
 }
 
-var m_Transaction_Scheme = []membuffers.FieldType{membuffers.TypeMessage,membuffers.TypeBytes,membuffers.TypeUint16,}
-var m_Transaction_Unions = [][]membuffers.FieldType{}
+var _Transaction_Scheme = []membuffers.FieldType{membuffers.TypeMessage,membuffers.TypeBytes,membuffers.TypeUint16,}
+var _Transaction_Unions = [][]membuffers.FieldType{}
 
 func TransactionReader(buf []byte) *Transaction {
 	x := &Transaction{}
-	x.message.Init(buf, membuffers.Offset(len(buf)), m_Transaction_Scheme, m_Transaction_Unions)
+	x.message.Init(buf, membuffers.Offset(len(buf)), _Transaction_Scheme, _Transaction_Unions)
 	return x
 }
 
@@ -124,12 +124,12 @@ type TransactionData struct {
 	message membuffers.Message
 }
 
-var m_TransactionData_Scheme = []membuffers.FieldType{membuffers.TypeUint32,membuffers.TypeUint64,membuffers.TypeMessageArray,membuffers.TypeUint64,}
-var m_TransactionData_Unions = [][]membuffers.FieldType{}
+var _TransactionData_Scheme = []membuffers.FieldType{membuffers.TypeUint32,membuffers.TypeUint64,membuffers.TypeMessageArray,membuffers.TypeUint64,}
+var _TransactionData_Unions = [][]membuffers.FieldType{}
 
 func TransactionDataReader(buf []byte) *TransactionData {
 	x := &TransactionData{}
-	x.message.Init(buf, membuffers.Offset(len(buf)), m_TransactionData_Scheme, m_TransactionData_Unions)
+	x.message.Init(buf, membuffers.Offset(len(buf)), _TransactionData_Scheme, _TransactionData_Unions)
 	return x
 }
 
@@ -268,12 +268,12 @@ type TransactionSender struct {
 	message membuffers.Message
 }
 
-var m_TransactionSender_Scheme = []membuffers.FieldType{membuffers.TypeString,membuffers.TypeStringArray,}
-var m_TransactionSender_Unions = [][]membuffers.FieldType{}
+var _TransactionSender_Scheme = []membuffers.FieldType{membuffers.TypeString,membuffers.TypeStringArray,}
+var _TransactionSender_Unions = [][]membuffers.FieldType{}
 
 func TransactionSenderReader(buf []byte) *TransactionSender {
 	x := &TransactionSender{}
-	x.message.Init(buf, membuffers.Offset(len(buf)), m_TransactionSender_Scheme, m_TransactionSender_Unions)
+	x.message.Init(buf, membuffers.Offset(len(buf)), _TransactionSender_Scheme, _TransactionSender_Unions)
 	return x
 }
 

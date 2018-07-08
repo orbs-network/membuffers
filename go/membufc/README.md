@@ -150,35 +150,81 @@ Now, service Consumer relies on service Notifier (we broke the other direction) 
 This pattern can be implemented using `option` schema extensions this way:
 
 ##### notifier.proto:
- ```proto
- syntax = "proto3";
- package notifier;
- 
- service Notifier {
-     option register_handler = "listener.NotificationListener";
-     rpc SendNotification (SNInput) returns (SNOutput);
- }
- ```
+```proto
+syntax = "proto3";
+package notifier;
+
+service Notifier {
+   option register_handler = "listener.NotificationListener";
+   rpc SendNotification (SNInput) returns (SNOutput);
+}
+```
  
 ##### notification_listener.proto:
- ```proto
- syntax = "proto3";
- package listener;
- 
- service NotificationListener {
-     rpc NotificationReceived (NRInput) returns (NROutput);
- }
- ```
+```proto
+syntax = "proto3";
+package listener;
+
+service NotificationListener {
+   rpc NotificationReceived (NRInput) returns (NROutput);
+}
+```
  
 ##### consumer.proto:
- ```proto
- syntax = "proto3";
- package consumer;
+```proto
+syntax = "proto3";
+package consumer;
  
- service Consumer {
-     option implement_handler = "listener.NotificationListener";
-     rpc AnotherMethod (AMInput) returns (AMOutput);
- }
- ```
+service Consumer {
+    option implement_handler = "listener.NotificationListener";
+    rpc AnotherMethod (AMInput) returns (AMOutput);
+}
+```
  
- You can see a working example of this feature in the compiler [test suite](e2e/handlers_test.go) and [test protos](e2e/protos/options/handlers.proto).
+You can see a working example of this feature in the compiler [test suite](e2e/handlers_test.go) and [test protos](e2e/protos/options/handlers.proto).
+
+### Services with non serializable arguments
+
+Wrapping an already encoded MemBuffers message with another MemBuffers message causes data copy. This is particularly taxing with argument wrappers for service methods which can be avoided by encoding them as plain structs instead of MemBuffers messages.
+
+Consider this service:
+
+```proto
+service StateStorage {
+    rpc WriteKey (WriteKeyInput) returns (WriteKeyOutput);
+}
+
+message WriteKeyInput {
+    string key = 1;
+    uint32 value = 2;
+}
+
+message WriteKeyOutput {
+    uint32 result = 1;
+}
+```
+
+The messages `WriteKeyInput` and `WriteKeyOutput` by default will also be MemBuffers messages which can be serialized quickly to a data stream.
+
+Normally, this does not add much overhead but if you think about it, isn't really needed since they're just argument wrappers. It may add overhead if one of the messages contained another MemBuffers message which was already encoded. In this case, its data would need to be copied in order to fit inside the wrapper MemBuffers.
+
+By adding the following option, all messages in the proto file will be encoded as regular structs instead of MemBuffers (will not be serializable):
+
+```proto
+option serialize_service_args = false;
+
+service StateStorage {
+    rpc WriteKey (WriteKeyInput) returns (WriteKeyOutput);
+}
+
+message WriteKeyInput {
+    string key = 1;
+    uint32 value = 2;
+}
+
+message WriteKeyOutput {
+    uint32 result = 1;
+}
+```
+
+You can see a working example of this feature in the compiler [test suite](e2e/service_test.go) and [test protos](e2e/protos/service_no_serialization.proto).

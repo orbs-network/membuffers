@@ -1,4 +1,4 @@
-// AUTO GENERATED FILE (by membufc proto compiler)
+// AUTO GENERATED FILE (by membufc proto compiler v0.0.11)
 package options
 
 import (
@@ -24,12 +24,12 @@ type ExampleMethodInput struct {
 	message membuffers.Message
 }
 
-var m_ExampleMethodInput_Scheme = []membuffers.FieldType{membuffers.TypeString,}
-var m_ExampleMethodInput_Unions = [][]membuffers.FieldType{}
+var _ExampleMethodInput_Scheme = []membuffers.FieldType{membuffers.TypeString,}
+var _ExampleMethodInput_Unions = [][]membuffers.FieldType{}
 
 func ExampleMethodInputReader(buf []byte) *ExampleMethodInput {
 	x := &ExampleMethodInput{}
-	x.message.Init(buf, membuffers.Offset(len(buf)), m_ExampleMethodInput_Scheme, m_ExampleMethodInput_Unions)
+	x.message.Init(buf, membuffers.Offset(len(buf)), _ExampleMethodInput_Scheme, _ExampleMethodInput_Unions)
 	return x
 }
 
@@ -106,12 +106,12 @@ type ExampleMethodOutput struct {
 	message membuffers.Message
 }
 
-var m_ExampleMethodOutput_Scheme = []membuffers.FieldType{}
-var m_ExampleMethodOutput_Unions = [][]membuffers.FieldType{}
+var _ExampleMethodOutput_Scheme = []membuffers.FieldType{}
+var _ExampleMethodOutput_Unions = [][]membuffers.FieldType{}
 
 func ExampleMethodOutputReader(buf []byte) *ExampleMethodOutput {
 	x := &ExampleMethodOutput{}
-	x.message.Init(buf, membuffers.Offset(len(buf)), m_ExampleMethodOutput_Scheme, m_ExampleMethodOutput_Unions)
+	x.message.Init(buf, membuffers.Offset(len(buf)), _ExampleMethodOutput_Scheme, _ExampleMethodOutput_Unions)
 	return x
 }
 

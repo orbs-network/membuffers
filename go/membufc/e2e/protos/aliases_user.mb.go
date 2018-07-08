@@ -1,4 +1,4 @@
-// AUTO GENERATED FILE (by membufc proto compiler)
+// AUTO GENERATED FILE (by membufc proto compiler v0.0.11)
 package types
 
 import (
@@ -14,12 +14,12 @@ type FileRecord struct {
 	message membuffers.Message
 }
 
-var m_FileRecord_Scheme = []membuffers.FieldType{membuffers.TypeBytes,membuffers.TypeBytes,membuffers.TypeBytesArray,}
-var m_FileRecord_Unions = [][]membuffers.FieldType{}
+var _FileRecord_Scheme = []membuffers.FieldType{membuffers.TypeBytes,membuffers.TypeBytes,membuffers.TypeBytesArray,}
+var _FileRecord_Unions = [][]membuffers.FieldType{}
 
 func FileRecordReader(buf []byte) *FileRecord {
 	x := &FileRecord{}
-	x.message.Init(buf, membuffers.Offset(len(buf)), m_FileRecord_Scheme, m_FileRecord_Unions)
+	x.message.Init(buf, membuffers.Offset(len(buf)), _FileRecord_Scheme, _FileRecord_Unions)
 	return x
 }
 

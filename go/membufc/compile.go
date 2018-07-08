@@ -33,22 +33,36 @@ func convertFieldNameToGoCase(fieldName string) string {
 	return ToCamel(fieldName)
 }
 
-func compileMockFile(w io.Writer, file pbparser.ProtoFile, dependencyData map[string]dependencyData) {
-	addMockHeader(w, &file, dependencyData)
+func compileMockFile(w io.Writer, file pbparser.ProtoFile, dependencyData map[string]dependencyData, compilerVersion string) {
+	addMockHeader(w, &file, dependencyData, compilerVersion)
 	for _, s := range file.Services {
 		addMockService(w, file.PackageName, s, &file)
 	}
 }
 
-func compileProtoFile(w io.Writer, file pbparser.ProtoFile, dependencyData map[string]dependencyData) {
-	addHeader(w, &file, dependencyData)
+func compileProtoFile(w io.Writer, file pbparser.ProtoFile, dependencyData map[string]dependencyData, compilerVersion string) {
+	serializeServiceArgs := shouldSerializeServiceArgs(&file)
+	addHeader(w, &file, dependencyData, serializeServiceArgs, compilerVersion)
 	for _, s := range file.Services {
 		addService(w, file.PackageName, s, &file)
 	}
 	for _, m := range file.Messages {
-		addMessage(w, file.PackageName, m, &file)
+		if serializeServiceArgs {
+			addMessage(w, file.PackageName, m, &file)
+		} else {
+			addMessageNonSerializable(w, file.PackageName, m, &file)
+		}
 	}
 	addEnums(w, file.Enums)
+}
+
+func shouldSerializeServiceArgs(file *pbparser.ProtoFile) bool {
+	for _, option := range file.Options {
+		if option.Name == "serialize_service_args" && option.Value == "false" {
+			return false
+		}
+	}
+	return true
 }
 
 func normalizeFieldsAndOneOfs(m *pbparser.MessageElement) {
@@ -122,7 +136,7 @@ func addEnumsFromImports(file *pbparser.ProtoFile, dependencyData map[string]dep
 	}
 }
 
-func addMockHeader(w io.Writer, file *pbparser.ProtoFile, dependencyData map[string]dependencyData) {
+func addMockHeader(w io.Writer, file *pbparser.ProtoFile, dependencyData map[string]dependencyData, compilerVersion string) {
 	var goPackage string
 	implementHandlers := []NameWithAndWithoutImport{}
 	registerHandlers := []NameWithAndWithoutImport{}
@@ -156,9 +170,11 @@ func addMockHeader(w io.Writer, file *pbparser.ProtoFile, dependencyData map[str
 	t.Execute(w, struct {
 		PackageName string
 		Imports []string
+		CompilerVersion string
 	}{
 		PackageName: file.PackageName,
 		Imports: unique(imports),
+		CompilerVersion: compilerVersion,
 	})
 }
 
@@ -178,7 +194,7 @@ func doesFileContainHandlers(path string, handlers []NameWithAndWithoutImport) b
 	return false
 }
 
-func addHeader(w io.Writer, file *pbparser.ProtoFile, dependencyData map[string]dependencyData) {
+func addHeader(w io.Writer, file *pbparser.ProtoFile, dependencyData map[string]dependencyData, serializeServiceArgs bool, compilerVersion string) {
 	var goPackage string
 	for _, option := range file.Options {
 		if option.Name == "go_package" {
@@ -207,10 +223,12 @@ func addHeader(w io.Writer, file *pbparser.ProtoFile, dependencyData map[string]
 		PackageName string
 		Imports []string
 		HasMessages bool
+		CompilerVersion string
 	}{
 		PackageName: file.PackageName,
 		Imports: unique(imports),
-		HasMessages: len(file.Messages) > 0,
+		HasMessages: len(file.Messages) > 0 && serializeServiceArgs,
+		CompilerVersion: compilerVersion,
 	})
 }
 
@@ -335,6 +353,32 @@ func addMessage(w io.Writer, packageName string, m pbparser.MessageElement, file
 		addMessageReaderField(w, packageName, m.Name, field, m.OneOfs, enumNameToIndex)
 	}
 	addMessageBuilder(w, packageName, m.Name, m.Fields, m.OneOfs, enumNameToIndex)
+}
+
+func addMessageNonSerializable(w io.Writer, packageName string, m pbparser.MessageElement, file *pbparser.ProtoFile) {
+	messageFields := []MessageField{}
+	messageName := m.Name
+	fields := m.Fields
+	unions := m.OneOfs
+	normalizeFieldsAndOneOfs(&m)
+	_, enumNameToIndex := getFileEnums(file.Enums)
+	unionByIndex, unionNameToIndex := getMessageUnions(packageName, messageName, unions, enumNameToIndex)
+	for _, field := range fields {
+		messageField := getMessageField(packageName, messageName, field, enumNameToIndex)
+		messageFields = append(messageFields, messageField)
+	}
+	t := templateByBoxName("MessageNonSerializable.template")
+	t.Execute(w, struct {
+		MessageName string
+		MessageFields []MessageField
+		UnionByIndex [][]MessageField
+		UnionNameToIndex map[string]int
+	}{
+		MessageName:   messageName,
+		MessageFields: messageFields,
+		UnionByIndex:  unionByIndex,
+		UnionNameToIndex: unionNameToIndex,
+	})
 }
 
 func addMessageScheme(w io.Writer, packageName string, messageName string, fields []pbparser.FieldElement, unions []pbparser.OneOfElement, enumNameToIndex map[string]int) {

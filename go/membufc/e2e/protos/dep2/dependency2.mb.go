@@ -1,4 +1,4 @@
-// AUTO GENERATED FILE (by membufc proto compiler)
+// AUTO GENERATED FILE (by membufc proto compiler v0.0.11)
 package dep2
 
 import (
@@ -14,12 +14,12 @@ type SamePackageDependencyMessage struct {
 	message membuffers.Message
 }
 
-var m_SamePackageDependencyMessage_Scheme = []membuffers.FieldType{membuffers.TypeString,}
-var m_SamePackageDependencyMessage_Unions = [][]membuffers.FieldType{}
+var _SamePackageDependencyMessage_Scheme = []membuffers.FieldType{membuffers.TypeString,}
+var _SamePackageDependencyMessage_Unions = [][]membuffers.FieldType{}
 
 func SamePackageDependencyMessageReader(buf []byte) *SamePackageDependencyMessage {
 	x := &SamePackageDependencyMessage{}
-	x.message.Init(buf, membuffers.Offset(len(buf)), m_SamePackageDependencyMessage_Scheme, m_SamePackageDependencyMessage_Unions)
+	x.message.Init(buf, membuffers.Offset(len(buf)), _SamePackageDependencyMessage_Scheme, _SamePackageDependencyMessage_Unions)
 	return x
 }
 

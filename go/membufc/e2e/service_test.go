@@ -59,3 +59,57 @@ func TestServiceMock(t *testing.T) {
 		t.Fatalf("Mock err is not as expected")
 	}
 }
+
+type stateStorageServiceNS struct {
+	types.StateStorageNS
+}
+
+func (s *stateStorageServiceNS) WriteKeyNS(*types.WriteKeyInputNS) (*types.WriteKeyOutputNS, error) {
+	return nil, nil
+}
+
+func (s *stateStorageServiceNS) ReadKeyNS(*types.ReadKeyInputNS) (*types.ReadKeyOutputNS, error) {
+	return nil, nil
+}
+
+func TestServiceNSMock(t *testing.T) {
+	m := &types.MockStateStorageNS{}
+
+	wantedWriteOut := &types.WriteKeyOutputNS{}
+	m.When("WriteKeyNS", nil).Return(wantedWriteOut, nil).Times(1)
+	writeOut, err := m.WriteKeyNS(nil)
+	if writeOut != wantedWriteOut {
+		t.Fatalf("Mock WriteKeyOutputNS is not as expected")
+	}
+	if err != nil {
+		t.Fatalf("Mock err is not nil")
+	}
+
+	m.When("WriteKeyNS", nil).Return(nil, errors.New("errorWrite")).Times(1)
+	writeOut, err = m.WriteKeyNS(nil)
+	if writeOut != nil {
+		t.Fatalf("Mock WriteKeyOutputNS is not nil")
+	}
+	if err.Error() != "errorWrite" {
+		t.Fatalf("Mock err is not as expected")
+	}
+
+	wantedReadOut := &types.ReadKeyOutputNS{}
+	m.When("ReadKeyNS", nil).Return(wantedReadOut, nil).Times(1)
+	readOut, err := m.ReadKeyNS(nil)
+	if readOut != wantedReadOut {
+		t.Fatalf("Mock ReadKeyOutputNS is not as expected")
+	}
+	if err != nil {
+		t.Fatalf("Mock err is not nil")
+	}
+
+	m.When("ReadKeyNS", nil).Return(nil, errors.New("errorRead")).Times(1)
+	readOut, err = m.ReadKeyNS(nil)
+	if readOut != nil {
+		t.Fatalf("Mock ReadKeyOutputNS is not nil")
+	}
+	if err.Error() != "errorRead" {
+		t.Fatalf("Mock err is not as expected")
+	}
+}

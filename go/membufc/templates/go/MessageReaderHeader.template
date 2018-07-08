@@ -1,6 +1,6 @@
 func {{.MessageName}}Reader(buf []byte) *{{.MessageName}} {
 	x := &{{.MessageName}}{}
-	x.message.Init(buf, membuffers.Offset(len(buf)), m_{{.MessageName}}_Scheme, m_{{.MessageName}}_Unions)
+	x.message.Init(buf, membuffers.Offset(len(buf)), _{{.MessageName}}_Scheme, _{{.MessageName}}_Unions)
 	return x
 }
 

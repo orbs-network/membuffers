@@ -1,4 +1,4 @@
-// AUTO GENERATED FILE (by membufc proto compiler)
+// AUTO GENERATED FILE (by membufc proto compiler v0.0.11)
 package types
 
 import (
@@ -14,12 +14,12 @@ type ExampleMessage struct {
 	message membuffers.Message
 }
 
-var m_ExampleMessage_Scheme = []membuffers.FieldType{membuffers.TypeString,}
-var m_ExampleMessage_Unions = [][]membuffers.FieldType{}
+var _ExampleMessage_Scheme = []membuffers.FieldType{membuffers.TypeString,}
+var _ExampleMessage_Unions = [][]membuffers.FieldType{}
 
 func ExampleMessageReader(buf []byte) *ExampleMessage {
 	x := &ExampleMessage{}
-	x.message.Init(buf, membuffers.Offset(len(buf)), m_ExampleMessage_Scheme, m_ExampleMessage_Unions)
+	x.message.Init(buf, membuffers.Offset(len(buf)), _ExampleMessage_Scheme, _ExampleMessage_Unions)
 	return x
 }
 
@@ -96,12 +96,12 @@ type ComplexUnion struct {
 	message membuffers.Message
 }
 
-var m_ComplexUnion_Scheme = []membuffers.FieldType{membuffers.TypeUnion,}
-var m_ComplexUnion_Unions = [][]membuffers.FieldType{{membuffers.TypeUint32,membuffers.TypeMessage,membuffers.TypeUint16,}}
+var _ComplexUnion_Scheme = []membuffers.FieldType{membuffers.TypeUnion,}
+var _ComplexUnion_Unions = [][]membuffers.FieldType{{membuffers.TypeUint32,membuffers.TypeMessage,membuffers.TypeUint16,}}
 
 func ComplexUnionReader(buf []byte) *ComplexUnion {
 	x := &ComplexUnion{}
-	x.message.Init(buf, membuffers.Offset(len(buf)), m_ComplexUnion_Scheme, m_ComplexUnion_Unions)
+	x.message.Init(buf, membuffers.Offset(len(buf)), _ComplexUnion_Scheme, _ComplexUnion_Unions)
 	return x
 }
 

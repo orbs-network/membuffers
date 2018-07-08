@@ -1,0 +1,8 @@
+/////////////////////////////////////////////////////////////////////////////
+// message {{.MessageName}} (non serializable)
+
+type {{.MessageName}} struct {
+{{range .MessageFields}}	{{.FieldName}} {{if .IsArray}}[]{{end}}{{if .IsMessage}}*{{.FieldGoType}}{{else}}{{.FieldGoType}}{{end}}
+{{end -}}
+}
+

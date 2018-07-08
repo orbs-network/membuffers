@@ -1,4 +1,4 @@
-// AUTO GENERATED FILE (by membufc proto compiler)
+// AUTO GENERATED FILE (by membufc proto compiler v0.0.11)
 package dep2
 
 import (
@@ -16,12 +16,12 @@ type Dependent struct {
 	message membuffers.Message
 }
 
-var m_Dependent_Scheme = []membuffers.FieldType{membuffers.TypeMessage,membuffers.TypeUint16,membuffers.TypeMessage,}
-var m_Dependent_Unions = [][]membuffers.FieldType{}
+var _Dependent_Scheme = []membuffers.FieldType{membuffers.TypeMessage,membuffers.TypeUint16,membuffers.TypeMessage,}
+var _Dependent_Unions = [][]membuffers.FieldType{}
 
 func DependentReader(buf []byte) *Dependent {
 	x := &Dependent{}
-	x.message.Init(buf, membuffers.Offset(len(buf)), m_Dependent_Scheme, m_Dependent_Unions)
+	x.message.Init(buf, membuffers.Offset(len(buf)), _Dependent_Scheme, _Dependent_Unions)
 	return x
 }
 

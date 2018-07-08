@@ -325,6 +325,10 @@ MemBuffers supports proto definitions using standard [Protobuf v3 schema](https:
 
   Circular dependencies between services are often resolved with a listener pattern where one of the services extracts its callback methods into a separate service and the other service exposes a registration method for the listener. Read more about `option` extensions under `membufc` compiler [documentation](go/membufc/README.md).    
 
+* Services with non serializable arguments
+
+  Wrapping an already encoded MemBuffers message with another MemBuffers message causes data copy. This is particularly taxing with argument wrappers for service methods which can be avoided by encoding them as plain structs instead of MemBuffers messages. Read more about `option` extensions under `membufc` compiler [documentation](go/membufc/README.md).   
+
 ## License
 
 MIT

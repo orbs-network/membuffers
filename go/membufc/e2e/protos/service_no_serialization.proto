@@ -1,0 +1,33 @@
+syntax = "proto3";
+package types;
+option go_package = "github.com/orbs-network/membuffers/go/membufc/e2e/protos";
+
+import "protos/transaction.proto";
+import "protos/dep1/dependency1.proto";
+
+option serialize_service_args = false;
+
+service StateStorageNS {
+    rpc WriteKeyNS (WriteKeyInputNS) returns (WriteKeyOutputNS);
+    rpc ReadKeyNS (ReadKeyInputNS) returns (ReadKeyOutputNS);
+}
+
+message WriteKeyInputNS {
+    string key = 1;
+    uint32 value = 2;
+}
+
+message WriteKeyOutputNS {
+    string key = 1;
+    repeated string additional = 2;
+}
+
+message ReadKeyInputNS {
+    string key = 1;
+    types.Transaction transaction = 2;
+}
+
+message ReadKeyOutputNS {
+    uint32 value = 1;
+    repeated dep1.DependencyMessage dep = 2;
+}

@@ -1,1 +1,1 @@
-var m_{{.MessageName}}_Scheme = []membuffers.FieldType{{`{`}}{{range .MessageFields}}membuffers.Type{{.TypeAccessor}}{{if .IsArray}}Array{{end}},{{end}}}
+var _{{.MessageName}}_Scheme = []membuffers.FieldType{{`{`}}{{range .MessageFields}}membuffers.Type{{.TypeAccessor}}{{if .IsArray}}Array{{end}},{{end}}}

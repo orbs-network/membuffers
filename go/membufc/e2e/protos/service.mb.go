@@ -1,4 +1,4 @@
-// AUTO GENERATED FILE (by membufc proto compiler)
+// AUTO GENERATED FILE (by membufc proto compiler v0.0.11)
 package types
 
 import (
@@ -22,12 +22,12 @@ type WriteKeyInput struct {
 	message membuffers.Message
 }
 
-var m_WriteKeyInput_Scheme = []membuffers.FieldType{membuffers.TypeString,membuffers.TypeUint32,}
-var m_WriteKeyInput_Unions = [][]membuffers.FieldType{}
+var _WriteKeyInput_Scheme = []membuffers.FieldType{membuffers.TypeString,membuffers.TypeUint32,}
+var _WriteKeyInput_Unions = [][]membuffers.FieldType{}
 
 func WriteKeyInputReader(buf []byte) *WriteKeyInput {
 	x := &WriteKeyInput{}
-	x.message.Init(buf, membuffers.Offset(len(buf)), m_WriteKeyInput_Scheme, m_WriteKeyInput_Unions)
+	x.message.Init(buf, membuffers.Offset(len(buf)), _WriteKeyInput_Scheme, _WriteKeyInput_Unions)
 	return x
 }
 
@@ -118,12 +118,12 @@ type WriteKeyOutput struct {
 	message membuffers.Message
 }
 
-var m_WriteKeyOutput_Scheme = []membuffers.FieldType{}
-var m_WriteKeyOutput_Unions = [][]membuffers.FieldType{}
+var _WriteKeyOutput_Scheme = []membuffers.FieldType{}
+var _WriteKeyOutput_Unions = [][]membuffers.FieldType{}
 
 func WriteKeyOutputReader(buf []byte) *WriteKeyOutput {
 	x := &WriteKeyOutput{}
-	x.message.Init(buf, membuffers.Offset(len(buf)), m_WriteKeyOutput_Scheme, m_WriteKeyOutput_Unions)
+	x.message.Init(buf, membuffers.Offset(len(buf)), _WriteKeyOutput_Scheme, _WriteKeyOutput_Unions)
 	return x
 }
 
@@ -186,12 +186,12 @@ type ReadKeyInput struct {
 	message membuffers.Message
 }
 
-var m_ReadKeyInput_Scheme = []membuffers.FieldType{membuffers.TypeString,}
-var m_ReadKeyInput_Unions = [][]membuffers.FieldType{}
+var _ReadKeyInput_Scheme = []membuffers.FieldType{membuffers.TypeString,}
+var _ReadKeyInput_Unions = [][]membuffers.FieldType{}
 
 func ReadKeyInputReader(buf []byte) *ReadKeyInput {
 	x := &ReadKeyInput{}
-	x.message.Init(buf, membuffers.Offset(len(buf)), m_ReadKeyInput_Scheme, m_ReadKeyInput_Unions)
+	x.message.Init(buf, membuffers.Offset(len(buf)), _ReadKeyInput_Scheme, _ReadKeyInput_Unions)
 	return x
 }
 
@@ -268,12 +268,12 @@ type ReadKeyOutput struct {
 	message membuffers.Message
 }
 
-var m_ReadKeyOutput_Scheme = []membuffers.FieldType{membuffers.TypeUint32,}
-var m_ReadKeyOutput_Unions = [][]membuffers.FieldType{}
+var _ReadKeyOutput_Scheme = []membuffers.FieldType{membuffers.TypeUint32,}
+var _ReadKeyOutput_Unions = [][]membuffers.FieldType{}
 
 func ReadKeyOutputReader(buf []byte) *ReadKeyOutput {
 	x := &ReadKeyOutput{}
-	x.message.Init(buf, membuffers.Offset(len(buf)), m_ReadKeyOutput_Scheme, m_ReadKeyOutput_Unions)
+	x.message.Init(buf, membuffers.Offset(len(buf)), _ReadKeyOutput_Scheme, _ReadKeyOutput_Unions)
 	return x
 }
 

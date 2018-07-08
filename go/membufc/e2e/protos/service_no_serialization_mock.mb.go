@@ -6,25 +6,25 @@ import (
 )
 
 /////////////////////////////////////////////////////////////////////////////
-// service StateStorage
+// service StateStorageNS
 
-type MockStateStorage struct {
+type MockStateStorageNS struct {
 	mock.Mock
 }
 
-func (s *MockStateStorage) WriteKey(input *WriteKeyInput) (*WriteKeyOutput, error) {
+func (s *MockStateStorageNS) WriteKeyNS(input *WriteKeyInputNS) (*WriteKeyOutputNS, error) {
 	ret := s.Called(input)
 	if out := ret.Get(0); out != nil {
-		return out.(*WriteKeyOutput), ret.Error(1)
+		return out.(*WriteKeyOutputNS), ret.Error(1)
 	} else {
 		return nil, ret.Error(1)
 	}
 }
 
-func (s *MockStateStorage) ReadKey(input *ReadKeyInput) (*ReadKeyOutput, error) {
+func (s *MockStateStorageNS) ReadKeyNS(input *ReadKeyInputNS) (*ReadKeyOutputNS, error) {
 	ret := s.Called(input)
 	if out := ret.Get(0); out != nil {
-		return out.(*ReadKeyOutput), ret.Error(1)
+		return out.(*ReadKeyOutputNS), ret.Error(1)
 	} else {
 		return nil, ret.Error(1)
 	}

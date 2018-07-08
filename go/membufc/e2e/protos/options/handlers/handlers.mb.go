@@ -1,4 +1,4 @@
-// AUTO GENERATED FILE (by membufc proto compiler)
+// AUTO GENERATED FILE (by membufc proto compiler v0.0.11)
 package handlers
 
 import (
@@ -28,12 +28,12 @@ type SomeMessage struct {
 	message membuffers.Message
 }
 
-var m_SomeMessage_Scheme = []membuffers.FieldType{membuffers.TypeString,}
-var m_SomeMessage_Unions = [][]membuffers.FieldType{}
+var _SomeMessage_Scheme = []membuffers.FieldType{membuffers.TypeString,}
+var _SomeMessage_Unions = [][]membuffers.FieldType{}
 
 func SomeMessageReader(buf []byte) *SomeMessage {
 	x := &SomeMessage{}
-	x.message.Init(buf, membuffers.Offset(len(buf)), m_SomeMessage_Scheme, m_SomeMessage_Unions)
+	x.message.Init(buf, membuffers.Offset(len(buf)), _SomeMessage_Scheme, _SomeMessage_Unions)
 	return x
 }
 
