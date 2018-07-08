@@ -3,17 +3,14 @@ package main
 import (
 	"github.com/orbs-network/pbparser"
 	"io"
-	"sort"
 	"text/template"
 	"fmt"
 	"os"
 	"path"
-	"strings"
 	"github.com/gobuffalo/packr"
 )
 
 var box = packr.NewBox("./templates/go")
-var inlineTypes = make(map[string]string)
 
 func templateByBoxName(name string) *template.Template {
 	s, err := box.MustString(name)
@@ -27,23 +24,6 @@ func templateByBoxName(name string) *template.Template {
 		os.Exit(1)
 	}
 	return t
-}
-
-func convertFieldNameToGoCase(fieldName string) string {
-	return ToCamel(fieldName)
-}
-
-func convertFieldNameToGoCaseWithPackage(fieldName string) string {
-	parts := strings.Split(fieldName, ".")
-	parts[len(parts) - 1] = convertFieldNameToGoCase(parts[len(parts) - 1])
-	return strings.Join(parts, ".")
-}
-
-func compileMockFile(w io.Writer, file pbparser.ProtoFile, dependencyData map[string]dependencyData, compilerVersion string) {
-	addMockHeader(w, &file, dependencyData, compilerVersion)
-	for _, s := range file.Services {
-		addMockService(w, file.PackageName, s, &file)
-	}
 }
 
 func compileProtoFile(w io.Writer, file pbparser.ProtoFile, dependencyData map[string]dependencyData, compilerVersion string) {
@@ -60,184 +40,6 @@ func compileProtoFile(w io.Writer, file pbparser.ProtoFile, dependencyData map[s
 		}
 	}
 	addEnums(w, file.Enums)
-}
-
-type InlineType struct {
-	Name string
-	Alias string
-	FieldGoType string
-}
-
-func compileInlineFile(w io.Writer, file pbparser.ProtoFile, dependencyData map[string]dependencyData, compilerVersion string) {
-	inlines := []InlineType{}
-	for _, m := range file.Messages {
-		if len(m.Options) == 1 && m.Options[0].Name == "inline_type" {
-			goTypes := map[string]string{
-				"bytes":  "[]byte",
-				"string": "string",
-				"uint8":  "uint8",
-				"uint16": "uint16",
-				"uint32": "uint32",
-				"uint64": "uint64",
-			}
-			fieldGoType, found := goTypes[m.Options[0].Value]
-			if found {
-				inlines = append(inlines, InlineType{
-					Name: convertFieldNameToGoCase(m.Name),
-					Alias: m.Options[0].Value,
-					FieldGoType: fieldGoType,
-				})
-			}
-		}
-	}
-	t := templateByBoxName("InlineFile.template")
-	t.Execute(w, struct {
-		PackageName string
-		InlineType []InlineType
-		CompilerVersion string
-	}{
-		PackageName: file.PackageName,
-		InlineType: inlines,
-		CompilerVersion: compilerVersion,
-	})
-}
-
-func shouldSerializeServiceArgs(file *pbparser.ProtoFile) bool {
-	for _, option := range file.Options {
-		if option.Name == "serialize_service_args" && option.Value == "false" {
-			return false
-		}
-	}
-	return true
-}
-
-func normalizeFieldsAndOneOfs(m *pbparser.MessageElement) {
-	for _, oneOf := range m.OneOfs {
-		if len(oneOf.Fields) == 0 {
-			continue
-		}
-		m.Fields = append(m.Fields, pbparser.FieldElement{
-			Label: "oneof",
-			Tag: oneOf.Fields[0].Tag,
-			Name: oneOf.Name,
-		})
-	}
-	sort.Slice(m.Fields, func(i, j int) bool {
-		return m.Fields[i].Tag < m.Fields[j].Tag
-	})
-	sort.Slice(m.OneOfs, func(i, j int) bool {
-		return m.OneOfs[i].Fields[0].Tag < m.OneOfs[j].Fields[0].Tag
-	})
-	for i, _ := range m.Fields {
-		m.Fields[i].Tag = i
-	}
-	for i, _ := range m.OneOfs {
-		for j, _ := range m.OneOfs[i].Fields {
-			m.OneOfs[i].Fields[j].Tag = j
-		}
-	}
-}
-
-func addInlineFromImports(file *pbparser.ProtoFile, dependencyData map[string]dependencyData) {
-	for _, dep := range dependencyData {
-		importedFile, err := parseImportedFile(dep.path)
-		if err != nil {
-			fmt.Println("ERROR:", "imported file cannot be parsed:", dep.path, "\n", err)
-			os.Exit(1)
-		}
-		for _, option := range importedFile.Options {
-			if option.Name == "inline" && option.Value == "true" {
-				for _, m := range importedFile.Messages {
-					if len(m.Options) == 1 && m.Options[0].Name == "inline_type" {
-						if importedFile.PackageName != file.PackageName {
-							inlineTypes[importedFile.PackageName + "." + m.Name] = m.Options[0].Value
-						} else {
-							inlineTypes[m.Name] = m.Options[0].Value
-						}
-					}
-				}
-			}
-		}
-	}
-}
-
-func addEnumsFromImports(file *pbparser.ProtoFile, dependencyData map[string]dependencyData) {
-	for _, dep := range dependencyData {
-		importedFile, err := parseImportedFile(dep.path)
-		if err != nil {
-			fmt.Println("ERROR:", "imported file cannot be parsed:", dep.path, "\n", err)
-			os.Exit(1)
-		}
-		for i, enum := range importedFile.Enums {
-			importedFile.Enums[i].Documentation = "imported"
-			importedPackageName := path.Base(path.Dir(dep.path))
-			if importedPackageName != file.PackageName {
-				importedFile.Enums[i].Name = importedPackageName + "." + enum.Name
-			} else {
-				importedFile.Enums[i].Name = enum.Name
-			}
-
-		}
-		file.Enums = append(file.Enums, importedFile.Enums...)
-	}
-}
-
-func addMockHeader(w io.Writer, file *pbparser.ProtoFile, dependencyData map[string]dependencyData, compilerVersion string) {
-	var goPackage string
-	implementHandlers := []NameWithAndWithoutImport{}
-	registerHandlers := []NameWithAndWithoutImport{}
-	for _, option := range file.Options {
-		if option.Name == "go_package" {
-			goPackage = option.Value
-		}
-	}
-	for _, service := range file.Services {
-		for _, option := range service.Options {
-			if option.Name == "register_handler" {
-				registerHandlers = append(registerHandlers, getNameWithAndWithoutImport(option.Value))
-			}
-			if option.Name == "implement_handler" {
-				implementHandlers = append(implementHandlers, getNameWithAndWithoutImport(option.Value))
-			}
-		}
-	}
-	imports := []string{}
-	for _, dependency := range file.Dependencies {
-		if !doesFileContainHandlers(dependencyData[dependency].path, append(implementHandlers, registerHandlers...)) {
-			continue
-		}
-		relative := dependencyData[dependency].relative
-		packageImport := path.Dir(path.Clean(goPackage + "/" + relative + "/" + dependency))
-		if packageImport != goPackage {
-			imports = append(imports, packageImport)
-		}
-	}
-	t := templateByBoxName("MockFileHeader.template")
-	t.Execute(w, struct {
-		PackageName string
-		Imports []string
-		CompilerVersion string
-	}{
-		PackageName: file.PackageName,
-		Imports: unique(imports),
-		CompilerVersion: compilerVersion,
-	})
-}
-
-func doesFileContainHandlers(path string, handlers []NameWithAndWithoutImport) bool {
-	file, err := parseImportedFile(path)
-	if err != nil {
-		fmt.Println("ERROR:", "imported file cannot be parsed:", path, "\n", err)
-		os.Exit(1)
-	}
-	for _, handler := range handlers {
-		for _, service := range file.Services {
-			if handler.CleanName == service.Name {
-				return true
-			}
-		}
-	}
-	return false
 }
 
 func addHeader(w io.Writer, file *pbparser.ProtoFile, dependencyData map[string]dependencyData, serializeServiceArgs bool, compilerVersion string) {
@@ -275,75 +77,10 @@ func addHeader(w io.Writer, file *pbparser.ProtoFile, dependencyData map[string]
 	})
 }
 
-func addEnums(w io.Writer, enums []pbparser.EnumElement) {
-	if len(enums) == 0 {
-		return
-	}
-	messageEnums, _ := getFileEnums(enums)
-	t := templateByBoxName("MessageFileEnums.template")
-	t.Execute(w, struct {
-		Enums []Enum
-	}{
-		Enums: messageEnums,
-	})
-}
-
 type ServiceMethod struct{
 	Name string
 	Input string
 	Output string
-}
-
-func addMockService(w io.Writer, packageName string, s pbparser.ServiceElement, file *pbparser.ProtoFile) {
-	methods := []ServiceMethod{}
-	for _, rpc := range s.RPCs {
-		method := ServiceMethod{
-			Name: rpc.Name,
-			Input: removeLocalPackagePrefix(packageName, rpc.RequestType.Name()),
-			Output: removeLocalPackagePrefix(packageName, rpc.ResponseType.Name()),
-		}
-		methods = append(methods, method)
-	}
-	registerHandlers := []NameWithAndWithoutImport{}
-	implementHandlers := []NameWithAndWithoutImport{}
-	for _, option := range s.Options {
-		if option.Name == "register_handler" {
-			registerHandlers = append(registerHandlers, getNameWithAndWithoutImport(option.Value))
-		}
-		if option.Name == "implement_handler" {
-			implementHandlers = append(implementHandlers, getNameWithAndWithoutImport(option.Value))
-		}
-	}
-	t := templateByBoxName("MockService.template")
-	t.Execute(w, struct {
-		ServiceName string
-		Methods []ServiceMethod
-		RegisterHandlers []NameWithAndWithoutImport
-		ImplementHandlers []NameWithAndWithoutImport
-	}{
-		ServiceName: s.Name,
-		Methods: methods,
-		RegisterHandlers: registerHandlers,
-		ImplementHandlers: implementHandlers,
-	})
-}
-
-type NameWithAndWithoutImport struct {
-	CleanName string
-	ImportName string
-	MockImportName string
-}
-func getNameWithAndWithoutImport(name string) NameWithAndWithoutImport {
-	parts := strings.Split(name, ".")
-	packagePrefix := ""
-	if len(parts) == 2 {
-		packagePrefix = parts[0] + "."
-	}
-	return NameWithAndWithoutImport{
-		CleanName: parts[len(parts)-1],
-		ImportName: name,
-		MockImportName: packagePrefix + "Mock" + parts[len(parts)-1],
-	}
 }
 
 func addService(w io.Writer, packageName string, s pbparser.ServiceElement, file *pbparser.ProtoFile) {
@@ -396,32 +133,6 @@ func addMessage(w io.Writer, packageName string, m pbparser.MessageElement, file
 		addMessageReaderField(w, packageName, m.Name, field, m.OneOfs, enumNameToIndex)
 	}
 	addMessageBuilder(w, packageName, m.Name, m.Fields, m.OneOfs, enumNameToIndex)
-}
-
-func addMessageNonSerializable(w io.Writer, packageName string, m pbparser.MessageElement, file *pbparser.ProtoFile) {
-	messageFields := []MessageField{}
-	messageName := m.Name
-	fields := m.Fields
-	unions := m.OneOfs
-	normalizeFieldsAndOneOfs(&m)
-	_, enumNameToIndex := getFileEnums(file.Enums)
-	unionByIndex, unionNameToIndex := getMessageUnions(packageName, messageName, unions, enumNameToIndex)
-	for _, field := range fields {
-		messageField := getMessageField(packageName, messageName, field, enumNameToIndex)
-		messageFields = append(messageFields, messageField)
-	}
-	t := templateByBoxName("MessageNonSerializable.template")
-	t.Execute(w, struct {
-		MessageName string
-		MessageFields []MessageField
-		UnionByIndex [][]MessageField
-		UnionNameToIndex map[string]int
-	}{
-		MessageName:   messageName,
-		MessageFields: messageFields,
-		UnionByIndex:  unionByIndex,
-		UnionNameToIndex: unionNameToIndex,
-	})
 }
 
 func addMessageScheme(w io.Writer, packageName string, messageName string, fields []pbparser.FieldElement, unions []pbparser.OneOfElement, enumNameToIndex map[string]int) {
@@ -562,195 +273,6 @@ func getMessageUnions(packageName string, messageName string, unions []pbparser.
 	return unionByIndex, unionNameToIndex
 }
 
-type MessageField struct{
-	FieldName string
-	FieldGoType string
-	IsMessage bool
-	IsArray bool
-	IsUnion bool
-	IsEnum bool
-	IsInline bool
-	InlineUnderlyingGoType string
-	TypeAccessor string
-	FieldIndex int
-	MessageName string
-}
-
-func getMessageField(packageName string, messageName string, field pbparser.FieldElement, enumNameToIndex map[string]int) (messageField MessageField) {
-	defer func() {
-		if _, ok := enumNameToIndex[messageField.FieldGoType]; ok {
-			messageField.IsEnum = true
-			messageField.IsMessage = false
-			messageField.TypeAccessor = "Uint16"
-		}
-	}()
-	if field.Label == "oneof" {
-		messageField = MessageField{
-			FieldName:    convertFieldNameToGoCase(field.Name),
-			FieldGoType:  messageName + convertFieldNameToGoCase(field.Name),
-			IsMessage:    false,
-			IsArray:      false,
-			IsUnion:      true,
-			TypeAccessor: "Union",
-			FieldIndex:   field.Tag,
-			MessageName:  messageName,
-		}
-		return
-	}
-	if inlineType, isInline := inlineTypes[field.Type.Name()]; isInline {
-		originalFieldType := field.Type.Name()
-		newType, err := pbparser.NewScalarDataType(inlineType)
-		if err == nil {
-			field.Type = newType
-			defer func() {
-				messageField.IsInline = true
-				messageField.InlineUnderlyingGoType = messageField.FieldGoType
-				messageField.FieldGoType = convertFieldNameToGoCaseWithPackage(originalFieldType)
-			}()
-		}
-	}
-	if field.Label == "" || field.Label == "optional" || field.Label == "required" {
-		if field.Type.Category() == pbparser.ScalarDataTypeCategory {
-			goTypes := map[string]string{
-				"bytes":  "[]byte",
-				"string": "string",
-				"uint8":  "uint8",
-				"uint16": "uint16",
-				"uint32": "uint32",
-				"uint64": "uint64",
-			}
-			accessor := map[string]string{
-				"bytes":  "Bytes",
-				"string": "String",
-				"uint8":  "Uint8",
-				"uint16": "Uint16",
-				"uint32": "Uint32",
-				"uint64": "Uint64",
-			}
-			_, ok := accessor[field.Type.Name()]
-			if !ok {
-				fmt.Println("ERROR: unsupported primitive type:", field.Type.Name())
-				os.Exit(1)
-			}
-			messageField = MessageField{
-				FieldName:    convertFieldNameToGoCase(field.Name),
-				FieldGoType:  goTypes[field.Type.Name()],
-				IsMessage:    false,
-				IsArray:      false,
-				IsUnion:      false,
-				TypeAccessor: accessor[field.Type.Name()],
-				FieldIndex:   field.Tag,
-				MessageName:  messageName,
-			}
-			return
-		}
-		if field.Type.Category() == pbparser.NamedDataTypeCategory {
-			messageField = MessageField{
-				FieldName:    convertFieldNameToGoCase(field.Name),
-				FieldGoType:  removeLocalPackagePrefix(packageName, field.Type.Name()),
-				IsMessage:    true,
-				IsArray:      false,
-				IsUnion:      false,
-				TypeAccessor: "Message",
-				FieldIndex:   field.Tag,
-				MessageName:  messageName,
-			}
-			return
-		}
-	}
-	if field.Label == "repeated" {
-		if field.Type.Category() == pbparser.ScalarDataTypeCategory {
-			goTypes := map[string]string{
-				"bytes":  "[]byte",
-				"string": "string",
-				"uint8":  "uint8",
-				"uint16": "uint16",
-				"uint32": "uint32",
-				"uint64": "uint64",
-			}
-			accessor := map[string]string{
-				"bytes":  "Bytes",
-				"string": "String",
-				"uint8":  "Uint8",
-				"uint16": "Uint16",
-				"uint32": "Uint32",
-				"uint64": "Uint64",
-			}
-			messageField = MessageField{
-				FieldName:    convertFieldNameToGoCase(field.Name),
-				FieldGoType:  goTypes[field.Type.Name()],
-				IsMessage:    false,
-				IsArray:      true,
-				IsUnion:      false,
-				TypeAccessor: accessor[field.Type.Name()],
-				FieldIndex:   field.Tag,
-				MessageName:  messageName,
-			}
-			return
-		}
-		if field.Type.Category() == pbparser.NamedDataTypeCategory {
-			messageField = MessageField{
-				FieldName:    convertFieldNameToGoCase(field.Name),
-				FieldGoType:  removeLocalPackagePrefix(packageName, field.Type.Name()),
-				IsMessage:    true,
-				IsArray:      true,
-				IsUnion:      false,
-				TypeAccessor: "Message",
-				FieldIndex:   field.Tag,
-				MessageName:  messageName,
-			}
-			return
-		}
-	}
-	return MessageField{}
-}
-
-func removeLocalPackagePrefix(localPackageName string, fieldGoType string) string {
-	return strings.TrimPrefix(fieldGoType, localPackageName + ".")
-}
-
-func getFileEnums(enums []pbparser.EnumElement) ([]Enum, map[string]int) {
-	enumByIndex := []Enum{}
-	enumNameToIndex := make(map[string]int)
-	for _, enum := range enums {
-		enumNameToIndex[enum.Name] = len(enumByIndex)
-		values := []EnumValue{}
-		for _, value := range enum.EnumConstants {
-			values = append(values, EnumValue{
-				Name: value.Name,
-				Value: value.Tag,
-			})
-		}
-		// only add here enums from this package
-		if enum.Documentation != "imported" {
-			enumByIndex = append(enumByIndex, Enum{
-				Name: enum.Name,
-				Values: values,
-			})
-		}
-	}
-	return enumByIndex, enumNameToIndex
-}
-
-func isInlineFileByPath(path string) bool {
-	file, err := parseImportedFile(path)
-	if err != nil {
-		fmt.Println("ERROR:", "imported file cannot be parsed:", path, "\n", err)
-		os.Exit(1)
-	}
-	return isInlineFile(&file)
-}
-
-type Enum struct{
-	Name string
-	Values []EnumValue
-}
-
-type EnumValue struct{
-	Name string
-	Value int
-}
-
 func parseImportedFile(path string) (pbparser.ProtoFile, error) {
 	in, err := os.Open(path)
 	if err != nil {
@@ -758,16 +280,4 @@ func parseImportedFile(path string) (pbparser.ProtoFile, error) {
 	}
 	p := importProvider{protoFile: path, moduleToRelative: nil}
 	return pbparser.Parse(in, &p)
-}
-
-func unique(slice []string) []string {
-	keys := make(map[string]bool)
-	list := []string{}
-	for _, entry := range slice {
-		if _, value := keys[entry]; !value {
-			keys[entry] = true
-			list = append(list, entry)
-		}
-	}
-	return list
 }
