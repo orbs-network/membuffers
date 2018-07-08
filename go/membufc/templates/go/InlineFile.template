@@ -1,0 +1,5 @@
+// AUTO GENERATED FILE (by membufc proto compiler v{{.CompilerVersion}})
+package {{.PackageName}}
+
+{{range .InlineType}}type {{.Name}} {{.FieldGoType}}
+{{end}}

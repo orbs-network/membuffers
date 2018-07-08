@@ -7,9 +7,18 @@ type {{.MessageName}}Builder struct {
 {{range .UnionByIndex}}{{range .}}	{{.FieldName}} {{if .IsMessage}}*{{.FieldGoType}}Builder{{else}}{{.FieldGoType}}{{end}}
 {{end}}{{end -}}
 }
-{{range .MessageFields}}{{if and .IsMessage .IsArray}}
+{{range .MessageFields}}{{if and .IsArray .IsMessage}}
 func (w *{{.MessageName}}Builder) arrayOf{{.FieldName}}() []membuffers.MessageBuilder {
 	res := make([]membuffers.MessageBuilder, len(w.{{.FieldName}}))
+	for i, v := range w.{{.FieldName}} {
+		res[i] = v
+	}
+	return res
+}
+{{end}}{{end}}
+{{- range .MessageFields}}{{if and .IsArray .IsInline}}
+func (w *{{.MessageName}}Builder) arrayOf{{.FieldName}}() []{{.InlineUnderlyingGoType}} {
+	res := make([]{{.InlineUnderlyingGoType}}, len(w.{{.FieldName}}))
 	for i, v := range w.{{.FieldName}} {
 		res[i] = v
 	}
@@ -42,7 +51,7 @@ func (w *{{.MessageName}}Builder) Write(buf []byte) (err error) {
 		return
 	}
 	{{- else}}
-	w.builder.Write{{.TypeAccessor}}{{if .IsArray}}Array{{end}}(buf, {{if .IsEnum}}uint16({{end}}w.{{.FieldName}}){{if .IsEnum}}){{end}}{{end}}{{end}}
+	w.builder.Write{{.TypeAccessor}}{{if .IsArray}}Array{{end}}(buf, {{if .IsEnum}}uint16({{end}}w.{{if and .IsArray .IsInline}}arrayOf{{.FieldName}}(){{else}}{{.FieldName}}{{end}}){{if .IsEnum}}){{end}}{{end}}{{end}}
 	return nil
 }
 

@@ -33,6 +33,12 @@ func convertFieldNameToGoCase(fieldName string) string {
 	return ToCamel(fieldName)
 }
 
+func convertFieldNameToGoCaseWithPackage(fieldName string) string {
+	parts := strings.Split(fieldName, ".")
+	parts[len(parts) - 1] = convertFieldNameToGoCase(parts[len(parts) - 1])
+	return strings.Join(parts, ".")
+}
+
 func compileMockFile(w io.Writer, file pbparser.ProtoFile, dependencyData map[string]dependencyData, compilerVersion string) {
 	addMockHeader(w, &file, dependencyData, compilerVersion)
 	for _, s := range file.Services {
@@ -54,6 +60,46 @@ func compileProtoFile(w io.Writer, file pbparser.ProtoFile, dependencyData map[s
 		}
 	}
 	addEnums(w, file.Enums)
+}
+
+type InlineType struct {
+	Name string
+	Alias string
+	FieldGoType string
+}
+
+func compileInlineFile(w io.Writer, file pbparser.ProtoFile, dependencyData map[string]dependencyData, compilerVersion string) {
+	inlines := []InlineType{}
+	for _, m := range file.Messages {
+		if len(m.Options) == 1 && m.Options[0].Name == "inline_type" {
+			goTypes := map[string]string{
+				"bytes":  "[]byte",
+				"string": "string",
+				"uint8":  "uint8",
+				"uint16": "uint16",
+				"uint32": "uint32",
+				"uint64": "uint64",
+			}
+			fieldGoType, found := goTypes[m.Options[0].Value]
+			if found {
+				inlines = append(inlines, InlineType{
+					Name: convertFieldNameToGoCase(m.Name),
+					Alias: m.Options[0].Value,
+					FieldGoType: fieldGoType,
+				})
+			}
+		}
+	}
+	t := templateByBoxName("InlineFile.template")
+	t.Execute(w, struct {
+		PackageName string
+		InlineType []InlineType
+		CompilerVersion string
+	}{
+		PackageName: file.PackageName,
+		InlineType: inlines,
+		CompilerVersion: compilerVersion,
+	})
 }
 
 func shouldSerializeServiceArgs(file *pbparser.ProtoFile) bool {
@@ -209,9 +255,6 @@ func addHeader(w io.Writer, file *pbparser.ProtoFile, dependencyData map[string]
 	addEnumsFromImports(file, dependencyData)
 	imports := []string{}
 	for _, dependency := range file.Dependencies {
-		if isInlineFileByPath(dependencyData[dependency].path) {
-			continue
-		}
 		relative := dependencyData[dependency].relative
 		packageImport := path.Dir(path.Clean(goPackage + "/" + relative + "/" + dependency))
 		if packageImport != goPackage {
@@ -526,6 +569,8 @@ type MessageField struct{
 	IsArray bool
 	IsUnion bool
 	IsEnum bool
+	IsInline bool
+	InlineUnderlyingGoType string
 	TypeAccessor string
 	FieldIndex int
 	MessageName string
@@ -553,14 +598,19 @@ func getMessageField(packageName string, messageName string, field pbparser.Fiel
 		return
 	}
 	if inlineType, isInline := inlineTypes[field.Type.Name()]; isInline {
+		originalFieldType := field.Type.Name()
 		newType, err := pbparser.NewScalarDataType(inlineType)
 		if err == nil {
 			field.Type = newType
+			defer func() {
+				messageField.IsInline = true
+				messageField.InlineUnderlyingGoType = messageField.FieldGoType
+				messageField.FieldGoType = convertFieldNameToGoCaseWithPackage(originalFieldType)
+			}()
 		}
 	}
 	if field.Label == "" || field.Label == "optional" || field.Label == "required" {
 		if field.Type.Category() == pbparser.ScalarDataTypeCategory {
-
 			goTypes := map[string]string{
 				"bytes":  "[]byte",
 				"string": "string",

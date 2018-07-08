@@ -10,7 +10,7 @@ import (
 	"path"
 )
 
-const MEMBUFC_VERSION = "0.0.11"
+const MEMBUFC_VERSION = "0.0.12"
 
 type config struct {
 	language string
@@ -101,10 +101,6 @@ func main() {
 			fmt.Println("ERROR:", err.Error())
 			os.Exit(1)
 		}
-		if isInlineFile(&protoFile) {
-			fmt.Println()
-			continue
-		}
 		outPath := outputFileForPath(path, ".mb.go")
 		out, err := os.Create(outPath)
 		if err != nil {
@@ -112,7 +108,11 @@ func main() {
 			os.Exit(1)
 		}
 		defer out.Close()
-		compileProtoFile(out, protoFile, p.moduleToRelative, MEMBUFC_VERSION)
+		if isInlineFile(&protoFile) {
+			compileInlineFile(out, protoFile, p.moduleToRelative, MEMBUFC_VERSION)
+		} else {
+			compileProtoFile(out, protoFile, p.moduleToRelative, MEMBUFC_VERSION)
+		}
 		fmt.Println("Created file:\t", outPath)
 		if len(protoFile.Services) > 0 && conf.mock {
 			outPath := outputFileForPath(path, "_mock.mb.go")
