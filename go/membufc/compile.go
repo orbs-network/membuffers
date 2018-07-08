@@ -125,6 +125,7 @@ func addEnumsFromImports(file *pbparser.ProtoFile, dependencyData map[string]dep
 func addMockHeader(w io.Writer, file *pbparser.ProtoFile, dependencyData map[string]dependencyData) {
 	var goPackage string
 	implementHandlers := []NameWithAndWithoutImport{}
+	registerHandlers := []NameWithAndWithoutImport{}
 	for _, option := range file.Options {
 		if option.Name == "go_package" {
 			goPackage = option.Value
@@ -132,6 +133,9 @@ func addMockHeader(w io.Writer, file *pbparser.ProtoFile, dependencyData map[str
 	}
 	for _, service := range file.Services {
 		for _, option := range service.Options {
+			if option.Name == "register_handler" {
+				registerHandlers = append(registerHandlers, getNameWithAndWithoutImport(option.Value))
+			}
 			if option.Name == "implement_handler" {
 				implementHandlers = append(implementHandlers, getNameWithAndWithoutImport(option.Value))
 			}
@@ -139,7 +143,7 @@ func addMockHeader(w io.Writer, file *pbparser.ProtoFile, dependencyData map[str
 	}
 	imports := []string{}
 	for _, dependency := range file.Dependencies {
-		if !doesFileContainImplementHandler(dependencyData[dependency].path, implementHandlers) {
+		if !doesFileContainHandlers(dependencyData[dependency].path, append(implementHandlers, registerHandlers...)) {
 			continue
 		}
 		relative := dependencyData[dependency].relative
@@ -158,15 +162,15 @@ func addMockHeader(w io.Writer, file *pbparser.ProtoFile, dependencyData map[str
 	})
 }
 
-func doesFileContainImplementHandler(path string, implementHandlers []NameWithAndWithoutImport) bool {
+func doesFileContainHandlers(path string, handlers []NameWithAndWithoutImport) bool {
 	file, err := parseImportedFile(path)
 	if err != nil {
 		fmt.Println("ERROR:", "imported file cannot be parsed:", path, "\n", err)
 		os.Exit(1)
 	}
-	for _, implementHandler := range implementHandlers {
+	for _, handler := range handlers {
 		for _, service := range file.Services {
-			if implementHandler.CleanName == service.Name {
+			if handler.CleanName == service.Name {
 				return true
 			}
 		}
