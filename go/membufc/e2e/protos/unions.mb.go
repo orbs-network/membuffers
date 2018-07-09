@@ -1,4 +1,4 @@
-// AUTO GENERATED FILE (by membufc proto compiler v0.0.12)
+// AUTO GENERATED FILE (by membufc proto compiler v0.0.13)
 package types
 
 import (
@@ -137,12 +137,12 @@ func (x *ComplexUnion) IsOptionNum() bool {
 	return is
 }
 
-func (x *ComplexUnion) OptionNum() uint32 {
+func (x *ComplexUnion) Num() uint32 {
 	_, off := x._message.IsUnionIndex(0, 0, 0)
 	return x._message.GetUint32InOffset(off)
 }
 
-func (x *ComplexUnion) MutateOptionNum(v uint32) error {
+func (x *ComplexUnion) MutateNum(v uint32) error {
 	is, off := x._message.IsUnionIndex(0, 0, 0)
 	if !is {
 		return &membuffers.ErrInvalidField{}
@@ -156,7 +156,7 @@ func (x *ComplexUnion) IsOptionMsg() bool {
 	return is
 }
 
-func (x *ComplexUnion) OptionMsg() *ExampleMessage {
+func (x *ComplexUnion) Msg() *ExampleMessage {
 	_, off := x._message.IsUnionIndex(0, 0, 1)
 	b, s := x._message.GetMessageInOffset(off)
 	return ExampleMessageReader(b[:s])
@@ -167,12 +167,12 @@ func (x *ComplexUnion) IsOptionEnu() bool {
 	return is
 }
 
-func (x *ComplexUnion) OptionEnu() ExampleEnum {
+func (x *ComplexUnion) Enu() ExampleEnum {
 	_, off := x._message.IsUnionIndex(0, 0, 2)
 	return ExampleEnum(x._message.GetUint16InOffset(off))
 }
 
-func (x *ComplexUnion) MutateOptionEnu(v ExampleEnum) error {
+func (x *ComplexUnion) MutateEnu(v ExampleEnum) error {
 	is, off := x._message.IsUnionIndex(0, 0, 2)
 	if !is {
 		return &membuffers.ErrInvalidField{}

@@ -1,4 +1,4 @@
-// AUTO GENERATED FILE (by membufc proto compiler v0.0.12)
+// AUTO GENERATED FILE (by membufc proto compiler v0.0.13)
 package types
 
 import (
@@ -171,12 +171,12 @@ func (x *MethodCallArgument) IsTypeNum() bool {
 	return is
 }
 
-func (x *MethodCallArgument) TypeNum() uint32 {
+func (x *MethodCallArgument) Num() uint32 {
 	_, off := x._message.IsUnionIndex(0, 0, 0)
 	return x._message.GetUint32InOffset(off)
 }
 
-func (x *MethodCallArgument) MutateTypeNum(v uint32) error {
+func (x *MethodCallArgument) MutateNum(v uint32) error {
 	is, off := x._message.IsUnionIndex(0, 0, 0)
 	if !is {
 		return &membuffers.ErrInvalidField{}
@@ -190,12 +190,12 @@ func (x *MethodCallArgument) IsTypeStr() bool {
 	return is
 }
 
-func (x *MethodCallArgument) TypeStr() string {
+func (x *MethodCallArgument) Str() string {
 	_, off := x._message.IsUnionIndex(0, 0, 1)
 	return x._message.GetStringInOffset(off)
 }
 
-func (x *MethodCallArgument) MutateTypeStr(v string) error {
+func (x *MethodCallArgument) MutateStr(v string) error {
 	is, off := x._message.IsUnionIndex(0, 0, 1)
 	if !is {
 		return &membuffers.ErrInvalidField{}
@@ -209,12 +209,12 @@ func (x *MethodCallArgument) IsTypeData() bool {
 	return is
 }
 
-func (x *MethodCallArgument) TypeData() []byte {
+func (x *MethodCallArgument) Data() []byte {
 	_, off := x._message.IsUnionIndex(0, 0, 2)
 	return x._message.GetBytesInOffset(off)
 }
 
-func (x *MethodCallArgument) MutateTypeData(v []byte) error {
+func (x *MethodCallArgument) MutateData(v []byte) error {
 	is, off := x._message.IsUnionIndex(0, 0, 2)
 	if !is {
 		return &membuffers.ErrInvalidField{}

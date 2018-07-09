@@ -12,7 +12,7 @@ func TestComplexUnionMessage(t *testing.T) {
 			Str: "hello",
 		},
 	}).Build()
-	if !cu.IsOptionMsg() || cu.OptionMsg().Str() != "hello" {
+	if !cu.IsOptionMsg() || cu.Msg().Str() != "hello" {
 		t.Fatalf("Message inside ComplexUnion is not as expected")
 	}
 }
@@ -22,7 +22,7 @@ func TestComplexUnionEnum(t *testing.T) {
 		Option: types.ComplexUnionOptionEnu,
 		Enu: types.EXAMPLE_ENUM_OPTION_B,
 	}).Build()
-	if !cu.IsOptionEnu() || cu.OptionEnu() != types.EXAMPLE_ENUM_OPTION_B {
+	if !cu.IsOptionEnu() || cu.Enu() != types.EXAMPLE_ENUM_OPTION_B {
 		t.Fatalf("Enum inside ComplexUnion is not as expected")
 	}
 }

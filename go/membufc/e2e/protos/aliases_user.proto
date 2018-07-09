@@ -8,4 +8,5 @@ message FileRecord {
     bytes data = 1;
     crypto.sha256 hash = 2;
     repeated crypto.md5 another_hash = 3;
+    crypto.block_height block_height = 4;
 }

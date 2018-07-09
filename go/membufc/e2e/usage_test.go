@@ -143,8 +143,8 @@ func TestReadWriteMethod(t *testing.T) {
 	if arg0.Type() != types.MethodCallArgumentTypeNum {
 		t.Fatalf("Arg0: type is not num")
 	}
-	if arg0.TypeNum() != 0x17 {
-		t.Fatalf("Arg0.Num: instead of expected got %v", arg0.TypeNum())
+	if arg0.Num() != 0x17 {
+		t.Fatalf("Arg0.Num: instead of expected got %v", arg0.Num())
 	}
 	arg1 := i.NextArg()
 	if !arg1.IsTypeStr() {
@@ -156,8 +156,8 @@ func TestReadWriteMethod(t *testing.T) {
 	if arg1.Type() != types.MethodCallArgumentTypeStr {
 		t.Fatalf("Arg1: type is not str")
 	}
-	if arg1.TypeStr() != "flower" {
-		t.Fatalf("Arg1.Str: instead of expected got %v", arg1.TypeStr())
+	if arg1.Str() != "flower" {
+		t.Fatalf("Arg1.Str: instead of expected got %v", arg1.Str())
 	}
 }
 

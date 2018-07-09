@@ -14,3 +14,8 @@ message md5 {
     option inline_type = "bytes";
     bytes value = 1;
 }
+
+message block_height {
+    option inline_type = "uint64";
+    uint64 value = 1;
+}

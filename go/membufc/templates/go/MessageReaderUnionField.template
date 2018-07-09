@@ -18,21 +18,21 @@ func (x *{{.MessageName}}) Is{{$UnionName}}{{.FieldName}}() bool {
 }
 
 {{if not .IsMessage -}}
-func (x *{{.MessageName}}) {{$UnionName}}{{.FieldName}}() {{.FieldGoType}} {
+func (x *{{.MessageName}}) {{.FieldName}}() {{.FieldGoType}} {
 	_, off := x._message.IsUnionIndex({{$ParentFieldIndex}}, {{$UnionNum}}, {{.FieldIndex}})
-	return {{if .IsEnum}}{{.FieldGoType}}({{end}}x._message.Get{{.TypeAccessor}}InOffset(off){{if .IsEnum}}){{end}}
+	return {{if or .IsEnum .IsInline}}{{.FieldGoType}}({{end}}x._message.Get{{.TypeAccessor}}InOffset(off){{if or .IsEnum .IsInline}}){{end}}
 }
 
-func (x *{{.MessageName}}) Mutate{{$UnionName}}{{.FieldName}}(v {{.FieldGoType}}) error {
+func (x *{{.MessageName}}) Mutate{{.FieldName}}(v {{.FieldGoType}}) error {
 	is, off := x._message.IsUnionIndex({{$ParentFieldIndex}}, {{$UnionNum}}, {{.FieldIndex}})
 	if !is {
 		return &membuffers.ErrInvalidField{}
 	}
-	x._message.Set{{.TypeAccessor}}InOffset(off, {{if .IsEnum}}uint16({{end}}v){{if .IsEnum}}){{end}}
+	x._message.Set{{.TypeAccessor}}InOffset(off, {{if .IsEnum}}uint16({{end}}{{if .IsInline}}{{.InlineUnderlyingGoType}}({{end}}v){{if or .IsEnum .IsInline}}){{end}}
 	return nil
 }
 {{- else -}}
-func (x *{{.MessageName}}) {{$UnionName}}{{.FieldName}}() *{{.FieldGoType}} {
+func (x *{{.MessageName}}) {{.FieldName}}() *{{.FieldGoType}} {
 	_, off := x._message.IsUnionIndex({{$ParentFieldIndex}}, {{$UnionNum}}, {{.FieldIndex}})
 	b, s := x._message.GetMessageInOffset(off)
 	return {{.FieldGoType}}Reader(b[:s])

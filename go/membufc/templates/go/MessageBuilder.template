@@ -44,7 +44,7 @@ func (w *{{.MessageName}}Builder) Write(buf []byte) (err error) {
 	{{- $UnionName := .FieldName}}{{$UnionNum := index $UnionNameToIndex .FieldName}}
 	{{- range index $UnionByIndex $UnionNum}}
 	case {{.MessageName}}{{$UnionName}}{{.FieldName}}:
-		w._builder.Write{{.TypeAccessor}}(buf, {{if .IsEnum}}uint16({{end}}w.{{.FieldName}}){{if .IsEnum}}){{end}}
+		w._builder.Write{{.TypeAccessor}}(buf, {{if .IsEnum}}uint16({{end}}{{if .IsInline}}{{.InlineUnderlyingGoType}}({{end}}w.{{.FieldName}}){{if or .IsEnum .IsInline}}){{end}}
 	{{- end}}
 	}
 	{{- else if .IsMessage}}
@@ -53,7 +53,7 @@ func (w *{{.MessageName}}Builder) Write(buf []byte) (err error) {
 		return
 	}
 	{{- else}}
-	w._builder.Write{{.TypeAccessor}}{{if .IsArray}}Array{{end}}(buf, {{if .IsEnum}}uint16({{end}}w.{{if and .IsArray .IsInline}}arrayOf{{.FieldName}}(){{else}}{{.FieldName}}{{end}}){{if .IsEnum}}){{end}}{{end}}{{end}}
+	w._builder.Write{{.TypeAccessor}}{{if .IsArray}}Array{{end}}(buf, {{if .IsEnum}}uint16({{end}}{{if and .IsInline (not .IsArray)}}{{.InlineUnderlyingGoType}}({{end}}w.{{if and .IsArray .IsInline}}arrayOf{{.FieldName}}(){{else}}{{.FieldName}}{{end}}){{if .IsEnum}}){{end}}{{if and .IsInline (not .IsArray)}}){{end}}{{end}}{{end}}
 	return nil
 }
 

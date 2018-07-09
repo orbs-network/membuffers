@@ -1,4 +1,4 @@
-// AUTO GENERATED FILE (by membufc proto compiler v0.0.12)
+// AUTO GENERATED FILE (by membufc proto compiler v0.0.13)
 package types
 
 import (
@@ -17,7 +17,7 @@ type FileRecord struct {
 	_message membuffers.InternalMessage
 }
 
-var _FileRecord_Scheme = []membuffers.FieldType{membuffers.TypeBytes,membuffers.TypeBytes,membuffers.TypeBytesArray,}
+var _FileRecord_Scheme = []membuffers.FieldType{membuffers.TypeBytes,membuffers.TypeBytes,membuffers.TypeBytesArray,membuffers.TypeUint64,}
 var _FileRecord_Unions = [][]membuffers.FieldType{}
 
 func FileRecordReader(buf []byte) *FileRecord {
@@ -47,7 +47,7 @@ func (x *FileRecord) MutateData(v []byte) error {
 }
 
 func (x *FileRecord) Hash() crypto.Sha256 {
-	return x._message.GetBytes(1)
+	return crypto.Sha256(x._message.GetBytes(1))
 }
 
 func (x *FileRecord) RawHash() []byte {
@@ -55,7 +55,7 @@ func (x *FileRecord) RawHash() []byte {
 }
 
 func (x *FileRecord) MutateHash(v crypto.Sha256) error {
-	return x._message.SetBytes(1, v)
+	return x._message.SetBytes(1, []byte(v))
 }
 
 func (x *FileRecord) AnotherHashIterator() *FileRecordAnotherHashIterator {
@@ -71,11 +71,23 @@ func (i *FileRecordAnotherHashIterator) HasNext() bool {
 }
 
 func (i *FileRecordAnotherHashIterator) NextAnotherHash() crypto.Md5 {
-	return i.iterator.NextBytes()
+	return crypto.Md5(i.iterator.NextBytes())
 }
 
 func (x *FileRecord) RawAnotherHashArray() []byte {
 	return x._message.RawBufferForField(2, 0)
+}
+
+func (x *FileRecord) BlockHeight() crypto.BlockHeight {
+	return crypto.BlockHeight(x._message.GetUint64(3))
+}
+
+func (x *FileRecord) RawBlockHeight() []byte {
+	return x._message.RawBufferForField(3, 0)
+}
+
+func (x *FileRecord) MutateBlockHeight(v crypto.BlockHeight) error {
+	return x._message.SetUint64(3, uint64(v))
 }
 
 // builder
@@ -84,6 +96,7 @@ type FileRecordBuilder struct {
 	Data []byte
 	Hash crypto.Sha256
 	AnotherHash []crypto.Md5
+	BlockHeight crypto.BlockHeight
 
 	// internal
 	membuffers.Builder // interface
@@ -109,8 +122,9 @@ func (w *FileRecordBuilder) Write(buf []byte) (err error) {
 	}()
 	w._builder.Reset()
 	w._builder.WriteBytes(buf, w.Data)
-	w._builder.WriteBytes(buf, w.Hash)
+	w._builder.WriteBytes(buf, []byte(w.Hash))
 	w._builder.WriteBytesArray(buf, w.arrayOfAnotherHash())
+	w._builder.WriteUint64(buf, uint64(w.BlockHeight))
 	return nil
 }
 
