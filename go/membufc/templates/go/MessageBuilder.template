@@ -1,15 +1,17 @@
 // builder
 {{$UnionNameToIndex := .UnionNameToIndex}}{{$UnionByIndex := .UnionByIndex}}
 type {{.MessageName}}Builder struct {
-	builder membuffers.Builder
 {{range .MessageFields}}	{{.FieldName}} {{if .IsArray}}[]{{end}}{{if .IsMessage}}*{{.FieldGoType}}Builder{{else}}{{.FieldGoType}}{{end}}
 {{end -}}
 {{range .UnionByIndex}}{{range .}}	{{.FieldName}} {{if .IsMessage}}*{{.FieldGoType}}Builder{{else}}{{.FieldGoType}}{{end}}
-{{end}}{{end -}}
+{{end}}{{end}}
+	// internal
+	membuffers.Builder // interface
+	_builder membuffers.InternalBuilder
 }
 {{range .MessageFields}}{{if and .IsArray .IsMessage}}
-func (w *{{.MessageName}}Builder) arrayOf{{.FieldName}}() []membuffers.MessageBuilder {
-	res := make([]membuffers.MessageBuilder, len(w.{{.FieldName}}))
+func (w *{{.MessageName}}Builder) arrayOf{{.FieldName}}() []membuffers.MessageWriter {
+	res := make([]membuffers.MessageWriter, len(w.{{.FieldName}}))
 	for i, v := range w.{{.FieldName}} {
 		res[i] = v
 	}
@@ -34,24 +36,24 @@ func (w *{{.MessageName}}Builder) Write(buf []byte) (err error) {
 			err = &membuffers.ErrBufferOverrun{}
 		}
 	}()
-	w.builder.Reset()
+	w._builder.Reset()
 	{{- range .MessageFields}}
 	{{- if .IsUnion}}
-	w.builder.WriteUnionIndex(buf, uint16(w.{{.FieldName}}))
+	w._builder.WriteUnionIndex(buf, uint16(w.{{.FieldName}}))
 	switch w.{{.FieldName}} {
 	{{- $UnionName := .FieldName}}{{$UnionNum := index $UnionNameToIndex .FieldName}}
 	{{- range index $UnionByIndex $UnionNum}}
 	case {{.MessageName}}{{$UnionName}}{{.FieldName}}:
-		w.builder.Write{{.TypeAccessor}}(buf, {{if .IsEnum}}uint16({{end}}w.{{.FieldName}}){{if .IsEnum}}){{end}}
+		w._builder.Write{{.TypeAccessor}}(buf, {{if .IsEnum}}uint16({{end}}w.{{.FieldName}}){{if .IsEnum}}){{end}}
 	{{- end}}
 	}
 	{{- else if .IsMessage}}
-	err = w.builder.WriteMessage{{if .IsArray}}Array{{end}}(buf, w.{{if .IsArray}}arrayOf{{.FieldName}}(){{else}}{{.FieldName}}{{end}})
+	err = w._builder.WriteMessage{{if .IsArray}}Array{{end}}(buf, w.{{if .IsArray}}arrayOf{{.FieldName}}(){{else}}{{.FieldName}}{{end}})
 	if err != nil {
 		return
 	}
 	{{- else}}
-	w.builder.Write{{.TypeAccessor}}{{if .IsArray}}Array{{end}}(buf, {{if .IsEnum}}uint16({{end}}w.{{if and .IsArray .IsInline}}arrayOf{{.FieldName}}(){{else}}{{.FieldName}}{{end}}){{if .IsEnum}}){{end}}{{end}}{{end}}
+	w._builder.Write{{.TypeAccessor}}{{if .IsArray}}Array{{end}}(buf, {{if .IsEnum}}uint16({{end}}w.{{if and .IsArray .IsInline}}arrayOf{{.FieldName}}(){{else}}{{.FieldName}}{{end}}){{if .IsEnum}}){{end}}{{end}}{{end}}
 	return nil
 }
 
@@ -59,7 +61,7 @@ func (w *{{.MessageName}}Builder) GetSize() membuffers.Offset {
 	if w == nil {
 		return 0
 	}
-	return w.builder.GetSize()
+	return w._builder.GetSize()
 }
 
 func (w *{{.MessageName}}Builder) CalcRequiredSize() membuffers.Offset {
@@ -67,7 +69,7 @@ func (w *{{.MessageName}}Builder) CalcRequiredSize() membuffers.Offset {
 		return 0
 	}
 	w.Write(nil)
-	return w.builder.GetSize()
+	return w._builder.GetSize()
 }
 
 func (w *{{.MessageName}}Builder) Build() *{{.MessageName}} {

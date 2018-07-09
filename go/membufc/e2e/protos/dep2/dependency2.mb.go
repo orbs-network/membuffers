@@ -11,7 +11,9 @@ import (
 // reader
 
 type SamePackageDependencyMessage struct {
-	message membuffers.Message
+	// internal
+	membuffers.Message // interface
+	_message membuffers.InternalMessage
 }
 
 var _SamePackageDependencyMessage_Scheme = []membuffers.FieldType{membuffers.TypeString,}
@@ -19,35 +21,38 @@ var _SamePackageDependencyMessage_Unions = [][]membuffers.FieldType{}
 
 func SamePackageDependencyMessageReader(buf []byte) *SamePackageDependencyMessage {
 	x := &SamePackageDependencyMessage{}
-	x.message.Init(buf, membuffers.Offset(len(buf)), _SamePackageDependencyMessage_Scheme, _SamePackageDependencyMessage_Unions)
+	x._message.Init(buf, membuffers.Offset(len(buf)), _SamePackageDependencyMessage_Scheme, _SamePackageDependencyMessage_Unions)
 	return x
 }
 
 func (x *SamePackageDependencyMessage) IsValid() bool {
-	return x.message.IsValid()
+	return x._message.IsValid()
 }
 
 func (x *SamePackageDependencyMessage) Raw() []byte {
-	return x.message.RawBuffer()
+	return x._message.RawBuffer()
 }
 
 func (x *SamePackageDependencyMessage) Field() string {
-	return x.message.GetString(0)
+	return x._message.GetString(0)
 }
 
 func (x *SamePackageDependencyMessage) RawField() []byte {
-	return x.message.RawBufferForField(0, 0)
+	return x._message.RawBufferForField(0, 0)
 }
 
 func (x *SamePackageDependencyMessage) MutateField(v string) error {
-	return x.message.SetString(0, v)
+	return x._message.SetString(0, v)
 }
 
 // builder
 
 type SamePackageDependencyMessageBuilder struct {
-	builder membuffers.Builder
 	Field string
+
+	// internal
+	membuffers.Builder // interface
+	_builder membuffers.InternalBuilder
 }
 
 func (w *SamePackageDependencyMessageBuilder) Write(buf []byte) (err error) {
@@ -59,8 +64,8 @@ func (w *SamePackageDependencyMessageBuilder) Write(buf []byte) (err error) {
 			err = &membuffers.ErrBufferOverrun{}
 		}
 	}()
-	w.builder.Reset()
-	w.builder.WriteString(buf, w.Field)
+	w._builder.Reset()
+	w._builder.WriteString(buf, w.Field)
 	return nil
 }
 
@@ -68,7 +73,7 @@ func (w *SamePackageDependencyMessageBuilder) GetSize() membuffers.Offset {
 	if w == nil {
 		return 0
 	}
-	return w.builder.GetSize()
+	return w._builder.GetSize()
 }
 
 func (w *SamePackageDependencyMessageBuilder) CalcRequiredSize() membuffers.Offset {
@@ -76,7 +81,7 @@ func (w *SamePackageDependencyMessageBuilder) CalcRequiredSize() membuffers.Offs
 		return 0
 	}
 	w.Write(nil)
-	return w.builder.GetSize()
+	return w._builder.GetSize()
 }
 
 func (w *SamePackageDependencyMessageBuilder) Build() *SamePackageDependencyMessage {

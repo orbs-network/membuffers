@@ -15,7 +15,7 @@ message Transaction {
 // reader
 
 type Transaction struct {
-	message membuffers.Message
+	message membuffers.InternalMessage
 }
 
 var m_Transaction_Scheme = []membuffers.FieldType{membuffers.TypeMessage,membuffers.TypeBytes,membuffers.TypeUint16}
@@ -71,7 +71,7 @@ func (x *Transaction) MutateType(v NetworkType) error {
 // builder
 
 type TransactionBuilder struct {
-	builder   membuffers.Builder
+	builder   membuffers.InternalBuilder
 	Data      *TransactionDataBuilder
 	Signature []byte
 	Type      NetworkType
@@ -131,7 +131,7 @@ message TransactionData {
 // reader
 
 type TransactionData struct {
-	message membuffers.Message
+	message membuffers.InternalMessage
 }
 
 var m_TransactionData_Scheme = []membuffers.FieldType{membuffers.TypeUint32,membuffers.TypeUint64,membuffers.TypeMessageArray,membuffers.TypeUint64}
@@ -211,15 +211,15 @@ func (x *TransactionData) MutateTimeStamp(v uint64) error {
 // builder
 
 type TransactionDataBuilder struct {
-	builder         membuffers.Builder
+	builder         membuffers.InternalBuilder
 	ProtocolVersion uint32
 	VirtualChain    uint64
 	Sender          []*TransactionSenderBuilder
 	TimeStamp       uint64
 }
 
-func (w *TransactionDataBuilder) sender() []membuffers.MessageBuilder {
-	res := make([]membuffers.MessageBuilder, len(w.Sender))
+func (w *TransactionDataBuilder) sender() []membuffers.MessageWriter {
+	res := make([]membuffers.MessageWriter, len(w.Sender))
 	for i, v := range w.Sender {
 		res[i] = v
 	}
@@ -279,7 +279,7 @@ message TransactionSender {
 // reader
 
 type TransactionSender struct {
-	message membuffers.Message
+	message membuffers.InternalMessage
 }
 
 var m_TransactionSender_Scheme = []membuffers.FieldType{membuffers.TypeString,membuffers.TypeStringArray}
@@ -334,7 +334,7 @@ func (x *TransactionSender) RawFriendArray() []byte {
 // builder
 
 type TransactionSenderBuilder struct {
-	builder membuffers.Builder
+	builder membuffers.InternalBuilder
 	Name    string
 	Friend  []string
 }

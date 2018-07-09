@@ -33,7 +33,7 @@ var uint32Iterator = []struct{
 
 func TestIteratorUint32(t *testing.T) {
 	for tn, tt := range uint32Iterator {
-		m := Message{}
+		m := InternalMessage{}
 		m.Init(tt.buf, Offset(len(tt.buf)), tt.scheme, tt.unions)
 		res := []uint32{}
 		for i := m.GetUint32ArrayIterator(0); i.HasNext(); {
@@ -50,7 +50,7 @@ func TestIteratorUint8(t *testing.T) {
 	scheme := []FieldType{TypeUint8Array}
 	unions :=	[][]FieldType{{}}
 	expected := []uint8{0x13,0x14,0x15}
-	m := Message{}
+	m := InternalMessage{}
 	m.Init(buf, Offset(len(buf)), scheme, unions)
 	var res []uint8
 	for i := m.GetUint8ArrayIterator(0); i.HasNext(); {
@@ -66,7 +66,7 @@ func TestIteratorUint16(t *testing.T) {
 	scheme := []FieldType{TypeUint16Array}
 	unions :=	[][]FieldType{{}}
 	expected := []uint16{0x13,0x14,0x15}
-	m := Message{}
+	m := InternalMessage{}
 	m.Init(buf, Offset(len(buf)), scheme, unions)
 	var res []uint16
 	for i := m.GetUint16ArrayIterator(0); i.HasNext(); {
@@ -82,7 +82,7 @@ func TestIteratorUint64(t *testing.T) {
 	scheme := []FieldType{TypeUint64Array}
 	unions :=	[][]FieldType{{}}
 	expected := []uint64{0x13,0x14,0x15}
-	m := Message{}
+	m := InternalMessage{}
 	m.Init(buf, Offset(len(buf)), scheme, unions)
 	var res []uint64
 	for i := m.GetUint64ArrayIterator(0); i.HasNext(); {
@@ -133,7 +133,7 @@ var messageIterator = []struct{
 
 func TestIteratorMessage(t *testing.T) {
 	for tn, tt := range messageIterator {
-		m := Message{}
+		m := InternalMessage{}
 		m.Init(tt.buf, Offset(len(tt.buf)), tt.scheme, tt.unions)
 		res := []Offset{}
 		for i := m.GetMessageArrayIterator(0); i.HasNext(); {
@@ -186,7 +186,7 @@ var bytesIterator = []struct{
 
 func TestIteratorBytes(t *testing.T) {
 	for tn, tt := range bytesIterator {
-		m := Message{}
+		m := InternalMessage{}
 		m.Init(tt.buf, Offset(len(tt.buf)), tt.scheme, tt.unions)
 		res := [][]byte{}
 		for i := m.GetBytesArrayIterator(0); i.HasNext(); {
@@ -203,7 +203,7 @@ func TestIteratorString(t *testing.T) {
 	scheme := []FieldType{TypeStringArray}
 	unions :=	[][]FieldType{{}}
 	expected := []string{"abc","hello","def"}
-	m := Message{}
+	m := InternalMessage{}
 	m.Init(buf, Offset(len(buf)), scheme, unions)
 	res := []string{}
 	for i := m.GetStringArrayIterator(0); i.HasNext(); {

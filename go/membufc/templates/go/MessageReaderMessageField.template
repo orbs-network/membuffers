@@ -1,9 +1,9 @@
 func (x *{{.MessageName}}) {{.MessageField.FieldName}}() *{{.MessageField.FieldGoType}} {
-	b, s := x.message.GetMessage({{.MessageField.FieldIndex}})
+	b, s := x._message.GetMessage({{.MessageField.FieldIndex}})
 	return {{.MessageField.FieldGoType}}Reader(b[:s])
 }
 
 func (x *{{.MessageName}}) Raw{{.MessageField.FieldName}}() []byte {
-	return x.message.RawBufferForField({{.MessageField.FieldIndex}}, 0)
+	return x._message.RawBufferForField({{.MessageField.FieldIndex}}, 0)
 }
 

@@ -6,7 +6,7 @@ import (
 )
 
 func TestBuilderUint8(t *testing.T) {
-	w := Builder{}
+	w := InternalBuilder{}
 	v := uint8(0x17)
 	w.WriteUint8(nil, v)
 	if w.Size != 1 {
@@ -22,7 +22,7 @@ func TestBuilderUint8(t *testing.T) {
 }
 
 func TestBuilderUint16(t *testing.T) {
-	w := Builder{}
+	w := InternalBuilder{}
 	v := uint16(0x17)
 	w.WriteUint16(nil, v)
 	if w.Size != 2 {
@@ -38,7 +38,7 @@ func TestBuilderUint16(t *testing.T) {
 }
 
 func TestBuilderUint32(t *testing.T) {
-	w := Builder{}
+	w := InternalBuilder{}
 	v := uint32(0x17)
 	w.WriteUint32(nil, v)
 	if w.Size != 4 {
@@ -54,7 +54,7 @@ func TestBuilderUint32(t *testing.T) {
 }
 
 func TestBuilderUint64(t *testing.T) {
-	w := Builder{}
+	w := InternalBuilder{}
 	v := uint64(0x17)
 	w.WriteUint64(nil, v)
 	if w.Size != 8 {
@@ -70,7 +70,7 @@ func TestBuilderUint64(t *testing.T) {
 }
 
 func TestBuilderBytes(t *testing.T) {
-	w := Builder{}
+	w := InternalBuilder{}
 	v := []byte{0x01,0x02,0x03}
 	w.WriteBytes(nil, v)
 	if w.Size != 7 {
@@ -95,7 +95,7 @@ func TestBuilderBytes(t *testing.T) {
 }
 
 func TestBuilderString(t *testing.T) {
-	w := Builder{}
+	w := InternalBuilder{}
 	v := "hello"
 	w.WriteString(nil, v)
 	if w.Size != 9 {
@@ -120,7 +120,7 @@ func TestBuilderString(t *testing.T) {
 }
 
 func TestBuilderUnionIndex(t *testing.T) {
-	w := Builder{}
+	w := InternalBuilder{}
 	v := uint16(0x01)
 	w.WriteUnionIndex(nil, v)
 	if w.Size != 2 {
@@ -136,7 +136,7 @@ func TestBuilderUnionIndex(t *testing.T) {
 }
 
 func TestBuilderUint8Array(t *testing.T) {
-	w := Builder{}
+	w := InternalBuilder{}
 	v := []uint8{0x01,0x02,0x03}
 	w.WriteUint8Array(nil, v)
 	if w.Size != 7 {
@@ -152,7 +152,7 @@ func TestBuilderUint8Array(t *testing.T) {
 }
 
 func TestBuilderUint16Array(t *testing.T) {
-	w := Builder{}
+	w := InternalBuilder{}
 	v := []uint16{0x01,0x02,0x03}
 	w.WriteUint16Array(nil, v)
 	if w.Size != 10 {
@@ -168,7 +168,7 @@ func TestBuilderUint16Array(t *testing.T) {
 }
 
 func TestBuilderUint32Array(t *testing.T) {
-	w := Builder{}
+	w := InternalBuilder{}
 	v := []uint32{0x01,0x02,0x03}
 	w.WriteUint32Array(nil, v)
 	if w.Size != 16 {
@@ -184,7 +184,7 @@ func TestBuilderUint32Array(t *testing.T) {
 }
 
 func TestBuilderUint64Array(t *testing.T) {
-	w := Builder{}
+	w := InternalBuilder{}
 	v := []uint64{0x01,0x02,0x03}
 	w.WriteUint64Array(nil, v)
 	if w.Size != 28 {
@@ -200,7 +200,7 @@ func TestBuilderUint64Array(t *testing.T) {
 }
 
 func TestBuilderBytesArray(t *testing.T) {
-	w := Builder{}
+	w := InternalBuilder{}
 	v := [][]byte{{0x01,0x02,0x03},{0x04,0x05}}
 	w.WriteBytesArray(nil, v)
 	if w.Size != 18 {
@@ -216,7 +216,7 @@ func TestBuilderBytesArray(t *testing.T) {
 }
 
 func TestBuilderStringArray(t *testing.T) {
-	w := Builder{}
+	w := InternalBuilder{}
 	v := []string{"jay","lo"}
 	w.WriteStringArray(nil, v)
 	if w.Size != 18 {
@@ -232,7 +232,7 @@ func TestBuilderStringArray(t *testing.T) {
 }
 
 type ExampleMessageBuilder struct {
-	builder Builder
+	builder InternalBuilder
 }
 func (w *ExampleMessageBuilder) Write(buf []byte) (err error) {
 	defer func() {
@@ -254,7 +254,7 @@ func (w *ExampleMessageBuilder) CalcRequiredSize() Offset {
 }
 
 func TestBuilderMessage(t *testing.T) {
-	w := Builder{}
+	w := InternalBuilder{}
 	v := ExampleMessageBuilder{}
 	w.WriteMessage(nil, &v)
 	if w.Size != 12 {
@@ -270,8 +270,8 @@ func TestBuilderMessage(t *testing.T) {
 }
 
 func TestBuilderMessageArray(t *testing.T) {
-	w := Builder{}
-	v := []MessageBuilder{&ExampleMessageBuilder{}, &ExampleMessageBuilder{}}
+	w := InternalBuilder{}
+	v := []MessageWriter{&ExampleMessageBuilder{}, &ExampleMessageBuilder{}}
 	w.WriteMessageArray(nil, v)
 	if w.Size != 28 {
 		t.Fatalf("instead of expected size got %v", w.Size)

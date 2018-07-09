@@ -1,5 +1,5 @@
 func (x *{{.MessageName}}) {{.MessageField.FieldName}}Iterator() *{{.MessageName}}{{.MessageField.FieldName}}Iterator {
-	return &{{.MessageName}}{{.MessageField.FieldName}}Iterator{iterator: x.message.Get{{.MessageField.TypeAccessor}}ArrayIterator({{.MessageField.FieldIndex}})}
+	return &{{.MessageName}}{{.MessageField.FieldName}}Iterator{iterator: x._message.Get{{.MessageField.TypeAccessor}}ArrayIterator({{.MessageField.FieldIndex}})}
 }
 
 type {{.MessageName}}{{.MessageField.FieldName}}Iterator struct {
@@ -15,6 +15,6 @@ func (i *{{.MessageName}}{{.MessageField.FieldName}}Iterator) Next{{.MessageFiel
 }
 
 func (x *{{.MessageName}}) Raw{{.MessageField.FieldName}}Array() []byte {
-	return x.message.RawBufferForField({{.MessageField.FieldIndex}}, 0)
+	return x._message.RawBufferForField({{.MessageField.FieldIndex}}, 0)
 }
 

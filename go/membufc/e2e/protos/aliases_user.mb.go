@@ -12,7 +12,9 @@ import (
 // reader
 
 type FileRecord struct {
-	message membuffers.Message
+	// internal
+	membuffers.Message // interface
+	_message membuffers.InternalMessage
 }
 
 var _FileRecord_Scheme = []membuffers.FieldType{membuffers.TypeBytes,membuffers.TypeBytes,membuffers.TypeBytesArray,}
@@ -20,44 +22,44 @@ var _FileRecord_Unions = [][]membuffers.FieldType{}
 
 func FileRecordReader(buf []byte) *FileRecord {
 	x := &FileRecord{}
-	x.message.Init(buf, membuffers.Offset(len(buf)), _FileRecord_Scheme, _FileRecord_Unions)
+	x._message.Init(buf, membuffers.Offset(len(buf)), _FileRecord_Scheme, _FileRecord_Unions)
 	return x
 }
 
 func (x *FileRecord) IsValid() bool {
-	return x.message.IsValid()
+	return x._message.IsValid()
 }
 
 func (x *FileRecord) Raw() []byte {
-	return x.message.RawBuffer()
+	return x._message.RawBuffer()
 }
 
 func (x *FileRecord) Data() []byte {
-	return x.message.GetBytes(0)
+	return x._message.GetBytes(0)
 }
 
 func (x *FileRecord) RawData() []byte {
-	return x.message.RawBufferForField(0, 0)
+	return x._message.RawBufferForField(0, 0)
 }
 
 func (x *FileRecord) MutateData(v []byte) error {
-	return x.message.SetBytes(0, v)
+	return x._message.SetBytes(0, v)
 }
 
 func (x *FileRecord) Hash() crypto.Sha256 {
-	return x.message.GetBytes(1)
+	return x._message.GetBytes(1)
 }
 
 func (x *FileRecord) RawHash() []byte {
-	return x.message.RawBufferForField(1, 0)
+	return x._message.RawBufferForField(1, 0)
 }
 
 func (x *FileRecord) MutateHash(v crypto.Sha256) error {
-	return x.message.SetBytes(1, v)
+	return x._message.SetBytes(1, v)
 }
 
 func (x *FileRecord) AnotherHashIterator() *FileRecordAnotherHashIterator {
-	return &FileRecordAnotherHashIterator{iterator: x.message.GetBytesArrayIterator(2)}
+	return &FileRecordAnotherHashIterator{iterator: x._message.GetBytesArrayIterator(2)}
 }
 
 type FileRecordAnotherHashIterator struct {
@@ -73,16 +75,19 @@ func (i *FileRecordAnotherHashIterator) NextAnotherHash() crypto.Md5 {
 }
 
 func (x *FileRecord) RawAnotherHashArray() []byte {
-	return x.message.RawBufferForField(2, 0)
+	return x._message.RawBufferForField(2, 0)
 }
 
 // builder
 
 type FileRecordBuilder struct {
-	builder membuffers.Builder
 	Data []byte
 	Hash crypto.Sha256
 	AnotherHash []crypto.Md5
+
+	// internal
+	membuffers.Builder // interface
+	_builder membuffers.InternalBuilder
 }
 
 func (w *FileRecordBuilder) arrayOfAnotherHash() [][]byte {
@@ -102,10 +107,10 @@ func (w *FileRecordBuilder) Write(buf []byte) (err error) {
 			err = &membuffers.ErrBufferOverrun{}
 		}
 	}()
-	w.builder.Reset()
-	w.builder.WriteBytes(buf, w.Data)
-	w.builder.WriteBytes(buf, w.Hash)
-	w.builder.WriteBytesArray(buf, w.arrayOfAnotherHash())
+	w._builder.Reset()
+	w._builder.WriteBytes(buf, w.Data)
+	w._builder.WriteBytes(buf, w.Hash)
+	w._builder.WriteBytesArray(buf, w.arrayOfAnotherHash())
 	return nil
 }
 
@@ -113,7 +118,7 @@ func (w *FileRecordBuilder) GetSize() membuffers.Offset {
 	if w == nil {
 		return 0
 	}
-	return w.builder.GetSize()
+	return w._builder.GetSize()
 }
 
 func (w *FileRecordBuilder) CalcRequiredSize() membuffers.Offset {
@@ -121,7 +126,7 @@ func (w *FileRecordBuilder) CalcRequiredSize() membuffers.Offset {
 		return 0
 	}
 	w.Write(nil)
-	return w.builder.GetSize()
+	return w._builder.GetSize()
 }
 
 func (w *FileRecordBuilder) Build() *FileRecord {

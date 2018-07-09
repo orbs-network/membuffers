@@ -25,7 +25,9 @@ type ServicesIProvideToOthersHandler interface {
 // reader
 
 type SomeMessage struct {
-	message membuffers.Message
+	// internal
+	membuffers.Message // interface
+	_message membuffers.InternalMessage
 }
 
 var _SomeMessage_Scheme = []membuffers.FieldType{membuffers.TypeString,}
@@ -33,35 +35,38 @@ var _SomeMessage_Unions = [][]membuffers.FieldType{}
 
 func SomeMessageReader(buf []byte) *SomeMessage {
 	x := &SomeMessage{}
-	x.message.Init(buf, membuffers.Offset(len(buf)), _SomeMessage_Scheme, _SomeMessage_Unions)
+	x._message.Init(buf, membuffers.Offset(len(buf)), _SomeMessage_Scheme, _SomeMessage_Unions)
 	return x
 }
 
 func (x *SomeMessage) IsValid() bool {
-	return x.message.IsValid()
+	return x._message.IsValid()
 }
 
 func (x *SomeMessage) Raw() []byte {
-	return x.message.RawBuffer()
+	return x._message.RawBuffer()
 }
 
 func (x *SomeMessage) Str() string {
-	return x.message.GetString(0)
+	return x._message.GetString(0)
 }
 
 func (x *SomeMessage) RawStr() []byte {
-	return x.message.RawBufferForField(0, 0)
+	return x._message.RawBufferForField(0, 0)
 }
 
 func (x *SomeMessage) MutateStr(v string) error {
-	return x.message.SetString(0, v)
+	return x._message.SetString(0, v)
 }
 
 // builder
 
 type SomeMessageBuilder struct {
-	builder membuffers.Builder
 	Str string
+
+	// internal
+	membuffers.Builder // interface
+	_builder membuffers.InternalBuilder
 }
 
 func (w *SomeMessageBuilder) Write(buf []byte) (err error) {
@@ -73,8 +78,8 @@ func (w *SomeMessageBuilder) Write(buf []byte) (err error) {
 			err = &membuffers.ErrBufferOverrun{}
 		}
 	}()
-	w.builder.Reset()
-	w.builder.WriteString(buf, w.Str)
+	w._builder.Reset()
+	w._builder.WriteString(buf, w.Str)
 	return nil
 }
 
@@ -82,7 +87,7 @@ func (w *SomeMessageBuilder) GetSize() membuffers.Offset {
 	if w == nil {
 		return 0
 	}
-	return w.builder.GetSize()
+	return w._builder.GetSize()
 }
 
 func (w *SomeMessageBuilder) CalcRequiredSize() membuffers.Offset {
@@ -90,7 +95,7 @@ func (w *SomeMessageBuilder) CalcRequiredSize() membuffers.Offset {
 		return 0
 	}
 	w.Write(nil)
-	return w.builder.GetSize()
+	return w._builder.GetSize()
 }
 
 func (w *SomeMessageBuilder) Build() *SomeMessage {

@@ -21,7 +21,9 @@ type ExampleService interface {
 // reader
 
 type ExampleMethodInput struct {
-	message membuffers.Message
+	// internal
+	membuffers.Message // interface
+	_message membuffers.InternalMessage
 }
 
 var _ExampleMethodInput_Scheme = []membuffers.FieldType{membuffers.TypeString,}
@@ -29,35 +31,38 @@ var _ExampleMethodInput_Unions = [][]membuffers.FieldType{}
 
 func ExampleMethodInputReader(buf []byte) *ExampleMethodInput {
 	x := &ExampleMethodInput{}
-	x.message.Init(buf, membuffers.Offset(len(buf)), _ExampleMethodInput_Scheme, _ExampleMethodInput_Unions)
+	x._message.Init(buf, membuffers.Offset(len(buf)), _ExampleMethodInput_Scheme, _ExampleMethodInput_Unions)
 	return x
 }
 
 func (x *ExampleMethodInput) IsValid() bool {
-	return x.message.IsValid()
+	return x._message.IsValid()
 }
 
 func (x *ExampleMethodInput) Raw() []byte {
-	return x.message.RawBuffer()
+	return x._message.RawBuffer()
 }
 
 func (x *ExampleMethodInput) Arg() string {
-	return x.message.GetString(0)
+	return x._message.GetString(0)
 }
 
 func (x *ExampleMethodInput) RawArg() []byte {
-	return x.message.RawBufferForField(0, 0)
+	return x._message.RawBufferForField(0, 0)
 }
 
 func (x *ExampleMethodInput) MutateArg(v string) error {
-	return x.message.SetString(0, v)
+	return x._message.SetString(0, v)
 }
 
 // builder
 
 type ExampleMethodInputBuilder struct {
-	builder membuffers.Builder
 	Arg string
+
+	// internal
+	membuffers.Builder // interface
+	_builder membuffers.InternalBuilder
 }
 
 func (w *ExampleMethodInputBuilder) Write(buf []byte) (err error) {
@@ -69,8 +74,8 @@ func (w *ExampleMethodInputBuilder) Write(buf []byte) (err error) {
 			err = &membuffers.ErrBufferOverrun{}
 		}
 	}()
-	w.builder.Reset()
-	w.builder.WriteString(buf, w.Arg)
+	w._builder.Reset()
+	w._builder.WriteString(buf, w.Arg)
 	return nil
 }
 
@@ -78,7 +83,7 @@ func (w *ExampleMethodInputBuilder) GetSize() membuffers.Offset {
 	if w == nil {
 		return 0
 	}
-	return w.builder.GetSize()
+	return w._builder.GetSize()
 }
 
 func (w *ExampleMethodInputBuilder) CalcRequiredSize() membuffers.Offset {
@@ -86,7 +91,7 @@ func (w *ExampleMethodInputBuilder) CalcRequiredSize() membuffers.Offset {
 		return 0
 	}
 	w.Write(nil)
-	return w.builder.GetSize()
+	return w._builder.GetSize()
 }
 
 func (w *ExampleMethodInputBuilder) Build() *ExampleMethodInput {
@@ -103,7 +108,9 @@ func (w *ExampleMethodInputBuilder) Build() *ExampleMethodInput {
 // reader
 
 type ExampleMethodOutput struct {
-	message membuffers.Message
+	// internal
+	membuffers.Message // interface
+	_message membuffers.InternalMessage
 }
 
 var _ExampleMethodOutput_Scheme = []membuffers.FieldType{}
@@ -111,22 +118,25 @@ var _ExampleMethodOutput_Unions = [][]membuffers.FieldType{}
 
 func ExampleMethodOutputReader(buf []byte) *ExampleMethodOutput {
 	x := &ExampleMethodOutput{}
-	x.message.Init(buf, membuffers.Offset(len(buf)), _ExampleMethodOutput_Scheme, _ExampleMethodOutput_Unions)
+	x._message.Init(buf, membuffers.Offset(len(buf)), _ExampleMethodOutput_Scheme, _ExampleMethodOutput_Unions)
 	return x
 }
 
 func (x *ExampleMethodOutput) IsValid() bool {
-	return x.message.IsValid()
+	return x._message.IsValid()
 }
 
 func (x *ExampleMethodOutput) Raw() []byte {
-	return x.message.RawBuffer()
+	return x._message.RawBuffer()
 }
 
 // builder
 
 type ExampleMethodOutputBuilder struct {
-	builder membuffers.Builder
+
+	// internal
+	membuffers.Builder // interface
+	_builder membuffers.InternalBuilder
 }
 
 func (w *ExampleMethodOutputBuilder) Write(buf []byte) (err error) {
@@ -138,7 +148,7 @@ func (w *ExampleMethodOutputBuilder) Write(buf []byte) (err error) {
 			err = &membuffers.ErrBufferOverrun{}
 		}
 	}()
-	w.builder.Reset()
+	w._builder.Reset()
 	return nil
 }
 
@@ -146,7 +156,7 @@ func (w *ExampleMethodOutputBuilder) GetSize() membuffers.Offset {
 	if w == nil {
 		return 0
 	}
-	return w.builder.GetSize()
+	return w._builder.GetSize()
 }
 
 func (w *ExampleMethodOutputBuilder) CalcRequiredSize() membuffers.Offset {
@@ -154,7 +164,7 @@ func (w *ExampleMethodOutputBuilder) CalcRequiredSize() membuffers.Offset {
 		return 0
 	}
 	w.Write(nil)
-	return w.builder.GetSize()
+	return w._builder.GetSize()
 }
 
 func (w *ExampleMethodOutputBuilder) Build() *ExampleMethodOutput {

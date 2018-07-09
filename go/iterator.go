@@ -4,7 +4,7 @@ type Iterator struct {
 	cursor Offset
 	endCursor Offset
 	fieldType FieldType
-	m *Message
+	m *InternalMessage
 }
 
 func (i *Iterator) HasNext() bool {

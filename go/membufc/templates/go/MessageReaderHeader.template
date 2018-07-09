@@ -1,14 +1,14 @@
 func {{.MessageName}}Reader(buf []byte) *{{.MessageName}} {
 	x := &{{.MessageName}}{}
-	x.message.Init(buf, membuffers.Offset(len(buf)), _{{.MessageName}}_Scheme, _{{.MessageName}}_Unions)
+	x._message.Init(buf, membuffers.Offset(len(buf)), _{{.MessageName}}_Scheme, _{{.MessageName}}_Unions)
 	return x
 }
 
 func (x *{{.MessageName}}) IsValid() bool {
-	return x.message.IsValid()
+	return x._message.IsValid()
 }
 
 func (x *{{.MessageName}}) Raw() []byte {
-	return x.message.RawBuffer()
+	return x._message.RawBuffer()
 }
 

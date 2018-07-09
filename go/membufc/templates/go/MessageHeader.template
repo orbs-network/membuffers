@@ -4,6 +4,8 @@
 // reader
 
 type {{.MessageName}} struct {
-	message membuffers.Message
+	// internal
+	membuffers.Message // interface
+	_message membuffers.InternalMessage
 }
 

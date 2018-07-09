@@ -11,7 +11,9 @@ import (
 // reader
 
 type ExampleMessage struct {
-	message membuffers.Message
+	// internal
+	membuffers.Message // interface
+	_message membuffers.InternalMessage
 }
 
 var _ExampleMessage_Scheme = []membuffers.FieldType{membuffers.TypeString,}
@@ -19,35 +21,38 @@ var _ExampleMessage_Unions = [][]membuffers.FieldType{}
 
 func ExampleMessageReader(buf []byte) *ExampleMessage {
 	x := &ExampleMessage{}
-	x.message.Init(buf, membuffers.Offset(len(buf)), _ExampleMessage_Scheme, _ExampleMessage_Unions)
+	x._message.Init(buf, membuffers.Offset(len(buf)), _ExampleMessage_Scheme, _ExampleMessage_Unions)
 	return x
 }
 
 func (x *ExampleMessage) IsValid() bool {
-	return x.message.IsValid()
+	return x._message.IsValid()
 }
 
 func (x *ExampleMessage) Raw() []byte {
-	return x.message.RawBuffer()
+	return x._message.RawBuffer()
 }
 
 func (x *ExampleMessage) Str() string {
-	return x.message.GetString(0)
+	return x._message.GetString(0)
 }
 
 func (x *ExampleMessage) RawStr() []byte {
-	return x.message.RawBufferForField(0, 0)
+	return x._message.RawBufferForField(0, 0)
 }
 
 func (x *ExampleMessage) MutateStr(v string) error {
-	return x.message.SetString(0, v)
+	return x._message.SetString(0, v)
 }
 
 // builder
 
 type ExampleMessageBuilder struct {
-	builder membuffers.Builder
 	Str string
+
+	// internal
+	membuffers.Builder // interface
+	_builder membuffers.InternalBuilder
 }
 
 func (w *ExampleMessageBuilder) Write(buf []byte) (err error) {
@@ -59,8 +64,8 @@ func (w *ExampleMessageBuilder) Write(buf []byte) (err error) {
 			err = &membuffers.ErrBufferOverrun{}
 		}
 	}()
-	w.builder.Reset()
-	w.builder.WriteString(buf, w.Str)
+	w._builder.Reset()
+	w._builder.WriteString(buf, w.Str)
 	return nil
 }
 
@@ -68,7 +73,7 @@ func (w *ExampleMessageBuilder) GetSize() membuffers.Offset {
 	if w == nil {
 		return 0
 	}
-	return w.builder.GetSize()
+	return w._builder.GetSize()
 }
 
 func (w *ExampleMessageBuilder) CalcRequiredSize() membuffers.Offset {
@@ -76,7 +81,7 @@ func (w *ExampleMessageBuilder) CalcRequiredSize() membuffers.Offset {
 		return 0
 	}
 	w.Write(nil)
-	return w.builder.GetSize()
+	return w._builder.GetSize()
 }
 
 func (w *ExampleMessageBuilder) Build() *ExampleMessage {
@@ -93,7 +98,9 @@ func (w *ExampleMessageBuilder) Build() *ExampleMessage {
 // reader
 
 type ComplexUnion struct {
-	message membuffers.Message
+	// internal
+	membuffers.Message // interface
+	_message membuffers.InternalMessage
 }
 
 var _ComplexUnion_Scheme = []membuffers.FieldType{membuffers.TypeUnion,}
@@ -101,16 +108,16 @@ var _ComplexUnion_Unions = [][]membuffers.FieldType{{membuffers.TypeUint32,membu
 
 func ComplexUnionReader(buf []byte) *ComplexUnion {
 	x := &ComplexUnion{}
-	x.message.Init(buf, membuffers.Offset(len(buf)), _ComplexUnion_Scheme, _ComplexUnion_Unions)
+	x._message.Init(buf, membuffers.Offset(len(buf)), _ComplexUnion_Scheme, _ComplexUnion_Unions)
 	return x
 }
 
 func (x *ComplexUnion) IsValid() bool {
-	return x.message.IsValid()
+	return x._message.IsValid()
 }
 
 func (x *ComplexUnion) Raw() []byte {
-	return x.message.RawBuffer()
+	return x._message.RawBuffer()
 }
 
 type ComplexUnionOption uint16
@@ -122,70 +129,73 @@ const (
 )
 
 func (x *ComplexUnion) Option() ComplexUnionOption {
-	return ComplexUnionOption(x.message.GetUint16(0))
+	return ComplexUnionOption(x._message.GetUint16(0))
 }
 
 func (x *ComplexUnion) IsOptionNum() bool {
-	is, _ := x.message.IsUnionIndex(0, 0, 0)
+	is, _ := x._message.IsUnionIndex(0, 0, 0)
 	return is
 }
 
 func (x *ComplexUnion) OptionNum() uint32 {
-	_, off := x.message.IsUnionIndex(0, 0, 0)
-	return x.message.GetUint32InOffset(off)
+	_, off := x._message.IsUnionIndex(0, 0, 0)
+	return x._message.GetUint32InOffset(off)
 }
 
 func (x *ComplexUnion) MutateOptionNum(v uint32) error {
-	is, off := x.message.IsUnionIndex(0, 0, 0)
+	is, off := x._message.IsUnionIndex(0, 0, 0)
 	if !is {
 		return &membuffers.ErrInvalidField{}
 	}
-	x.message.SetUint32InOffset(off, v)
+	x._message.SetUint32InOffset(off, v)
 	return nil
 }
 
 func (x *ComplexUnion) IsOptionMsg() bool {
-	is, _ := x.message.IsUnionIndex(0, 0, 1)
+	is, _ := x._message.IsUnionIndex(0, 0, 1)
 	return is
 }
 
 func (x *ComplexUnion) OptionMsg() *ExampleMessage {
-	_, off := x.message.IsUnionIndex(0, 0, 1)
-	b, s := x.message.GetMessageInOffset(off)
+	_, off := x._message.IsUnionIndex(0, 0, 1)
+	b, s := x._message.GetMessageInOffset(off)
 	return ExampleMessageReader(b[:s])
 }
 
 func (x *ComplexUnion) IsOptionEnu() bool {
-	is, _ := x.message.IsUnionIndex(0, 0, 2)
+	is, _ := x._message.IsUnionIndex(0, 0, 2)
 	return is
 }
 
 func (x *ComplexUnion) OptionEnu() ExampleEnum {
-	_, off := x.message.IsUnionIndex(0, 0, 2)
-	return ExampleEnum(x.message.GetUint16InOffset(off))
+	_, off := x._message.IsUnionIndex(0, 0, 2)
+	return ExampleEnum(x._message.GetUint16InOffset(off))
 }
 
 func (x *ComplexUnion) MutateOptionEnu(v ExampleEnum) error {
-	is, off := x.message.IsUnionIndex(0, 0, 2)
+	is, off := x._message.IsUnionIndex(0, 0, 2)
 	if !is {
 		return &membuffers.ErrInvalidField{}
 	}
-	x.message.SetUint16InOffset(off, uint16(v))
+	x._message.SetUint16InOffset(off, uint16(v))
 	return nil
 }
 
 func (x *ComplexUnion) RawOption() []byte {
-	return x.message.RawBufferForField(0, 0)
+	return x._message.RawBufferForField(0, 0)
 }
 
 // builder
 
 type ComplexUnionBuilder struct {
-	builder membuffers.Builder
 	Option ComplexUnionOption
 	Num uint32
 	Msg *ExampleMessageBuilder
 	Enu ExampleEnum
+
+	// internal
+	membuffers.Builder // interface
+	_builder membuffers.InternalBuilder
 }
 
 func (w *ComplexUnionBuilder) Write(buf []byte) (err error) {
@@ -197,15 +207,15 @@ func (w *ComplexUnionBuilder) Write(buf []byte) (err error) {
 			err = &membuffers.ErrBufferOverrun{}
 		}
 	}()
-	w.builder.Reset()
-	w.builder.WriteUnionIndex(buf, uint16(w.Option))
+	w._builder.Reset()
+	w._builder.WriteUnionIndex(buf, uint16(w.Option))
 	switch w.Option {
 	case ComplexUnionOptionNum:
-		w.builder.WriteUint32(buf, w.Num)
+		w._builder.WriteUint32(buf, w.Num)
 	case ComplexUnionOptionMsg:
-		w.builder.WriteMessage(buf, w.Msg)
+		w._builder.WriteMessage(buf, w.Msg)
 	case ComplexUnionOptionEnu:
-		w.builder.WriteUint16(buf, uint16(w.Enu))
+		w._builder.WriteUint16(buf, uint16(w.Enu))
 	}
 	return nil
 }
@@ -214,7 +224,7 @@ func (w *ComplexUnionBuilder) GetSize() membuffers.Offset {
 	if w == nil {
 		return 0
 	}
-	return w.builder.GetSize()
+	return w._builder.GetSize()
 }
 
 func (w *ComplexUnionBuilder) CalcRequiredSize() membuffers.Offset {
@@ -222,7 +232,7 @@ func (w *ComplexUnionBuilder) CalcRequiredSize() membuffers.Offset {
 		return 0
 	}
 	w.Write(nil)
-	return w.builder.GetSize()
+	return w._builder.GetSize()
 }
 
 func (w *ComplexUnionBuilder) Build() *ComplexUnion {

@@ -27,7 +27,7 @@ var rawBuffer = []struct{
 
 func TestMessageRawBuffer(t *testing.T) {
 	for tn, tt := range rawBuffer {
-		m := Message{}
+		m := InternalMessage{}
 		m.Init(tt.buf, Offset(len(tt.buf)), tt.scheme, tt.unions)
 		s := m.RawBuffer()
 		if !bytes.Equal(s, tt.expected) {
@@ -144,7 +144,7 @@ var rawBufferForField = []struct{
 
 func TestMessageRawBufferForField(t *testing.T) {
 	for tn, tt := range rawBufferForField {
-		m := Message{}
+		m := InternalMessage{}
 		m.Init(tt.buf, Offset(len(tt.buf)), tt.scheme, tt.unions)
 		s := m.RawBufferForField(tt.fieldNum, tt.unionNum)
 		if !bytes.Equal(s, tt.expected) {
@@ -213,7 +213,7 @@ var readUint32 = []struct{
 
 func TestMessageReadUint32(t *testing.T) {
 	for tn, tt := range readUint32 {
-		m := Message{}
+		m := InternalMessage{}
 		m.Init(tt.buf, Offset(len(tt.buf)), tt.scheme, tt.unions)
 		s := m.GetUint32(tt.fieldNum)
 		if tt.expected != s {
@@ -240,7 +240,7 @@ var readUint8 = []struct{
 
 func TestMessageReadUint8(t *testing.T) {
 	for tn, tt := range readUint8 {
-		m := Message{}
+		m := InternalMessage{}
 		m.Init(tt.buf, Offset(len(tt.buf)), tt.scheme, tt.unions)
 		s := m.GetUint8(tt.fieldNum)
 		if tt.expected != s {
@@ -267,7 +267,7 @@ var readUint16 = []struct{
 
 func TestMessageReadUint16(t *testing.T) {
 	for tn, tt := range readUint16 {
-		m := Message{}
+		m := InternalMessage{}
 		m.Init(tt.buf, Offset(len(tt.buf)), tt.scheme, tt.unions)
 		s := m.GetUint16(tt.fieldNum)
 		if tt.expected != s {
@@ -301,7 +301,7 @@ var readUint64 = []struct{
 
 func TestMessageReadUint64(t *testing.T) {
 	for tn, tt := range readUint64 {
-		m := Message{}
+		m := InternalMessage{}
 		m.Init(tt.buf, Offset(len(tt.buf)), tt.scheme, tt.unions)
 		s := m.GetUint64(tt.fieldNum)
 		if tt.expected != s {
@@ -384,7 +384,7 @@ var readBytes = []struct{
 
 func TestMessageReadBytes(t *testing.T) {
 	for tn, tt := range readBytes {
-		m := Message{}
+		m := InternalMessage{}
 		m.Init(tt.buf, Offset(len(tt.buf)), tt.scheme, tt.unions)
 		s := m.GetBytes(tt.fieldNum)
 		if !bytes.Equal(s, tt.expected) {
@@ -446,7 +446,7 @@ var readString = []struct{
 
 func TestMessageReadString(t *testing.T) {
 	for tn, tt := range readString {
-		m := Message{}
+		m := InternalMessage{}
 		m.Init(tt.buf, Offset(len(tt.buf)), tt.scheme, tt.unions)
 		s := m.GetString(tt.fieldNum)
 		if s != tt.expected {
@@ -515,7 +515,7 @@ var readMessage = []struct{
 
 func TestMessageReadMessage(t *testing.T) {
 	for tn, tt := range readMessage {
-		m := Message{}
+		m := InternalMessage{}
 		m.Init(tt.buf, Offset(len(tt.buf)), tt.scheme, tt.unions)
 		b, s := m.GetMessage(tt.fieldNum)
 		if !bytes.Equal(b, tt.expectedBuf) {
@@ -651,7 +651,7 @@ var readUnion = []struct{
 
 func TestMessageReadUnion(t *testing.T) {
 	for tn, tt := range readUnion {
-		m := Message{}
+		m := InternalMessage{}
 		m.Init(tt.buf, Offset(len(tt.buf)), tt.scheme, tt.unions)
 		is, off := m.IsUnionIndex(tt.fieldNum, tt.unionNum, tt.unionIndex)
 		if is != tt.expectedIs {
@@ -731,7 +731,7 @@ var mutateUint32 = []struct{
 
 func TestMessageMutateUint32(t *testing.T) {
 	for tn, tt := range mutateUint32 {
-		m := Message{}
+		m := InternalMessage{}
 		m.Init(tt.buf, Offset(len(tt.buf)), tt.scheme, tt.unions)
 		err := m.SetUint32(tt.fieldNum, 0x55555555)
 		if !bytes.Equal(tt.expected, tt.buf) {
@@ -763,7 +763,7 @@ var mutateUint8 = []struct{
 
 func TestMessageMutateUint8(t *testing.T) {
 	for tn, tt := range mutateUint8 {
-		m := Message{}
+		m := InternalMessage{}
 		m.Init(tt.buf, Offset(len(tt.buf)), tt.scheme, tt.unions)
 		err := m.SetUint8(tt.fieldNum, 0x55)
 		if !bytes.Equal(tt.expected, tt.buf) {
@@ -795,7 +795,7 @@ var mutateUint16 = []struct{
 
 func TestMessageMutateUint16(t *testing.T) {
 	for tn, tt := range mutateUint16 {
-		m := Message{}
+		m := InternalMessage{}
 		m.Init(tt.buf, Offset(len(tt.buf)), tt.scheme, tt.unions)
 		err := m.SetUint16(tt.fieldNum, 0x5555)
 		if !bytes.Equal(tt.expected, tt.buf) {
@@ -835,7 +835,7 @@ var mutateUint64 = []struct{
 
 func TestMessageMutateUint64(t *testing.T) {
 	for tn, tt := range mutateUint64 {
-		m := Message{}
+		m := InternalMessage{}
 		m.Init(tt.buf, Offset(len(tt.buf)), tt.scheme, tt.unions)
 		err := m.SetUint64(tt.fieldNum, 0x5555555555555555)
 		if !bytes.Equal(tt.expected, tt.buf) {
@@ -931,7 +931,7 @@ var mutateBytes = []struct{
 
 func TestMessageMutateBytes(t *testing.T) {
 	for tn, tt := range mutateBytes {
-		m := Message{}
+		m := InternalMessage{}
 		m.Init(tt.buf, Offset(len(tt.buf)), tt.scheme, tt.unions)
 		err := m.SetBytes(tt.fieldNum, []byte{0x55,0x55,0x55})
 		if !bytes.Equal(tt.expected, tt.buf) {
@@ -963,7 +963,7 @@ var mutateString = []struct{
 
 func TestMessageMutateString(t *testing.T) {
 	for tn, tt := range mutateString {
-		m := Message{}
+		m := InternalMessage{}
 		m.Init(tt.buf, Offset(len(tt.buf)), tt.scheme, tt.unions)
 		err := m.SetString(tt.fieldNum, "zzz")
 		if !bytes.Equal(tt.expected, tt.buf) {

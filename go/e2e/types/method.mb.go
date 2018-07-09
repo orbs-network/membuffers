@@ -14,7 +14,7 @@ message Method {
 // reader
 
 type Method struct {
-	message membuffers.Message
+	message membuffers.InternalMessage
 }
 
 var m_Method_Scheme = []membuffers.FieldType{membuffers.TypeString,membuffers.TypeMessageArray}
@@ -70,13 +70,13 @@ func (x *Method) RawArgArray() []byte {
 // builder
 
 type MethodBuilder struct {
-	builder membuffers.Builder
+	builder membuffers.InternalBuilder
 	Name    string
 	Arg     []*MethodCallArgumentBuilder
 }
 
-func (w *MethodBuilder) arg() []membuffers.MessageBuilder {
-	res := make([]membuffers.MessageBuilder, len(w.Arg))
+func (w *MethodBuilder) arg() []membuffers.MessageWriter {
+	res := make([]membuffers.MessageWriter, len(w.Arg))
 	for i, v := range w.Arg {
 		res[i] = v
 	}
@@ -137,7 +137,7 @@ message MethodCallArgument {
 // reader
 
 type MethodCallArgument struct {
-	message membuffers.Message
+	message membuffers.InternalMessage
 }
 
 var m_MethodCallArgument_Scheme = []membuffers.FieldType{membuffers.TypeUnion}
@@ -233,7 +233,7 @@ func (x *MethodCallArgument) RawType() []byte {
 // builder
 
 type MethodCallArgumentBuilder struct {
-	builder membuffers.Builder
+	builder membuffers.InternalBuilder
 	Num     uint32
 	Str     string
 	Data    []byte

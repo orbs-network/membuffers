@@ -1,12 +1,12 @@
 func (x *{{.MessageName}}) {{.MessageField.FieldName}}() {{.MessageField.FieldGoType}} {
-	return {{if .MessageField.IsEnum}}{{.MessageField.FieldGoType}}({{end}}x.message.Get{{.MessageField.TypeAccessor}}({{.MessageField.FieldIndex}}){{if .MessageField.IsEnum}}){{end}}
+	return {{if .MessageField.IsEnum}}{{.MessageField.FieldGoType}}({{end}}x._message.Get{{.MessageField.TypeAccessor}}({{.MessageField.FieldIndex}}){{if .MessageField.IsEnum}}){{end}}
 }
 
 func (x *{{.MessageName}}) Raw{{.MessageField.FieldName}}() []byte {
-	return x.message.RawBufferForField({{.MessageField.FieldIndex}}, 0)
+	return x._message.RawBufferForField({{.MessageField.FieldIndex}}, 0)
 }
 
 func (x *{{.MessageName}}) Mutate{{.MessageField.FieldName}}(v {{.MessageField.FieldGoType}}) error {
-	return x.message.Set{{.MessageField.TypeAccessor}}({{.MessageField.FieldIndex}}, {{if .MessageField.IsEnum}}uint16({{end}}v){{if .MessageField.IsEnum}}){{end}}
+	return x._message.Set{{.MessageField.TypeAccessor}}({{.MessageField.FieldIndex}}, {{if .MessageField.IsEnum}}uint16({{end}}v){{if .MessageField.IsEnum}}){{end}}
 }
 
