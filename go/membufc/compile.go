@@ -18,7 +18,11 @@ func templateByBoxName(name string) *template.Template {
 		fmt.Println("ERROR:", err.Error())
 		os.Exit(1)
 	}
-	t, err := template.New(name).Parse(s)
+	funcMap := template.FuncMap{
+		// The name "title" is what the function will be called in the template text.
+		"capsnake": ToSnake,
+	}
+	t, err := template.New(name).Funcs(funcMap).Parse(s)
 	if err != nil {
 		fmt.Println("ERROR:", err.Error())
 		os.Exit(1)

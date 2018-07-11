@@ -43,7 +43,7 @@ func (w *{{.MessageName}}Builder) Write(buf []byte) (err error) {
 	switch w.{{.FieldName}} {
 	{{- $UnionName := .FieldName}}{{$UnionNum := index $UnionNameToIndex .FieldName}}
 	{{- range index $UnionByIndex $UnionNum}}
-	case {{.MessageName}}{{$UnionName}}{{.FieldName}}:
+	case {{capsnake (print .MessageName $UnionName .FieldName)}}:
 		w._builder.Write{{.TypeAccessor}}(buf, {{if .IsEnum}}uint16({{end}}{{if .IsInline}}{{.InlineUnderlyingGoType}}({{end}}w.{{.FieldName}}){{if or .IsEnum .IsInline}}){{end}}
 	{{- end}}
 	}

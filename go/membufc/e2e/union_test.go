@@ -7,7 +7,7 @@ import (
 
 func TestComplexUnionMessage(t *testing.T) {
 	cu := (&types.ComplexUnionBuilder{
-		Option: types.ComplexUnionOptionMsg,
+		Option: types.COMPLEX_UNION_OPTION_MSG,
 		Msg: &types.ExampleMessageBuilder{
 			Str: "hello",
 		},
@@ -19,7 +19,7 @@ func TestComplexUnionMessage(t *testing.T) {
 
 func TestComplexUnionEnum(t *testing.T) {
 	cu := (&types.ComplexUnionBuilder{
-		Option: types.ComplexUnionOptionEnu,
+		Option: types.COMPLEX_UNION_OPTION_ENU,
 		Enu: types.EXAMPLE_ENUM_OPTION_B,
 	}).Build()
 	if !cu.IsOptionEnu() || cu.Enu() != types.EXAMPLE_ENUM_OPTION_B {

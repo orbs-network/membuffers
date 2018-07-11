@@ -123,9 +123,9 @@ func (x *ComplexUnion) Raw() []byte {
 type ComplexUnionOption uint16
 
 const (
-	ComplexUnionOptionNum ComplexUnionOption = 0
-	ComplexUnionOptionMsg ComplexUnionOption = 1
-	ComplexUnionOptionEnu ComplexUnionOption = 2
+	COMPLEX_UNION_OPTION_NUM ComplexUnionOption = 0
+	COMPLEX_UNION_OPTION_MSG ComplexUnionOption = 1
+	COMPLEX_UNION_OPTION_ENU ComplexUnionOption = 2
 )
 
 func (x *ComplexUnion) Option() ComplexUnionOption {
@@ -210,11 +210,11 @@ func (w *ComplexUnionBuilder) Write(buf []byte) (err error) {
 	w._builder.Reset()
 	w._builder.WriteUnionIndex(buf, uint16(w.Option))
 	switch w.Option {
-	case ComplexUnionOptionNum:
+	case COMPLEX_UNION_OPTION_NUM:
 		w._builder.WriteUint32(buf, w.Num)
-	case ComplexUnionOptionMsg:
+	case COMPLEX_UNION_OPTION_MSG:
 		w._builder.WriteMessage(buf, w.Msg)
-	case ComplexUnionOptionEnu:
+	case COMPLEX_UNION_OPTION_ENU:
 		w._builder.WriteUint16(buf, uint16(w.Enu))
 	}
 	return nil

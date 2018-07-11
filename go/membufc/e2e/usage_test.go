@@ -108,15 +108,15 @@ func TestReadWriteMethod(t *testing.T) {
 		Name: "MyMethod",
 		Arg: []*types.MethodCallArgumentBuilder{
 			&types.MethodCallArgumentBuilder{
-				Type: types.MethodCallArgumentTypeNum,
+				Type: types.METHOD_CALL_ARGUMENT_TYPE_NUM,
 				Num:  0x17,
 			},
 			&types.MethodCallArgumentBuilder{
-				Type: types.MethodCallArgumentTypeStr,
+				Type: types.METHOD_CALL_ARGUMENT_TYPE_STR,
 				Str:  "flower",
 			},
 			&types.MethodCallArgumentBuilder{
-				Type: types.MethodCallArgumentTypeData,
+				Type: types.METHOD_CALL_ARGUMENT_TYPE_DATA,
 				Data: []byte{0x01,0x02,0x03},
 			},
 		},
@@ -140,7 +140,7 @@ func TestReadWriteMethod(t *testing.T) {
 	if arg0.IsTypeStr() {
 		t.Fatalf("Arg0: is type is str")
 	}
-	if arg0.Type() != types.MethodCallArgumentTypeNum {
+	if arg0.Type() != types.METHOD_CALL_ARGUMENT_TYPE_NUM {
 		t.Fatalf("Arg0: type is not num")
 	}
 	if arg0.Num() != 0x17 {
@@ -153,7 +153,7 @@ func TestReadWriteMethod(t *testing.T) {
 	if arg1.IsTypeNum() {
 		t.Fatalf("Arg1: is type is num")
 	}
-	if arg1.Type() != types.MethodCallArgumentTypeStr {
+	if arg1.Type() != types.METHOD_CALL_ARGUMENT_TYPE_STR {
 		t.Fatalf("Arg1: type is not str")
 	}
 	if arg1.Str() != "flower" {

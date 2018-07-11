@@ -2,7 +2,7 @@ type {{.MessageName}}{{.UnionName}} uint16
 {{$UnionName := .UnionName}}{{$UnionNum := .UnionNum}}{{$ParentFieldIndex := .FieldIndex}}
 const (
 {{- range .UnionFields}}
-	{{.MessageName}}{{$UnionName}}{{.FieldName}} {{.MessageName}}{{$UnionName}} = {{.FieldIndex -}}
+	{{capsnake (print .MessageName $UnionName .FieldName)}} {{.MessageName}}{{$UnionName}} = {{.FieldIndex -}}
 {{end}}
 )
 

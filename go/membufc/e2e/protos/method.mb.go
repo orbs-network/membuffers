@@ -157,9 +157,9 @@ func (x *MethodCallArgument) Raw() []byte {
 type MethodCallArgumentType uint16
 
 const (
-	MethodCallArgumentTypeNum MethodCallArgumentType = 0
-	MethodCallArgumentTypeStr MethodCallArgumentType = 1
-	MethodCallArgumentTypeData MethodCallArgumentType = 2
+	METHOD_CALL_ARGUMENT_TYPE_NUM MethodCallArgumentType = 0
+	METHOD_CALL_ARGUMENT_TYPE_STR MethodCallArgumentType = 1
+	METHOD_CALL_ARGUMENT_TYPE_DATA MethodCallArgumentType = 2
 )
 
 func (x *MethodCallArgument) Type() MethodCallArgumentType {
@@ -252,11 +252,11 @@ func (w *MethodCallArgumentBuilder) Write(buf []byte) (err error) {
 	w._builder.Reset()
 	w._builder.WriteUnionIndex(buf, uint16(w.Type))
 	switch w.Type {
-	case MethodCallArgumentTypeNum:
+	case METHOD_CALL_ARGUMENT_TYPE_NUM:
 		w._builder.WriteUint32(buf, w.Num)
-	case MethodCallArgumentTypeStr:
+	case METHOD_CALL_ARGUMENT_TYPE_STR:
 		w._builder.WriteString(buf, w.Str)
-	case MethodCallArgumentTypeData:
+	case METHOD_CALL_ARGUMENT_TYPE_DATA:
 		w._builder.WriteBytes(buf, w.Data)
 	}
 	return nil
