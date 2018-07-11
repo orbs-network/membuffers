@@ -11,6 +11,8 @@ import (
 // reader
 
 type ExampleMessage struct {
+	// Str
+
 	// internal
 	membuffers.Message // interface
 	_message membuffers.InternalMessage
@@ -98,6 +100,8 @@ func (w *ExampleMessageBuilder) Build() *ExampleMessage {
 // reader
 
 type ComplexUnion struct {
+	// Option
+
 	// internal
 	membuffers.Message // interface
 	_message membuffers.InternalMessage

@@ -124,15 +124,22 @@ func addService(w io.Writer, packageName string, s pbparser.ServiceElement, file
 func addMessage(w io.Writer, packageName string, m pbparser.MessageElement, file *pbparser.ProtoFile) {
 	normalizeFieldsAndOneOfs(&m)
 	_, enumNameToIndex := getFileEnums(file.Enums)
+	messageFields := []MessageField{}
+	for _, field := range m.Fields {
+		messageField := getMessageField(packageName, m.Name, field, enumNameToIndex)
+		messageFields = append(messageFields, messageField)
+	}
 	t := templateByBoxName("MessageHeader.template")
 	t.Execute(w, struct {
 		MessageName string
+		MessageFields []MessageField
 	}{
 		MessageName: m.Name,
+		MessageFields: messageFields,
 	})
 	addMessageScheme(w, packageName, m.Name, m.Fields, m.OneOfs, enumNameToIndex)
 	addMessageUnions(w, packageName, m.Name, m.Fields, m.OneOfs, enumNameToIndex)
-	addMessageReaderHeader(w, m.Name, m.Fields, m.OneOfs, enumNameToIndex)
+	addMessageReaderHeader(w, packageName, m.Name, m.Fields, m.OneOfs, enumNameToIndex)
 	for _, field := range m.Fields {
 		addMessageReaderField(w, packageName, m.Name, field, m.OneOfs, enumNameToIndex)
 	}
@@ -167,7 +174,7 @@ func addMessageUnions(w io.Writer, packageName string, messageName string, field
 	})
 }
 
-func addMessageReaderHeader(w io.Writer, messageName string, fields []pbparser.FieldElement, unions []pbparser.OneOfElement, enumNameToIndex map[string]int) {
+func addMessageReaderHeader(w io.Writer, packageName string, messageName string, fields []pbparser.FieldElement, unions []pbparser.OneOfElement, enumNameToIndex map[string]int) {
 	t := templateByBoxName("MessageReaderHeader.template")
 	t.Execute(w, struct {
 		MessageName string

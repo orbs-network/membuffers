@@ -25,6 +25,8 @@ type ServicesIProvideToOthersHandler interface {
 // reader
 
 type SomeMessage struct {
+	// Str
+
 	// internal
 	membuffers.Message // interface
 	_message membuffers.InternalMessage

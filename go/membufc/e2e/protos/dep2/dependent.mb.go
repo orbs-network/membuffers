@@ -13,6 +13,10 @@ import (
 // reader
 
 type Dependent struct {
+	// A
+	// B
+	// C
+
 	// internal
 	membuffers.Message // interface
 	_message membuffers.InternalMessage

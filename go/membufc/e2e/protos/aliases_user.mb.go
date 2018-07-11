@@ -12,6 +12,11 @@ import (
 // reader
 
 type FileRecord struct {
+	// Data
+	// Hash
+	// AnotherHash
+	// BlockHeight
+
 	// internal
 	membuffers.Message // interface
 	_message membuffers.InternalMessage

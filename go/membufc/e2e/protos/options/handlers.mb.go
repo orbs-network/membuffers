@@ -21,6 +21,8 @@ type ExampleService interface {
 // reader
 
 type ExampleMethodInput struct {
+	// Arg
+
 	// internal
 	membuffers.Message // interface
 	_message membuffers.InternalMessage
@@ -108,6 +110,7 @@ func (w *ExampleMethodInputBuilder) Build() *ExampleMethodInput {
 // reader
 
 type ExampleMethodOutput struct {
+
 	// internal
 	membuffers.Message // interface
 	_message membuffers.InternalMessage

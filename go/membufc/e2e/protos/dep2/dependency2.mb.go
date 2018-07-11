@@ -11,6 +11,8 @@ import (
 // reader
 
 type SamePackageDependencyMessage struct {
+	// Field
+
 	// internal
 	membuffers.Message // interface
 	_message membuffers.InternalMessage
