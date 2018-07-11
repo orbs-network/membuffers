@@ -11,9 +11,9 @@ import (
 // reader
 
 type Transaction struct {
-	// Data
-	// Signature
-	// Type
+	// Data TransactionData
+	// Signature []byte
+	// Type NetworkType
 
 	// internal
 	membuffers.Message // interface
@@ -130,10 +130,10 @@ func (w *TransactionBuilder) Build() *Transaction {
 // reader
 
 type TransactionData struct {
-	// ProtocolVersion
-	// VirtualChain
-	// Sender
-	// TimeStamp
+	// ProtocolVersion uint32
+	// VirtualChain uint64
+	// Sender []TransactionSender
+	// TimeStamp uint64
 
 	// internal
 	membuffers.Message // interface
@@ -284,8 +284,8 @@ func (w *TransactionDataBuilder) Build() *TransactionData {
 // reader
 
 type TransactionSender struct {
-	// Name
-	// Friend
+	// Name string
+	// Friend []string
 
 	// internal
 	membuffers.Message // interface

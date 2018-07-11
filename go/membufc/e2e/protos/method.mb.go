@@ -11,8 +11,8 @@ import (
 // reader
 
 type Method struct {
-	// Name
-	// Arg
+	// Name string
+	// Arg []MethodCallArgument
 
 	// internal
 	membuffers.Message // interface
@@ -135,7 +135,7 @@ func (w *MethodBuilder) Build() *Method {
 // reader
 
 type MethodCallArgument struct {
-	// Type
+	// Type MethodCallArgumentType
 
 	// internal
 	membuffers.Message // interface

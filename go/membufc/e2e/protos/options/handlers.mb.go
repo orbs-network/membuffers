@@ -21,7 +21,7 @@ type ExampleService interface {
 // reader
 
 type ExampleMethodInput struct {
-	// Arg
+	// Arg string
 
 	// internal
 	membuffers.Message // interface

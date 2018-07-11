@@ -13,9 +13,9 @@ import (
 // reader
 
 type Dependent struct {
-	// A
-	// B
-	// C
+	// A dep1.DependencyMessage
+	// B dep11.DependencyEnum
+	// C SamePackageDependencyMessage
 
 	// internal
 	membuffers.Message // interface

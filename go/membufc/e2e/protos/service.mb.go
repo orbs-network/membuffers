@@ -19,8 +19,8 @@ type StateStorage interface {
 // reader
 
 type WriteKeyInput struct {
-	// Key
-	// Value
+	// Key string
+	// Value uint32
 
 	// internal
 	membuffers.Message // interface
@@ -197,7 +197,7 @@ func (w *WriteKeyOutputBuilder) Build() *WriteKeyOutput {
 // reader
 
 type ReadKeyInput struct {
-	// Key
+	// Key string
 
 	// internal
 	membuffers.Message // interface
@@ -286,7 +286,7 @@ func (w *ReadKeyInputBuilder) Build() *ReadKeyInput {
 // reader
 
 type ReadKeyOutput struct {
-	// Value
+	// Value uint32
 
 	// internal
 	membuffers.Message // interface

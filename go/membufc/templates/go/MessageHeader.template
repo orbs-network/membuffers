@@ -4,7 +4,7 @@
 // reader
 
 type {{.MessageName}} struct {
-{{range .MessageFields}}	// {{.FieldName}}
+{{range .MessageFields}}	// {{.FieldName}} {{if .IsArray}}[]{{end}}{{.FieldGoType}}
 {{end}}
 	// internal
 	membuffers.Message // interface

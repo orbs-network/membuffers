@@ -12,10 +12,10 @@ import (
 // reader
 
 type FileRecord struct {
-	// Data
-	// Hash
-	// AnotherHash
-	// BlockHeight
+	// Data []byte
+	// Hash crypto.Sha256
+	// AnotherHash []crypto.Md5
+	// BlockHeight crypto.BlockHeight
 
 	// internal
 	membuffers.Message // interface
