@@ -23,6 +23,10 @@ func (x *{{.MessageName}}) {{.FieldName}}() {{.FieldGoType}} {
 	return {{if or .IsEnum .IsInline}}{{.FieldGoType}}({{end}}x._message.Get{{.TypeAccessor}}InOffset(off){{if or .IsEnum .IsInline}}){{end}}
 }
 
+func (x *{{.MessageName}}) String{{.FieldName}}() string {
+{{if .IsEnum}}	return x.{{.FieldName}}().String(){{else}}	return fmt.Sprintf({{if ne .FieldGoType "string"}}"%x", {{end}}x.{{.FieldName}}()){{end}}
+}
+
 func (x *{{.MessageName}}) Mutate{{.FieldName}}(v {{.FieldGoType}}) error {
 	is, off := x._message.IsUnionIndex({{$ParentFieldIndex}}, {{$UnionNum}}, {{.FieldIndex}})
 	if !is {
@@ -37,9 +41,23 @@ func (x *{{.MessageName}}) {{.FieldName}}() *{{.FieldGoType}} {
 	b, s := x._message.GetMessageInOffset(off)
 	return {{.FieldGoType}}Reader(b[:s])
 }
+
+func (x *{{.MessageName}}) String{{.FieldName}}() string {
+	return x.{{.FieldName}}().String()
+}
 {{- end -}}{{end}}
 
 func (x *{{.MessageName}}) Raw{{.UnionName}}() []byte {
 	return x._message.RawBufferForField({{.FieldIndex}}, {{.UnionNum}})
+}
+
+func (x *{{.MessageName}}) String{{.UnionName}}() string {
+	switch x.{{.UnionName}}() {
+	{{range .UnionFields -}}
+	case {{capsnake (print .MessageName $UnionName .FieldName)}}:
+		return "({{.FieldName}})" + x.String{{.FieldName}}()
+	{{end -}}
+	}
+	return "(Unknown)"
 }
 

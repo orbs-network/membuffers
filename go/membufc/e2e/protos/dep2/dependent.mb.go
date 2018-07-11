@@ -3,6 +3,7 @@ package dep2
 
 import (
 	"github.com/orbs-network/membuffers/go"
+	"fmt"
 	"github.com/orbs-network/membuffers/go/membufc/e2e/protos/dep1"
 	"github.com/orbs-network/membuffers/go/membufc/e2e/protos/dep1/dep11"
 )
@@ -20,6 +21,10 @@ type Dependent struct {
 	// internal
 	membuffers.Message // interface
 	_message membuffers.InternalMessage
+}
+
+func (x *Dependent) String() string {
+	return fmt.Sprintf("{A:%s,B:%s,C:%s,}", x.StringA(), x.StringB(), x.StringC())
 }
 
 var _Dependent_Scheme = []membuffers.FieldType{membuffers.TypeMessage,membuffers.TypeUint16,membuffers.TypeMessage,}
@@ -48,6 +53,10 @@ func (x *Dependent) RawA() []byte {
 	return x._message.RawBufferForField(0, 0)
 }
 
+func (x *Dependent) StringA() string {
+	return x.A().String()
+}
+
 func (x *Dependent) B() dep11.DependencyEnum {
 	return dep11.DependencyEnum(x._message.GetUint16(1))
 }
@@ -60,6 +69,10 @@ func (x *Dependent) MutateB(v dep11.DependencyEnum) error {
 	return x._message.SetUint16(1, uint16(v))
 }
 
+func (x *Dependent) StringB() string {
+	return x.B().String()
+}
+
 func (x *Dependent) C() *SamePackageDependencyMessage {
 	b, s := x._message.GetMessage(2)
 	return SamePackageDependencyMessageReader(b[:s])
@@ -67,6 +80,10 @@ func (x *Dependent) C() *SamePackageDependencyMessage {
 
 func (x *Dependent) RawC() []byte {
 	return x._message.RawBufferForField(2, 0)
+}
+
+func (x *Dependent) StringC() string {
+	return x.C().String()
 }
 
 // builder

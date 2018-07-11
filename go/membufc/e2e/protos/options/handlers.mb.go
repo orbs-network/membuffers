@@ -3,6 +3,7 @@ package options
 
 import (
 	"github.com/orbs-network/membuffers/go"
+	"fmt"
 	"github.com/orbs-network/membuffers/go/membufc/e2e/protos/options/handlers"
 )
 
@@ -26,6 +27,10 @@ type ExampleMethodInput struct {
 	// internal
 	membuffers.Message // interface
 	_message membuffers.InternalMessage
+}
+
+func (x *ExampleMethodInput) String() string {
+	return fmt.Sprintf("{Arg:%s,}", x.StringArg())
 }
 
 var _ExampleMethodInput_Scheme = []membuffers.FieldType{membuffers.TypeString,}
@@ -55,6 +60,10 @@ func (x *ExampleMethodInput) RawArg() []byte {
 
 func (x *ExampleMethodInput) MutateArg(v string) error {
 	return x._message.SetString(0, v)
+}
+
+func (x *ExampleMethodInput) StringArg() string {
+	return fmt.Sprintf(x.Arg())
 }
 
 // builder
@@ -114,6 +123,10 @@ type ExampleMethodOutput struct {
 	// internal
 	membuffers.Message // interface
 	_message membuffers.InternalMessage
+}
+
+func (x *ExampleMethodOutput) String() string {
+	return fmt.Sprintf("{}")
 }
 
 var _ExampleMethodOutput_Scheme = []membuffers.FieldType{}

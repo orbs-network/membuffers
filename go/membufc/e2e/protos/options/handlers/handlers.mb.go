@@ -3,6 +3,7 @@ package handlers
 
 import (
 	"github.com/orbs-network/membuffers/go"
+	"fmt"
 )
 
 /////////////////////////////////////////////////////////////////////////////
@@ -32,6 +33,10 @@ type SomeMessage struct {
 	_message membuffers.InternalMessage
 }
 
+func (x *SomeMessage) String() string {
+	return fmt.Sprintf("{Str:%s,}", x.StringStr())
+}
+
 var _SomeMessage_Scheme = []membuffers.FieldType{membuffers.TypeString,}
 var _SomeMessage_Unions = [][]membuffers.FieldType{}
 
@@ -59,6 +64,10 @@ func (x *SomeMessage) RawStr() []byte {
 
 func (x *SomeMessage) MutateStr(v string) error {
 	return x._message.SetString(0, v)
+}
+
+func (x *SomeMessage) StringStr() string {
+	return fmt.Sprintf(x.Str())
 }
 
 // builder

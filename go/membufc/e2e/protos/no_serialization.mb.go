@@ -3,6 +3,7 @@ package types
 
 import (
 	"github.com/orbs-network/membuffers/go"
+	"fmt"
 )
 
 /////////////////////////////////////////////////////////////////////////////
@@ -25,6 +26,10 @@ type MessageInContainer struct {
 	// internal
 	membuffers.Message // interface
 	_message membuffers.InternalMessage
+}
+
+func (x *MessageInContainer) String() string {
+	return fmt.Sprintf("{Field:%s,}", x.StringField())
 }
 
 var _MessageInContainer_Scheme = []membuffers.FieldType{membuffers.TypeString,}
@@ -54,6 +59,10 @@ func (x *MessageInContainer) RawField() []byte {
 
 func (x *MessageInContainer) MutateField(v string) error {
 	return x._message.SetString(0, v)
+}
+
+func (x *MessageInContainer) StringField() string {
+	return fmt.Sprintf(x.Field())
 }
 
 // builder

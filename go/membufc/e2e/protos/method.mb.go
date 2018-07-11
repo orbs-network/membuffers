@@ -3,6 +3,7 @@ package types
 
 import (
 	"github.com/orbs-network/membuffers/go"
+	"fmt"
 )
 
 /////////////////////////////////////////////////////////////////////////////
@@ -17,6 +18,10 @@ type Method struct {
 	// internal
 	membuffers.Message // interface
 	_message membuffers.InternalMessage
+}
+
+func (x *Method) String() string {
+	return fmt.Sprintf("{Name:%s,Arg:%s,}", x.StringName(), x.StringArg())
 }
 
 var _Method_Scheme = []membuffers.FieldType{membuffers.TypeString,membuffers.TypeMessageArray,}
@@ -48,6 +53,10 @@ func (x *Method) MutateName(v string) error {
 	return x._message.SetString(0, v)
 }
 
+func (x *Method) StringName() string {
+	return fmt.Sprintf(x.Name())
+}
+
 func (x *Method) ArgIterator() *MethodArgIterator {
 	return &MethodArgIterator{iterator: x._message.GetMessageArrayIterator(1)}
 }
@@ -67,6 +76,15 @@ func (i *MethodArgIterator) NextArg() *MethodCallArgument {
 
 func (x *Method) RawArgArray() []byte {
 	return x._message.RawBufferForField(1, 0)
+}
+
+func (x *Method) StringArg() (res string) {
+	res = "["
+	for i := x.ArgIterator(); i.HasNext(); {
+		res += i.NextArg().String() + ","
+	}
+	res += "]"
+	return
 }
 
 // builder
@@ -142,6 +160,10 @@ type MethodCallArgument struct {
 	_message membuffers.InternalMessage
 }
 
+func (x *MethodCallArgument) String() string {
+	return fmt.Sprintf("{Type:%s,}", x.StringType())
+}
+
 var _MethodCallArgument_Scheme = []membuffers.FieldType{membuffers.TypeUnion,}
 var _MethodCallArgument_Unions = [][]membuffers.FieldType{{membuffers.TypeUint32,membuffers.TypeString,membuffers.TypeBytes,}}
 
@@ -181,6 +203,10 @@ func (x *MethodCallArgument) Num() uint32 {
 	return x._message.GetUint32InOffset(off)
 }
 
+func (x *MethodCallArgument) StringNum() string {
+	return fmt.Sprintf("%x", x.Num())
+}
+
 func (x *MethodCallArgument) MutateNum(v uint32) error {
 	is, off := x._message.IsUnionIndex(0, 0, 0)
 	if !is {
@@ -198,6 +224,10 @@ func (x *MethodCallArgument) IsTypeStr() bool {
 func (x *MethodCallArgument) Str() string {
 	_, off := x._message.IsUnionIndex(0, 0, 1)
 	return x._message.GetStringInOffset(off)
+}
+
+func (x *MethodCallArgument) StringStr() string {
+	return fmt.Sprintf(x.Str())
 }
 
 func (x *MethodCallArgument) MutateStr(v string) error {
@@ -219,6 +249,10 @@ func (x *MethodCallArgument) Data() []byte {
 	return x._message.GetBytesInOffset(off)
 }
 
+func (x *MethodCallArgument) StringData() string {
+	return fmt.Sprintf("%x", x.Data())
+}
+
 func (x *MethodCallArgument) MutateData(v []byte) error {
 	is, off := x._message.IsUnionIndex(0, 0, 2)
 	if !is {
@@ -230,6 +264,18 @@ func (x *MethodCallArgument) MutateData(v []byte) error {
 
 func (x *MethodCallArgument) RawType() []byte {
 	return x._message.RawBufferForField(0, 0)
+}
+
+func (x *MethodCallArgument) StringType() string {
+	switch x.Type() {
+	case METHOD_CALL_ARGUMENT_TYPE_NUM:
+		return "(Num)" + x.StringNum()
+	case METHOD_CALL_ARGUMENT_TYPE_STR:
+		return "(Str)" + x.StringStr()
+	case METHOD_CALL_ARGUMENT_TYPE_DATA:
+		return "(Data)" + x.StringData()
+	}
+	return "(Unknown)"
 }
 
 // builder

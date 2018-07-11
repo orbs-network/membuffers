@@ -3,6 +3,7 @@ package types
 
 import (
 	"github.com/orbs-network/membuffers/go"
+	"fmt"
 )
 
 /////////////////////////////////////////////////////////////////////////////
@@ -18,6 +19,10 @@ type Transaction struct {
 	// internal
 	membuffers.Message // interface
 	_message membuffers.InternalMessage
+}
+
+func (x *Transaction) String() string {
+	return fmt.Sprintf("{Data:%s,Signature:%s,Type:%s,}", x.StringData(), x.StringSignature(), x.StringType())
 }
 
 var _Transaction_Scheme = []membuffers.FieldType{membuffers.TypeMessage,membuffers.TypeBytes,membuffers.TypeUint16,}
@@ -46,6 +51,10 @@ func (x *Transaction) RawData() []byte {
 	return x._message.RawBufferForField(0, 0)
 }
 
+func (x *Transaction) StringData() string {
+	return x.Data().String()
+}
+
 func (x *Transaction) Signature() []byte {
 	return x._message.GetBytes(1)
 }
@@ -58,6 +67,10 @@ func (x *Transaction) MutateSignature(v []byte) error {
 	return x._message.SetBytes(1, v)
 }
 
+func (x *Transaction) StringSignature() string {
+	return fmt.Sprintf("%x", x.Signature())
+}
+
 func (x *Transaction) Type() NetworkType {
 	return NetworkType(x._message.GetUint16(2))
 }
@@ -68,6 +81,10 @@ func (x *Transaction) RawType() []byte {
 
 func (x *Transaction) MutateType(v NetworkType) error {
 	return x._message.SetUint16(2, uint16(v))
+}
+
+func (x *Transaction) StringType() string {
+	return x.Type().String()
 }
 
 // builder
@@ -140,6 +157,10 @@ type TransactionData struct {
 	_message membuffers.InternalMessage
 }
 
+func (x *TransactionData) String() string {
+	return fmt.Sprintf("{ProtocolVersion:%s,VirtualChain:%s,Sender:%s,TimeStamp:%s,}", x.StringProtocolVersion(), x.StringVirtualChain(), x.StringSender(), x.StringTimeStamp())
+}
+
 var _TransactionData_Scheme = []membuffers.FieldType{membuffers.TypeUint32,membuffers.TypeUint64,membuffers.TypeMessageArray,membuffers.TypeUint64,}
 var _TransactionData_Unions = [][]membuffers.FieldType{}
 
@@ -169,6 +190,10 @@ func (x *TransactionData) MutateProtocolVersion(v uint32) error {
 	return x._message.SetUint32(0, v)
 }
 
+func (x *TransactionData) StringProtocolVersion() string {
+	return fmt.Sprintf("%x", x.ProtocolVersion())
+}
+
 func (x *TransactionData) VirtualChain() uint64 {
 	return x._message.GetUint64(1)
 }
@@ -179,6 +204,10 @@ func (x *TransactionData) RawVirtualChain() []byte {
 
 func (x *TransactionData) MutateVirtualChain(v uint64) error {
 	return x._message.SetUint64(1, v)
+}
+
+func (x *TransactionData) StringVirtualChain() string {
+	return fmt.Sprintf("%x", x.VirtualChain())
 }
 
 func (x *TransactionData) SenderIterator() *TransactionDataSenderIterator {
@@ -202,6 +231,15 @@ func (x *TransactionData) RawSenderArray() []byte {
 	return x._message.RawBufferForField(2, 0)
 }
 
+func (x *TransactionData) StringSender() (res string) {
+	res = "["
+	for i := x.SenderIterator(); i.HasNext(); {
+		res += i.NextSender().String() + ","
+	}
+	res += "]"
+	return
+}
+
 func (x *TransactionData) TimeStamp() uint64 {
 	return x._message.GetUint64(3)
 }
@@ -212,6 +250,10 @@ func (x *TransactionData) RawTimeStamp() []byte {
 
 func (x *TransactionData) MutateTimeStamp(v uint64) error {
 	return x._message.SetUint64(3, v)
+}
+
+func (x *TransactionData) StringTimeStamp() string {
+	return fmt.Sprintf("%x", x.TimeStamp())
 }
 
 // builder
@@ -292,6 +334,10 @@ type TransactionSender struct {
 	_message membuffers.InternalMessage
 }
 
+func (x *TransactionSender) String() string {
+	return fmt.Sprintf("{Name:%s,Friend:%s,}", x.StringName(), x.StringFriend())
+}
+
 var _TransactionSender_Scheme = []membuffers.FieldType{membuffers.TypeString,membuffers.TypeStringArray,}
 var _TransactionSender_Unions = [][]membuffers.FieldType{}
 
@@ -321,6 +367,10 @@ func (x *TransactionSender) MutateName(v string) error {
 	return x._message.SetString(0, v)
 }
 
+func (x *TransactionSender) StringName() string {
+	return fmt.Sprintf(x.Name())
+}
+
 func (x *TransactionSender) FriendIterator() *TransactionSenderFriendIterator {
 	return &TransactionSenderFriendIterator{iterator: x._message.GetStringArrayIterator(1)}
 }
@@ -339,6 +389,15 @@ func (i *TransactionSenderFriendIterator) NextFriend() string {
 
 func (x *TransactionSender) RawFriendArray() []byte {
 	return x._message.RawBufferForField(1, 0)
+}
+
+func (x *TransactionSender) StringFriend() (res string) {
+	res = "["
+	for i := x.FriendIterator(); i.HasNext(); {
+		res += fmt.Sprintf(i.NextFriend()) + ","
+	}
+	res += "]"
+	return
 }
 
 // builder
@@ -400,4 +459,16 @@ const (
 	NETWORK_TYPE_TEST_NET NetworkType = 1
 	NETWORK_TYPE_RESERVED NetworkType = 2
 )
+
+func (n NetworkType) String() string {
+	switch n {
+	case NETWORK_TYPE_MAIN_NET:
+		return "NETWORK_TYPE_MAIN_NET"
+	case NETWORK_TYPE_TEST_NET:
+		return "NETWORK_TYPE_TEST_NET"
+	case NETWORK_TYPE_RESERVED:
+		return "NETWORK_TYPE_RESERVED"
+	}
+	return "UNKNOWN"
+}
 

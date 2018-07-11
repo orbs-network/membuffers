@@ -14,3 +14,13 @@ const (
 	DEPENDENCY_ENUM_OPTION_B DependencyEnum = 1
 )
 
+func (n DependencyEnum) String() string {
+	switch n {
+	case DEPENDENCY_ENUM_OPTION_A:
+		return "DEPENDENCY_ENUM_OPTION_A"
+	case DEPENDENCY_ENUM_OPTION_B:
+		return "DEPENDENCY_ENUM_OPTION_B"
+	}
+	return "UNKNOWN"
+}
+

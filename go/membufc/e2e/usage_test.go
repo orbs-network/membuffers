@@ -90,6 +90,9 @@ func TestReadWriteTransaction(t *testing.T) {
 		}
 		senderCount++
 	}
+	if transaction.String() != `{Data:{ProtocolVersion:1,VirtualChain:11223344,Sender:[{Name:johnny,Friend:[billy,jeff,alex,],},{Name:rachel,Friend:[jessica,sara,],},],TimeStamp:445566778899,},Signature:22222222222222222222222222222222,Type:NETWORK_TYPE_RESERVED,}` {
+		t.Fatalf("String: instead of expected got %s", transaction.String())
+	}
 
 	// mutate
 	hash := hashBytes(transaction.RawData())
@@ -159,6 +162,9 @@ func TestReadWriteMethod(t *testing.T) {
 	if arg1.Str() != "flower" {
 		t.Fatalf("Arg1.Str: instead of expected got %v", arg1.Str())
 	}
+	if method.String() != `{Name:MyMethod,Arg:[{Type:(Num)17,},{Type:(Str)flower,},{Type:(Data)010203,},],}` {
+		t.Fatalf("String: instead of expected got %s", method.String())
+	}
 }
 
 func TestReadWriteWithImports(t *testing.T) {
@@ -219,4 +225,5 @@ func TestQuickBuildTransaction(t *testing.T) {
 	if transaction.Type() != types.NETWORK_TYPE_RESERVED {
 		t.Fatalf("Type: instead of expected got %v", transaction.Type())
 	}
+	//t.Fatal(transaction.String())
 }

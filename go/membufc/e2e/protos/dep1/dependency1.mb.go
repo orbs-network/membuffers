@@ -3,6 +3,7 @@ package dep1
 
 import (
 	"github.com/orbs-network/membuffers/go"
+	"fmt"
 )
 
 /////////////////////////////////////////////////////////////////////////////
@@ -16,6 +17,10 @@ type DependencyMessage struct {
 	// internal
 	membuffers.Message // interface
 	_message membuffers.InternalMessage
+}
+
+func (x *DependencyMessage) String() string {
+	return fmt.Sprintf("{Field:%s,}", x.StringField())
 }
 
 var _DependencyMessage_Scheme = []membuffers.FieldType{membuffers.TypeUint32,}
@@ -45,6 +50,10 @@ func (x *DependencyMessage) RawField() []byte {
 
 func (x *DependencyMessage) MutateField(v uint32) error {
 	return x._message.SetUint32(0, v)
+}
+
+func (x *DependencyMessage) StringField() string {
+	return fmt.Sprintf("%x", x.Field())
 }
 
 // builder

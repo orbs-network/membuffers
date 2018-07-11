@@ -3,6 +3,7 @@ package types
 
 import (
 	"github.com/orbs-network/membuffers/go"
+	"fmt"
 )
 
 /////////////////////////////////////////////////////////////////////////////
@@ -16,6 +17,10 @@ type ExampleMessage struct {
 	// internal
 	membuffers.Message // interface
 	_message membuffers.InternalMessage
+}
+
+func (x *ExampleMessage) String() string {
+	return fmt.Sprintf("{Str:%s,}", x.StringStr())
 }
 
 var _ExampleMessage_Scheme = []membuffers.FieldType{membuffers.TypeString,}
@@ -45,6 +50,10 @@ func (x *ExampleMessage) RawStr() []byte {
 
 func (x *ExampleMessage) MutateStr(v string) error {
 	return x._message.SetString(0, v)
+}
+
+func (x *ExampleMessage) StringStr() string {
+	return fmt.Sprintf(x.Str())
 }
 
 // builder
@@ -107,6 +116,10 @@ type ComplexUnion struct {
 	_message membuffers.InternalMessage
 }
 
+func (x *ComplexUnion) String() string {
+	return fmt.Sprintf("{Option:%s,}", x.StringOption())
+}
+
 var _ComplexUnion_Scheme = []membuffers.FieldType{membuffers.TypeUnion,}
 var _ComplexUnion_Unions = [][]membuffers.FieldType{{membuffers.TypeUint32,membuffers.TypeMessage,membuffers.TypeUint16,}}
 
@@ -146,6 +159,10 @@ func (x *ComplexUnion) Num() uint32 {
 	return x._message.GetUint32InOffset(off)
 }
 
+func (x *ComplexUnion) StringNum() string {
+	return fmt.Sprintf("%x", x.Num())
+}
+
 func (x *ComplexUnion) MutateNum(v uint32) error {
 	is, off := x._message.IsUnionIndex(0, 0, 0)
 	if !is {
@@ -166,6 +183,10 @@ func (x *ComplexUnion) Msg() *ExampleMessage {
 	return ExampleMessageReader(b[:s])
 }
 
+func (x *ComplexUnion) StringMsg() string {
+	return x.Msg().String()
+}
+
 func (x *ComplexUnion) IsOptionEnu() bool {
 	is, _ := x._message.IsUnionIndex(0, 0, 2)
 	return is
@@ -174,6 +195,10 @@ func (x *ComplexUnion) IsOptionEnu() bool {
 func (x *ComplexUnion) Enu() ExampleEnum {
 	_, off := x._message.IsUnionIndex(0, 0, 2)
 	return ExampleEnum(x._message.GetUint16InOffset(off))
+}
+
+func (x *ComplexUnion) StringEnu() string {
+	return x.Enu().String()
 }
 
 func (x *ComplexUnion) MutateEnu(v ExampleEnum) error {
@@ -187,6 +212,18 @@ func (x *ComplexUnion) MutateEnu(v ExampleEnum) error {
 
 func (x *ComplexUnion) RawOption() []byte {
 	return x._message.RawBufferForField(0, 0)
+}
+
+func (x *ComplexUnion) StringOption() string {
+	switch x.Option() {
+	case COMPLEX_UNION_OPTION_NUM:
+		return "(Num)" + x.StringNum()
+	case COMPLEX_UNION_OPTION_MSG:
+		return "(Msg)" + x.StringMsg()
+	case COMPLEX_UNION_OPTION_ENU:
+		return "(Enu)" + x.StringEnu()
+	}
+	return "(Unknown)"
 }
 
 // builder
@@ -257,4 +294,16 @@ const (
 	EXAMPLE_ENUM_OPTION_B ExampleEnum = 1
 	EXAMPLE_ENUM_OPTION_C ExampleEnum = 2
 )
+
+func (n ExampleEnum) String() string {
+	switch n {
+	case EXAMPLE_ENUM_OPTION_A:
+		return "EXAMPLE_ENUM_OPTION_A"
+	case EXAMPLE_ENUM_OPTION_B:
+		return "EXAMPLE_ENUM_OPTION_B"
+	case EXAMPLE_ENUM_OPTION_C:
+		return "EXAMPLE_ENUM_OPTION_C"
+	}
+	return "UNKNOWN"
+}
 

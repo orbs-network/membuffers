@@ -3,6 +3,7 @@ package types
 
 import (
 	"github.com/orbs-network/membuffers/go"
+	"fmt"
 )
 
 /////////////////////////////////////////////////////////////////////////////
@@ -25,6 +26,10 @@ type WriteKeyInput struct {
 	// internal
 	membuffers.Message // interface
 	_message membuffers.InternalMessage
+}
+
+func (x *WriteKeyInput) String() string {
+	return fmt.Sprintf("{Key:%s,Value:%s,}", x.StringKey(), x.StringValue())
 }
 
 var _WriteKeyInput_Scheme = []membuffers.FieldType{membuffers.TypeString,membuffers.TypeUint32,}
@@ -56,6 +61,10 @@ func (x *WriteKeyInput) MutateKey(v string) error {
 	return x._message.SetString(0, v)
 }
 
+func (x *WriteKeyInput) StringKey() string {
+	return fmt.Sprintf(x.Key())
+}
+
 func (x *WriteKeyInput) Value() uint32 {
 	return x._message.GetUint32(1)
 }
@@ -66,6 +75,10 @@ func (x *WriteKeyInput) RawValue() []byte {
 
 func (x *WriteKeyInput) MutateValue(v uint32) error {
 	return x._message.SetUint32(1, v)
+}
+
+func (x *WriteKeyInput) StringValue() string {
+	return fmt.Sprintf("%x", x.Value())
 }
 
 // builder
@@ -127,6 +140,10 @@ type WriteKeyOutput struct {
 	// internal
 	membuffers.Message // interface
 	_message membuffers.InternalMessage
+}
+
+func (x *WriteKeyOutput) String() string {
+	return fmt.Sprintf("{}")
 }
 
 var _WriteKeyOutput_Scheme = []membuffers.FieldType{}
@@ -204,6 +221,10 @@ type ReadKeyInput struct {
 	_message membuffers.InternalMessage
 }
 
+func (x *ReadKeyInput) String() string {
+	return fmt.Sprintf("{Key:%s,}", x.StringKey())
+}
+
 var _ReadKeyInput_Scheme = []membuffers.FieldType{membuffers.TypeString,}
 var _ReadKeyInput_Unions = [][]membuffers.FieldType{}
 
@@ -231,6 +252,10 @@ func (x *ReadKeyInput) RawKey() []byte {
 
 func (x *ReadKeyInput) MutateKey(v string) error {
 	return x._message.SetString(0, v)
+}
+
+func (x *ReadKeyInput) StringKey() string {
+	return fmt.Sprintf(x.Key())
 }
 
 // builder
@@ -293,6 +318,10 @@ type ReadKeyOutput struct {
 	_message membuffers.InternalMessage
 }
 
+func (x *ReadKeyOutput) String() string {
+	return fmt.Sprintf("{Value:%s,}", x.StringValue())
+}
+
 var _ReadKeyOutput_Scheme = []membuffers.FieldType{membuffers.TypeUint32,}
 var _ReadKeyOutput_Unions = [][]membuffers.FieldType{}
 
@@ -320,6 +349,10 @@ func (x *ReadKeyOutput) RawValue() []byte {
 
 func (x *ReadKeyOutput) MutateValue(v uint32) error {
 	return x._message.SetUint32(0, v)
+}
+
+func (x *ReadKeyOutput) StringValue() string {
+	return fmt.Sprintf("%x", x.Value())
 }
 
 // builder

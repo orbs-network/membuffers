@@ -3,6 +3,7 @@ package types
 
 import (
 	"github.com/orbs-network/membuffers/go"
+	"fmt"
 	"github.com/orbs-network/membuffers/go/membufc/e2e/protos/crypto"
 )
 
@@ -20,6 +21,10 @@ type FileRecord struct {
 	// internal
 	membuffers.Message // interface
 	_message membuffers.InternalMessage
+}
+
+func (x *FileRecord) String() string {
+	return fmt.Sprintf("{Data:%s,Hash:%s,AnotherHash:%s,BlockHeight:%s,}", x.StringData(), x.StringHash(), x.StringAnotherHash(), x.StringBlockHeight())
 }
 
 var _FileRecord_Scheme = []membuffers.FieldType{membuffers.TypeBytes,membuffers.TypeBytes,membuffers.TypeBytesArray,membuffers.TypeUint64,}
@@ -51,6 +56,10 @@ func (x *FileRecord) MutateData(v []byte) error {
 	return x._message.SetBytes(0, v)
 }
 
+func (x *FileRecord) StringData() string {
+	return fmt.Sprintf("%x", x.Data())
+}
+
 func (x *FileRecord) Hash() crypto.Sha256 {
 	return crypto.Sha256(x._message.GetBytes(1))
 }
@@ -61,6 +70,10 @@ func (x *FileRecord) RawHash() []byte {
 
 func (x *FileRecord) MutateHash(v crypto.Sha256) error {
 	return x._message.SetBytes(1, []byte(v))
+}
+
+func (x *FileRecord) StringHash() string {
+	return fmt.Sprintf("%x", x.Hash())
 }
 
 func (x *FileRecord) AnotherHashIterator() *FileRecordAnotherHashIterator {
@@ -83,6 +96,15 @@ func (x *FileRecord) RawAnotherHashArray() []byte {
 	return x._message.RawBufferForField(2, 0)
 }
 
+func (x *FileRecord) StringAnotherHash() (res string) {
+	res = "["
+	for i := x.AnotherHashIterator(); i.HasNext(); {
+		res += fmt.Sprintf("%x", i.NextAnotherHash()) + ","
+	}
+	res += "]"
+	return
+}
+
 func (x *FileRecord) BlockHeight() crypto.BlockHeight {
 	return crypto.BlockHeight(x._message.GetUint64(3))
 }
@@ -93,6 +115,10 @@ func (x *FileRecord) RawBlockHeight() []byte {
 
 func (x *FileRecord) MutateBlockHeight(v crypto.BlockHeight) error {
 	return x._message.SetUint64(3, uint64(v))
+}
+
+func (x *FileRecord) StringBlockHeight() string {
+	return fmt.Sprintf("%x", x.BlockHeight())
 }
 
 // builder

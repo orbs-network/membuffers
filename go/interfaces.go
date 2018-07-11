@@ -3,6 +3,7 @@ package membuffers
 type Message interface {
 	IsValid() bool
 	Raw() []byte
+	String() string
 }
 
 type Builder interface {

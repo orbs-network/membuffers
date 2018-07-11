@@ -10,3 +10,7 @@ func (x *{{.MessageName}}) Mutate{{.MessageField.FieldName}}(v {{.MessageField.F
 	return x._message.Set{{.MessageField.TypeAccessor}}({{.MessageField.FieldIndex}}, {{if .MessageField.IsEnum}}uint16({{end}}{{if .MessageField.IsInline}}{{.MessageField.InlineUnderlyingGoType}}({{end}}v){{if or .MessageField.IsEnum .MessageField.IsInline}}){{end}}
 }
 
+func (x *{{.MessageName}}) String{{.MessageField.FieldName}}() string {
+{{if .MessageField.IsEnum}}	return x.{{.MessageField.FieldName}}().String(){{else}}	return fmt.Sprintf({{if ne .MessageField.FieldGoType "string"}}"%x", {{end}}x.{{.MessageField.FieldName}}()){{end}}
+}
+

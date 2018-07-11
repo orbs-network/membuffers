@@ -10,4 +10,14 @@ const (
 {{end}}
 )
 
+func (n {{$EnumName}}) String() string {
+	switch n {
+	{{range .Values -}}
+	case {{.Name}}:
+		return "{{.Name}}"
+	{{end -}}
+	}
+	return "UNKNOWN"
+}
+
 {{end}}

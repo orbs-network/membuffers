@@ -19,3 +19,12 @@ func (x *{{.MessageName}}) Raw{{.MessageField.FieldName}}Array() []byte {
 	return x._message.RawBufferForField({{.MessageField.FieldIndex}}, 0)
 }
 
+func (x *{{.MessageName}}) String{{.MessageField.FieldName}}() (res string) {
+	res = "["
+	for i := x.{{.MessageField.FieldName}}Iterator(); i.HasNext(); {
+		res += i.Next{{.MessageField.FieldName}}().String() + ","
+	}
+	res += "]"
+	return
+}
+
