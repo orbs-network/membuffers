@@ -5,7 +5,7 @@ option go_package = "github.com/orbs-network/membuffers/go/membufc/e2e/protos";
 import "protos/transaction.proto";
 import "protos/dep1/dependency1.proto";
 
-option serialize_service_args = false;
+option serialize_messages = false;
 
 service StateStorageNS {
     rpc WriteKeyNS (WriteKeyInputNS) returns (WriteKeyOutputNS);

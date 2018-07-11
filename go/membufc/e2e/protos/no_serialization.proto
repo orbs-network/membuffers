@@ -1,0 +1,18 @@
+syntax = "proto3";
+package types;
+
+message ExampleContainer {
+    option serialize_message = false;
+    MessageInContainer message1 = 1;
+    NestedContainer container1 = 2;
+    repeated NestedContainer containers2 = 3;
+}
+
+message MessageInContainer {
+    string field = 1;
+}
+
+message NestedContainer {
+    option serialize_message = false;
+    string name = 1;
+}

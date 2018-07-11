@@ -5,6 +5,7 @@ go run *.go ./e2e/protos/dep1/dep11/dependency11.proto
 go run *.go ./e2e/protos/dep2/dependent.proto
 go run *.go -m ./e2e/protos/service.proto
 go run *.go -m ./e2e/protos/service_no_serialization.proto
+go run *.go -m ./e2e/protos/no_serialization.proto
 go run *.go ./e2e/protos/crypto/aliases.proto
 go run *.go ./e2e/protos/aliases_user.proto
 go run *.go ./e2e/protos/unions.proto

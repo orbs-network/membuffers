@@ -211,7 +211,7 @@ Normally, this does not add much overhead but if you think about it, isn't reall
 By adding the following option, all messages in the proto file will be encoded as regular structs instead of MemBuffers (will not be serializable):
 
 ```proto
-option serialize_service_args = false;
+option serialize_messages = false;
 
 service StateStorage {
     rpc WriteKey (WriteKeyInput) returns (WriteKeyOutput);
@@ -228,3 +228,29 @@ message WriteKeyOutput {
 ```
 
 You can see a working example of this feature in the compiler [test suite](e2e/service_test.go) and [test protos](e2e/protos/service_no_serialization.proto).
+
+### Non serializable messages
+
+The schema supports specifying that any message should be compiled to a plain struct instead of a MemBuffer. This is useful for messages that have no need in being serialized.
+
+Consider this example:
+
+```proto
+message ExampleContainer {
+    option serialize_message = false;
+    MessageInContainer message1 = 1;
+    NestedContainer container1 = 2;
+    repeated NestedContainer containers2 = 3;
+}
+
+message MessageInContainer {
+    string field = 1;
+}
+
+message NestedContainer {
+    option serialize_message = false;
+    string name = 1;
+}
+```
+
+The messages `ExampleContainer` and `NestedContainer` will be compiled to plain structs whereas `MessageInContainer` will be compiled to a regular MemBuffer which supports serialization.

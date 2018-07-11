@@ -329,6 +329,10 @@ MemBuffers supports proto definitions using standard [Protobuf v3 schema](https:
 
   Wrapping an already encoded MemBuffers message with another MemBuffers message causes data copy. This is particularly taxing with argument wrappers for service methods which can be avoided by encoding them as plain structs instead of MemBuffers messages. Read more about `option` extensions under `membufc` compiler [documentation](go/membufc/README.md).   
 
+* Non serializable messages
+
+  The schema supports specifying that any message should be compiled to a plain struct instead of a MemBuffer. This is useful for messages that have no need in being serialized. Read more about `option` extensions under `membufc` compiler [documentation](go/membufc/README.md).
+
 ## License
 
 MIT

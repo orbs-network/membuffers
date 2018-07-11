@@ -31,16 +31,16 @@ func templateByBoxName(name string) *template.Template {
 }
 
 func compileProtoFile(w io.Writer, file pbparser.ProtoFile, dependencyData map[string]dependencyData, compilerVersion string) {
-	serializeServiceArgs := shouldSerializeServiceArgs(&file)
-	addHeader(w, &file, dependencyData, serializeServiceArgs, compilerVersion)
+	serializeAllMessages := shouldSerializeAllMessages(&file)
+	addHeader(w, &file, dependencyData, serializeAllMessages, compilerVersion)
 	for _, s := range file.Services {
 		addService(w, file.PackageName, s, &file)
 	}
 	for _, m := range file.Messages {
-		if serializeServiceArgs {
-			addMessage(w, file.PackageName, m, &file)
-		} else {
+		if !serializeAllMessages || !shouldSerializeMessage(m) {
 			addMessageNonSerializable(w, file.PackageName, m, &file)
+		} else {
+			addMessage(w, file.PackageName, m, &file)
 		}
 	}
 	addEnums(w, file.Enums)

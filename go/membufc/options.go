@@ -7,9 +7,18 @@ import (
 	"io"
 )
 
-func shouldSerializeServiceArgs(file *pbparser.ProtoFile) bool {
+func shouldSerializeAllMessages(file *pbparser.ProtoFile) bool {
 	for _, option := range file.Options {
-		if option.Name == "serialize_service_args" && option.Value == "false" {
+		if option.Name == "serialize_messages" && option.Value == "false" {
+			return false
+		}
+	}
+	return true
+}
+
+func shouldSerializeMessage(m pbparser.MessageElement) bool {
+	for _, option := range m.Options {
+		if option.Name == "serialize_message" && option.Value == "false" {
 			return false
 		}
 	}
