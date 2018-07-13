@@ -115,6 +115,8 @@ This standalone library was originally created as part of the [ORBS](https://www
     contract := transaction.Data().ContractMethod()
     ```
 
+More about the API [here](API.md).
+
 ## Installation
 
 #### Prerequisites
