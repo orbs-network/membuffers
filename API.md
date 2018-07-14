@@ -28,7 +28,7 @@ Most of the time, an object will travel within the system as a **MemBuffer**. Th
 
 ## Examples of working with each entity
 
-#### Let's start with the schema
+### Let's start with the schema
 
 Consider this rather complicated example of a .proto file describing a transaction:
 
@@ -77,7 +77,7 @@ message MethodCallArgument {
 
 In the next sections we're going to attempt to encode and decode these two .protos separately - `Transaction` and `Method`.
 
-#### Working with a Builder
+### Working with a Builder
 
 The code generator will create `TransactionBuilder`, this is the **Builder** to create a MemBuffer for the schema. Here's the idiomatic way to work with the builder:
 
@@ -114,7 +114,7 @@ method := builder.Build()
 
 The example above shows a method that has 3 arguments, one of each type.
 
-#### Working with a MemBuffer
+### Working with a MemBuffer
 
 The `tx` object that we received from `buider.Build()` is a **MemBuffer** of type `*Transaction`. It is very easy to access its various fields:
 
@@ -171,7 +171,7 @@ if arg1.Type() == types.METHOD_CALL_ARGUMENT_TYPE_STR {
 }
 ``` 
 
-#### Working with raw bytes of a MemBuffer
+### Working with raw bytes of a MemBuffer
 
 Just use the `Raw()` method on the **MemBuffer**:
 
@@ -188,7 +188,7 @@ arg0 := method.ArgIterator().NextArg() // access the first argument (like before
 var arg0Bytes []byte = arg0.RawType() // returns []byte{0x17,0x00,0x00,0x00} 
 ```
 
-#### Working with a Reader
+### Working with a Reader
 
 Let's assume we've sent the transaction bytes `txBytes` over the wire, this is how we parse them back:
 
