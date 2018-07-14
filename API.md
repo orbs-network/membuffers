@@ -2,23 +2,23 @@
 
 ## Entities available from generated code
 
-* **MemBuffer** (eg. `tx *Transaction`)
+* **MemBuffer** - eg. `tx *Transaction`
   
   Serialized object. Its underlying data is a single sequential byte array. The MemBuffers interface is actually a thin accessor layer above the byte array that allows to access fields directly on it using a convenient API. 
 
-* **Raw** bytes (eg. `tx.Raw()`)
+* **Raw** bytes - eg. `tx.Raw()`
 
   Direct access to the underlying byte array of a MemBuffer. When using `Raw()` for a specific field, a relevant slice over this byte array is returned. 
 
-* **Reader** (eg. `TransactionReader`)
+* **Reader** - eg. `TransactionReader`
 
   A function that takes a byte array and returns a MemBuffer. This action is very cheap because the data is not really decoded, only the thin accessor layer is created.
 
-* **Builder** (eg. `TransactionBuilder`)
+* **Builder** - eg. `TransactionBuilder`
 
   An object that assists developers with creating a single MemBuffer from a collection of fragmented fields and pointers (non sequential in memory). This action is not cheap because all fields must be copied and serialized together to a single byte array. 
 
-* Plain struct (non serializable, "POJO")
+* Plain struct - non serializable, "POJO"
 
   Some messages in the generated code are marked as non-serializable. This means they're not MemBuffers, but will create a plain old struct instead that doesn't have any interesting methods.
 
