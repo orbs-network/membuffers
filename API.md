@@ -146,7 +146,7 @@ fmt.Printf("%s", tx.String()) // this does the same thing
 fmt.Printf("%s", tx.Data().StringVirtualChain()) // prints "11223344"
 ```
 
-Let's see how we would access the `method` object we received from building the `Method` message:
+Let's see how we would access the `method` MemBuffer object we received from building the `Method` message:
 
 ```go
 fmt.Printf("%s", method.Name()) // prints "MyMethod"
