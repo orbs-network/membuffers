@@ -22,7 +22,7 @@
 
   Some messages in the generated code are marked as non-serializable. This means they're not MemBuffers, but will create a plain old struct instead that doesn't have any interesting methods.
 
-#### When should you use each of them?
+### When should you use each of them?
 
 Most of the time, an object will travel within the system as a **MemBuffer**. This MemBuffer can be transmitted over the wire with its **Raw** bytes and can be reconstructed from raw bytes on the receiving end using a **Reader**. Whenever the MemBuffer is first created in the system, it is usually created though a **Builder**. 
 
