@@ -6,7 +6,7 @@ type {{.MessageName}}Builder struct {
 {{range .UnionByIndex}}{{range .}}	{{.FieldName}} {{if .IsMessage}}*{{.FieldGoType}}Builder{{else}}{{.FieldGoType}}{{end}}
 {{end}}{{end}}
 	// internal
-	membuffers.Builder // interface
+	// implements membuffers.Builder
 	_builder membuffers.InternalBuilder
 }
 {{range .MessageFields}}{{if and .IsArray .IsMessage}}

@@ -7,7 +7,7 @@ type {{.MessageName}} struct {
 {{range .MessageFields}}	// {{.FieldName}} {{if .IsArray}}[]{{end}}{{.FieldGoType}}
 {{end}}
 	// internal
-	membuffers.Message // interface
+	// implements membuffers.Message
 	_message membuffers.InternalMessage
 }
 
