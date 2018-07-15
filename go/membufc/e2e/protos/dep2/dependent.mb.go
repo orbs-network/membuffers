@@ -19,7 +19,7 @@ type Dependent struct {
 	// C SamePackageDependencyMessage
 
 	// internal
-	membuffers.Message // interface
+	// implements membuffers.Message
 	_message membuffers.InternalMessage
 }
 
@@ -94,7 +94,7 @@ type DependentBuilder struct {
 	C *SamePackageDependencyMessageBuilder
 
 	// internal
-	membuffers.Builder // interface
+	// implements membuffers.Builder
 	_builder membuffers.InternalBuilder
 }
 

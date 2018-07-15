@@ -29,7 +29,7 @@ type SomeMessage struct {
 	// Str string
 
 	// internal
-	membuffers.Message // interface
+	// implements membuffers.Message
 	_message membuffers.InternalMessage
 }
 
@@ -76,7 +76,7 @@ type SomeMessageBuilder struct {
 	Str string
 
 	// internal
-	membuffers.Builder // interface
+	// implements membuffers.Builder
 	_builder membuffers.InternalBuilder
 }
 

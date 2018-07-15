@@ -15,7 +15,7 @@ type SamePackageDependencyMessage struct {
 	// Field string
 
 	// internal
-	membuffers.Message // interface
+	// implements membuffers.Message
 	_message membuffers.InternalMessage
 }
 
@@ -62,7 +62,7 @@ type SamePackageDependencyMessageBuilder struct {
 	Field string
 
 	// internal
-	membuffers.Builder // interface
+	// implements membuffers.Builder
 	_builder membuffers.InternalBuilder
 }
 

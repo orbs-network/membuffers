@@ -24,7 +24,7 @@ type WriteKeyInput struct {
 	// Value uint32
 
 	// internal
-	membuffers.Message // interface
+	// implements membuffers.Message
 	_message membuffers.InternalMessage
 }
 
@@ -88,7 +88,7 @@ type WriteKeyInputBuilder struct {
 	Value uint32
 
 	// internal
-	membuffers.Builder // interface
+	// implements membuffers.Builder
 	_builder membuffers.InternalBuilder
 }
 
@@ -138,7 +138,7 @@ func (w *WriteKeyInputBuilder) Build() *WriteKeyInput {
 type WriteKeyOutput struct {
 
 	// internal
-	membuffers.Message // interface
+	// implements membuffers.Message
 	_message membuffers.InternalMessage
 }
 
@@ -168,7 +168,7 @@ func (x *WriteKeyOutput) Raw() []byte {
 type WriteKeyOutputBuilder struct {
 
 	// internal
-	membuffers.Builder // interface
+	// implements membuffers.Builder
 	_builder membuffers.InternalBuilder
 }
 
@@ -217,7 +217,7 @@ type ReadKeyInput struct {
 	// Key string
 
 	// internal
-	membuffers.Message // interface
+	// implements membuffers.Message
 	_message membuffers.InternalMessage
 }
 
@@ -264,7 +264,7 @@ type ReadKeyInputBuilder struct {
 	Key string
 
 	// internal
-	membuffers.Builder // interface
+	// implements membuffers.Builder
 	_builder membuffers.InternalBuilder
 }
 
@@ -314,7 +314,7 @@ type ReadKeyOutput struct {
 	// Value uint32
 
 	// internal
-	membuffers.Message // interface
+	// implements membuffers.Message
 	_message membuffers.InternalMessage
 }
 
@@ -361,7 +361,7 @@ type ReadKeyOutputBuilder struct {
 	Value uint32
 
 	// internal
-	membuffers.Builder // interface
+	// implements membuffers.Builder
 	_builder membuffers.InternalBuilder
 }
 

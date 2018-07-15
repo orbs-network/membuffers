@@ -15,7 +15,7 @@ type ExampleMessage struct {
 	// Str string
 
 	// internal
-	membuffers.Message // interface
+	// implements membuffers.Message
 	_message membuffers.InternalMessage
 }
 
@@ -62,7 +62,7 @@ type ExampleMessageBuilder struct {
 	Str string
 
 	// internal
-	membuffers.Builder // interface
+	// implements membuffers.Builder
 	_builder membuffers.InternalBuilder
 }
 
@@ -112,7 +112,7 @@ type ComplexUnion struct {
 	// Option ComplexUnionOption
 
 	// internal
-	membuffers.Message // interface
+	// implements membuffers.Message
 	_message membuffers.InternalMessage
 }
 
@@ -235,7 +235,7 @@ type ComplexUnionBuilder struct {
 	Enu ExampleEnum
 
 	// internal
-	membuffers.Builder // interface
+	// implements membuffers.Builder
 	_builder membuffers.InternalBuilder
 }
 

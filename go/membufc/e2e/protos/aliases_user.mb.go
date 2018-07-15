@@ -19,7 +19,7 @@ type FileRecord struct {
 	// BlockHeight crypto.BlockHeight
 
 	// internal
-	membuffers.Message // interface
+	// implements membuffers.Message
 	_message membuffers.InternalMessage
 }
 
@@ -130,7 +130,7 @@ type FileRecordBuilder struct {
 	BlockHeight crypto.BlockHeight
 
 	// internal
-	membuffers.Builder // interface
+	// implements membuffers.Builder
 	_builder membuffers.InternalBuilder
 }
 

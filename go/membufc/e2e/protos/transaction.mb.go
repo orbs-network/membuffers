@@ -17,7 +17,7 @@ type Transaction struct {
 	// Type NetworkType
 
 	// internal
-	membuffers.Message // interface
+	// implements membuffers.Message
 	_message membuffers.InternalMessage
 }
 
@@ -95,7 +95,7 @@ type TransactionBuilder struct {
 	Type NetworkType
 
 	// internal
-	membuffers.Builder // interface
+	// implements membuffers.Builder
 	_builder membuffers.InternalBuilder
 }
 
@@ -153,7 +153,7 @@ type TransactionData struct {
 	// TimeStamp uint64
 
 	// internal
-	membuffers.Message // interface
+	// implements membuffers.Message
 	_message membuffers.InternalMessage
 }
 
@@ -265,7 +265,7 @@ type TransactionDataBuilder struct {
 	TimeStamp uint64
 
 	// internal
-	membuffers.Builder // interface
+	// implements membuffers.Builder
 	_builder membuffers.InternalBuilder
 }
 
@@ -330,7 +330,7 @@ type TransactionSender struct {
 	// Friend []string
 
 	// internal
-	membuffers.Message // interface
+	// implements membuffers.Message
 	_message membuffers.InternalMessage
 }
 
@@ -407,7 +407,7 @@ type TransactionSenderBuilder struct {
 	Friend []string
 
 	// internal
-	membuffers.Builder // interface
+	// implements membuffers.Builder
 	_builder membuffers.InternalBuilder
 }
 

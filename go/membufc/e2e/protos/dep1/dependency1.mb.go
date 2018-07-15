@@ -15,7 +15,7 @@ type DependencyMessage struct {
 	// Field uint32
 
 	// internal
-	membuffers.Message // interface
+	// implements membuffers.Message
 	_message membuffers.InternalMessage
 }
 
@@ -62,7 +62,7 @@ type DependencyMessageBuilder struct {
 	Field uint32
 
 	// internal
-	membuffers.Builder // interface
+	// implements membuffers.Builder
 	_builder membuffers.InternalBuilder
 }
 

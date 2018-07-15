@@ -16,7 +16,7 @@ type Method struct {
 	// Arg []MethodCallArgument
 
 	// internal
-	membuffers.Message // interface
+	// implements membuffers.Message
 	_message membuffers.InternalMessage
 }
 
@@ -94,7 +94,7 @@ type MethodBuilder struct {
 	Arg []*MethodCallArgumentBuilder
 
 	// internal
-	membuffers.Builder // interface
+	// implements membuffers.Builder
 	_builder membuffers.InternalBuilder
 }
 
@@ -156,7 +156,7 @@ type MethodCallArgument struct {
 	// Type MethodCallArgumentType
 
 	// internal
-	membuffers.Message // interface
+	// implements membuffers.Message
 	_message membuffers.InternalMessage
 }
 
@@ -287,7 +287,7 @@ type MethodCallArgumentBuilder struct {
 	Data []byte
 
 	// internal
-	membuffers.Builder // interface
+	// implements membuffers.Builder
 	_builder membuffers.InternalBuilder
 }
 

@@ -25,7 +25,7 @@ type ExampleMethodInput struct {
 	// Arg string
 
 	// internal
-	membuffers.Message // interface
+	// implements membuffers.Message
 	_message membuffers.InternalMessage
 }
 
@@ -72,7 +72,7 @@ type ExampleMethodInputBuilder struct {
 	Arg string
 
 	// internal
-	membuffers.Builder // interface
+	// implements membuffers.Builder
 	_builder membuffers.InternalBuilder
 }
 
@@ -121,7 +121,7 @@ func (w *ExampleMethodInputBuilder) Build() *ExampleMethodInput {
 type ExampleMethodOutput struct {
 
 	// internal
-	membuffers.Message // interface
+	// implements membuffers.Message
 	_message membuffers.InternalMessage
 }
 
@@ -151,7 +151,7 @@ func (x *ExampleMethodOutput) Raw() []byte {
 type ExampleMethodOutputBuilder struct {
 
 	// internal
-	membuffers.Builder // interface
+	// implements membuffers.Builder
 	_builder membuffers.InternalBuilder
 }
 
