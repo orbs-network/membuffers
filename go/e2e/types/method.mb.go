@@ -2,6 +2,7 @@ package types
 
 import (
 	"github.com/orbs-network/membuffers/go"
+	"bytes"
 )
 
 /*
@@ -32,6 +33,10 @@ func (x *Method) IsValid() bool {
 
 func (x *Method) Raw() []byte {
 	return x.message.RawBuffer()
+}
+
+func (x *Method) Equal(y *Method) bool {
+	return bytes.Equal(x.message.Bytes, y.message.Bytes)
 }
 
 func (x *Method) Name() string {

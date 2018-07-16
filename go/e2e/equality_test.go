@@ -4,31 +4,39 @@ import (
 	"testing"
 	"github.com/orbs-network/membuffers/go/e2e/types"
 	"reflect"
+	"github.com/google/go-cmp/cmp"
 )
 
-func TestDeepEqualsForUnininitalizedObjects(t *testing.T) {
+func TestEqualityForUnininitalizedObjects(t *testing.T) {
 	m1 := (&types.MethodBuilder{Name: "myMethod"}).Build()
 	m2 := (&types.MethodBuilder{Name: "myMethod"}).Build()
 
 	if !reflect.DeepEqual(m1, m2) {
 		t.Fatalf("Expected DeepEqual to return true for (%v, %v)", m1, m2)
 	}
+
+	if !cmp.Equal(m1, m2) {
+		t.Fatalf("Expected cmp.Equal to return true for (%v, %v)", m1, m2)
+	}
 }
 
-func TestDeepEqualsForOneUninitializedObject(t *testing.T) {
-	t.Skip("This test doesn't pass because DeepEqual sucks")
-
+func TestEqualityForOneUninitializedObject(t *testing.T) {
 	m1 := (&types.MethodBuilder{Name: "myMethod"}).Build()
 	m2 := (&types.MethodBuilder{Name: "myMethod"}).Build()
 
 	m1.IsValid()
 
-	if !reflect.DeepEqual(m1, m2) {
-		t.Fatalf("Expected DeepEqual to return true for (%v, %v)", m1, m2)
+	//TODO reflect.DeepEqual does not pass in this case
+	//if !reflect.DeepEqual(m1, m2) {
+	//	t.Fatalf("Expected DeepEqual to return true for (%v, %v)", m1, m2)
+	//}
+
+	if !cmp.Equal(m1, m2) {
+		t.Fatalf("Expected cmp.Equal to return true for (%v, %v)", m1, m2)
 	}
 }
 
-func TestDeepEqualsForTwoInitializedObjects(t *testing.T) {
+func TestEqualityForTwoInitializedObjects(t *testing.T) {
 	m1 := (&types.MethodBuilder{Name: "myMethod"}).Build()
 	m2 := (&types.MethodBuilder{Name: "myMethod"}).Build()
 
@@ -38,9 +46,13 @@ func TestDeepEqualsForTwoInitializedObjects(t *testing.T) {
 	if !reflect.DeepEqual(m1, m2) {
 		t.Fatalf("Expected DeepEqual to return true for (%v, %v)", m1, m2)
 	}
+
+	if !cmp.Equal(m1, m2) {
+		t.Fatalf("Expected cmp.Equal to return true for (%v, %v)", m1, m2)
+	}
 }
 
-func TestDeepEqualsForUnequalObjects(t *testing.T) {
+func TestEqualityForUnequalObjects(t *testing.T) {
 	m1 := (&types.MethodBuilder{Name: "myMethod"}).Build()
 	m2 := (&types.MethodBuilder{Name: "myMethod2"}).Build()
 
@@ -49,5 +61,9 @@ func TestDeepEqualsForUnequalObjects(t *testing.T) {
 
 	if reflect.DeepEqual(m1, m2) {
 		t.Fatalf("Expected DeepEqual to return false for (%v, %v)", m1, m2)
+	}
+
+	if cmp.Equal(m1, m2) {
+		t.Fatalf("Expected cmp.Equal to return false for (%v, %v)", m1, m2)
 	}
 }
