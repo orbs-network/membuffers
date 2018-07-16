@@ -42,6 +42,37 @@ If you don't want to build from source, install the compiler with `brew install 
     > Verify with `membufc --version`
 
 &nbsp;
+## Releasing
+
+The compiler executable is released on Homebrew. To release a new version follow these steps:
+
+1. Push to git a new tag with the version number (eg. `1.0.1`)
+
+2. Edit the file `https://github.com/orbs-network/homebrew-membuffers/blob/master/membufc.rb`
+
+    1. Change the source URL (line 6) to the correct version number, eg:
+  
+        ```
+        https://github.com/orbs-network/membuffers/archive/1.0.1.tar.gz
+        ```
+  
+    2. Calc SHA256 over the source code gzip, eg:
+    
+        ```
+        curl https://github.com/orbs-network/membuffers/archive/1.0.1.tar.gz | openssl sha256
+        ```
+        
+    3. Change the SHA256 (line 7) to what you calculated
+    
+    4. Change the version in the test (line 32) to the correct one, eg:
+    
+        ```
+        assert_match "membufc 1.0.1", shell_output("#{bin}/membufc --version 2>&1", 2)
+        ```
+
+3. Make sure the edited file is pushed to git   
+
+&nbsp;
 ## Extensions to Protobuf schema with options
 
 The `membufc` compiler supports several useful extensions to the standard [Protobuf v3 schema](https://developers.google.com/protocol-buffers/docs/reference/proto3-spec) by utilizing `option` fields.
