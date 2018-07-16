@@ -12,3 +12,7 @@ func (x *{{.MessageName}}) Raw() []byte {
 	return x._message.RawBuffer()
 }
 
+func (x *{{.MessageName}}) Equal(y *{{.MessageName}}) bool {
+  return bytes.Equal(x.Raw(), y.Raw())
+}
+

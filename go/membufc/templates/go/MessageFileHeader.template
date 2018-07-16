@@ -4,6 +4,7 @@ package {{.PackageName}}
 import (
 {{if .HasMessages}}	"github.com/orbs-network/membuffers/go"
 	"fmt"
+	"bytes"
 {{end -}}
 {{range .Imports}}	"{{.}}"
 {{end -}}
