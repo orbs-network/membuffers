@@ -7,7 +7,7 @@ type InternalMessage struct {
 	Unions [][]FieldType
 
 	// lazily generated
-	Offsets map[int]Offset
+	offsets map[int]Offset
 }
 
 func (m *InternalMessage) Init(buf []byte, size Offset, scheme []FieldType, unions [][]FieldType) {
@@ -28,7 +28,7 @@ func alignDynamicFieldContentOffset(off Offset, fieldType FieldType) Offset {
 }
 
 func (m *InternalMessage) lazyCalcOffsets() bool {
-	if m.Offsets != nil {
+	if m.offsets != nil {
 		return true
 	}
 	res := make(map[int]Offset)
@@ -71,7 +71,7 @@ func (m *InternalMessage) lazyCalcOffsets() bool {
 	if off > m.Size {
 		return false
 	}
-	m.Offsets = res
+	m.offsets = res
 	return true
 }
 
@@ -84,11 +84,11 @@ func (m *InternalMessage) RawBuffer() []byte {
 }
 
 func (m *InternalMessage) RawBufferForField(fieldNum int, unionNum int) []byte {
-	if !m.lazyCalcOffsets() || fieldNum >= len(m.Offsets) || fieldNum >= len(m.Scheme) {
+	if !m.lazyCalcOffsets() || fieldNum >= len(m.offsets) || fieldNum >= len(m.Scheme) {
 		return []byte{}
 	}
 	fieldType := m.Scheme[fieldNum]
-	off := m.Offsets[fieldNum]
+	off := m.offsets[fieldNum]
 	if fieldType == TypeUnion {
 		unionType := GetUnionType(m.Bytes[off:])
 		off += FieldSizes[TypeUnion]
@@ -121,18 +121,18 @@ func (m *InternalMessage) SetUint8InOffset(off Offset, v uint8) {
 }
 
 func (m *InternalMessage) GetUint8(fieldNum int) uint8 {
-	if !m.lazyCalcOffsets() || fieldNum >= len(m.Offsets) {
+	if !m.lazyCalcOffsets() || fieldNum >= len(m.offsets) {
 		return 0
 	}
-	off := m.Offsets[fieldNum]
+	off := m.offsets[fieldNum]
 	return m.GetUint8InOffset(off)
 }
 
 func (m *InternalMessage) SetUint8(fieldNum int, v uint8) error {
-	if !m.lazyCalcOffsets() || fieldNum >= len(m.Offsets) {
+	if !m.lazyCalcOffsets() || fieldNum >= len(m.offsets) {
 		return &ErrInvalidField{}
 	}
-	off := m.Offsets[fieldNum]
+	off := m.offsets[fieldNum]
 	m.SetUint8InOffset(off, v)
 	return nil
 }
@@ -146,18 +146,18 @@ func (m *InternalMessage) SetUint16InOffset(off Offset, v uint16) {
 }
 
 func (m *InternalMessage) GetUint16(fieldNum int) uint16 {
-	if !m.lazyCalcOffsets() || fieldNum >= len(m.Offsets) {
+	if !m.lazyCalcOffsets() || fieldNum >= len(m.offsets) {
 		return 0
 	}
-	off := m.Offsets[fieldNum]
+	off := m.offsets[fieldNum]
 	return m.GetUint16InOffset(off)
 }
 
 func (m *InternalMessage) SetUint16(fieldNum int, v uint16) error {
-	if !m.lazyCalcOffsets() || fieldNum >= len(m.Offsets) {
+	if !m.lazyCalcOffsets() || fieldNum >= len(m.offsets) {
 		return &ErrInvalidField{}
 	}
-	off := m.Offsets[fieldNum]
+	off := m.offsets[fieldNum]
 	m.SetUint16InOffset(off, v)
 	return nil
 }
@@ -171,18 +171,18 @@ func (m *InternalMessage) SetUint32InOffset(off Offset, v uint32) {
 }
 
 func (m *InternalMessage) GetUint32(fieldNum int) uint32 {
-	if !m.lazyCalcOffsets() || fieldNum >= len(m.Offsets) {
+	if !m.lazyCalcOffsets() || fieldNum >= len(m.offsets) {
 		return 0
 	}
-	off := m.Offsets[fieldNum]
+	off := m.offsets[fieldNum]
 	return m.GetUint32InOffset(off)
 }
 
 func (m *InternalMessage) SetUint32(fieldNum int, v uint32) error {
-	if !m.lazyCalcOffsets() || fieldNum >= len(m.Offsets) {
+	if !m.lazyCalcOffsets() || fieldNum >= len(m.offsets) {
 		return &ErrInvalidField{}
 	}
-	off := m.Offsets[fieldNum]
+	off := m.offsets[fieldNum]
 	m.SetUint32InOffset(off, v)
 	return nil
 }
@@ -196,18 +196,18 @@ func (m *InternalMessage) SetUint64InOffset(off Offset, v uint64) {
 }
 
 func (m *InternalMessage) GetUint64(fieldNum int) uint64 {
-	if !m.lazyCalcOffsets() || fieldNum >= len(m.Offsets) {
+	if !m.lazyCalcOffsets() || fieldNum >= len(m.offsets) {
 		return 0
 	}
-	off := m.Offsets[fieldNum]
+	off := m.offsets[fieldNum]
 	return m.GetUint64InOffset(off)
 }
 
 func (m *InternalMessage) SetUint64(fieldNum int, v uint64) error {
-	if !m.lazyCalcOffsets() || fieldNum >= len(m.Offsets) {
+	if !m.lazyCalcOffsets() || fieldNum >= len(m.offsets) {
 		return &ErrInvalidField{}
 	}
-	off := m.Offsets[fieldNum]
+	off := m.offsets[fieldNum]
 	m.SetUint64InOffset(off, v)
 	return nil
 }
@@ -220,10 +220,10 @@ func (m *InternalMessage) GetMessageInOffset(off Offset) (buf []byte, size Offse
 }
 
 func (m *InternalMessage) GetMessage(fieldNum int) (buf []byte, size Offset) {
-	if !m.lazyCalcOffsets() || fieldNum >= len(m.Offsets) {
+	if !m.lazyCalcOffsets() || fieldNum >= len(m.offsets) {
 		return []byte{}, 0
 	}
-	off := m.Offsets[fieldNum]
+	off := m.offsets[fieldNum]
 	return m.GetMessageInOffset(off)
 }
 
@@ -249,18 +249,18 @@ func (m *InternalMessage) SetBytesInOffset(off Offset, v []byte) error {
 }
 
 func (m *InternalMessage) GetBytes(fieldNum int) []byte {
-	if !m.lazyCalcOffsets() || fieldNum >= len(m.Offsets) {
+	if !m.lazyCalcOffsets() || fieldNum >= len(m.offsets) {
 		return []byte{}
 	}
-	off := m.Offsets[fieldNum]
+	off := m.offsets[fieldNum]
 	return m.GetBytesInOffset(off)
 }
 
 func (m *InternalMessage) SetBytes(fieldNum int, v []byte) error {
-	if !m.lazyCalcOffsets() || fieldNum >= len(m.Offsets) {
+	if !m.lazyCalcOffsets() || fieldNum >= len(m.offsets) {
 		return &ErrInvalidField{}
 	}
-	off := m.Offsets[fieldNum]
+	off := m.offsets[fieldNum]
 	return m.SetBytesInOffset(off, v)
 }
 
@@ -283,10 +283,10 @@ func (m *InternalMessage) SetString(fieldNum int, v string) error {
 }
 
 func (m *InternalMessage) IsUnionIndex(fieldNum int, unionNum int, unionIndex uint16) (bool, Offset) {
-	if !m.lazyCalcOffsets() || fieldNum >= len(m.Offsets) {
+	if !m.lazyCalcOffsets() || fieldNum >= len(m.offsets) {
 		return false, 0
 	}
-	off := m.Offsets[fieldNum]
+	off := m.offsets[fieldNum]
 	unionType := GetUnionType(m.Bytes[off:])
 	off += FieldSizes[TypeUnion]
 	if unionNum >= len(m.Unions) || int(unionType) >= len(m.Unions[unionNum]) {
@@ -310,10 +310,10 @@ func (m *InternalMessage) GetUint8ArrayIteratorInOffset(off Offset) *Iterator {
 }
 
 func (m *InternalMessage) GetUint8ArrayIterator(fieldNum int) *Iterator {
-	if !m.lazyCalcOffsets() || fieldNum >= len(m.Offsets) {
+	if !m.lazyCalcOffsets() || fieldNum >= len(m.offsets) {
 		return &Iterator{0,0,TypeUint8,m}
 	}
-	off := m.Offsets[fieldNum]
+	off := m.offsets[fieldNum]
 	return m.GetUint8ArrayIteratorInOffset(off)
 }
 
@@ -330,10 +330,10 @@ func (m *InternalMessage) GetUint16ArrayIteratorInOffset(off Offset) *Iterator {
 }
 
 func (m *InternalMessage) GetUint16ArrayIterator(fieldNum int) *Iterator {
-	if !m.lazyCalcOffsets() || fieldNum >= len(m.Offsets) {
+	if !m.lazyCalcOffsets() || fieldNum >= len(m.offsets) {
 		return &Iterator{0,0,TypeUint16,m}
 	}
-	off := m.Offsets[fieldNum]
+	off := m.offsets[fieldNum]
 	return m.GetUint16ArrayIteratorInOffset(off)
 }
 
@@ -350,10 +350,10 @@ func (m *InternalMessage) GetUint32ArrayIteratorInOffset(off Offset) *Iterator {
 }
 
 func (m *InternalMessage) GetUint32ArrayIterator(fieldNum int) *Iterator {
-	if !m.lazyCalcOffsets() || fieldNum >= len(m.Offsets) {
+	if !m.lazyCalcOffsets() || fieldNum >= len(m.offsets) {
 		return &Iterator{0,0,TypeUint32,m}
 	}
-	off := m.Offsets[fieldNum]
+	off := m.offsets[fieldNum]
 	return m.GetUint32ArrayIteratorInOffset(off)
 }
 
@@ -370,10 +370,10 @@ func (m *InternalMessage) GetUint64ArrayIteratorInOffset(off Offset) *Iterator {
 }
 
 func (m *InternalMessage) GetUint64ArrayIterator(fieldNum int) *Iterator {
-	if !m.lazyCalcOffsets() || fieldNum >= len(m.Offsets) {
+	if !m.lazyCalcOffsets() || fieldNum >= len(m.offsets) {
 		return &Iterator{0,0,TypeUint64,m}
 	}
-	off := m.Offsets[fieldNum]
+	off := m.offsets[fieldNum]
 	return m.GetUint64ArrayIteratorInOffset(off)
 }
 
@@ -390,10 +390,10 @@ func (m *InternalMessage) GetMessageArrayIteratorInOffset(off Offset) *Iterator 
 }
 
 func (m *InternalMessage) GetMessageArrayIterator(fieldNum int) *Iterator {
-	if !m.lazyCalcOffsets() || fieldNum >= len(m.Offsets) {
+	if !m.lazyCalcOffsets() || fieldNum >= len(m.offsets) {
 		return &Iterator{0,0,TypeMessage,m}
 	}
-	off := m.Offsets[fieldNum]
+	off := m.offsets[fieldNum]
 	return m.GetMessageArrayIteratorInOffset(off)
 }
 
@@ -410,10 +410,10 @@ func (m *InternalMessage) GetBytesArrayIteratorInOffset(off Offset) *Iterator {
 }
 
 func (m *InternalMessage) GetBytesArrayIterator(fieldNum int) *Iterator {
-	if !m.lazyCalcOffsets() || fieldNum >= len(m.Offsets) {
+	if !m.lazyCalcOffsets() || fieldNum >= len(m.offsets) {
 		return &Iterator{0,0,TypeBytes,m}
 	}
-	off := m.Offsets[fieldNum]
+	off := m.offsets[fieldNum]
 	return m.GetMessageArrayIteratorInOffset(off)
 }
 
@@ -430,9 +430,9 @@ func (m *InternalMessage) GetStringArrayIteratorInOffset(off Offset) *Iterator {
 }
 
 func (m *InternalMessage) GetStringArrayIterator(fieldNum int) *Iterator {
-	if !m.lazyCalcOffsets() || fieldNum >= len(m.Offsets) {
+	if !m.lazyCalcOffsets() || fieldNum >= len(m.offsets) {
 		return &Iterator{0,0,TypeString,m}
 	}
-	off := m.Offsets[fieldNum]
+	off := m.offsets[fieldNum]
 	return m.GetMessageArrayIteratorInOffset(off)
 }
