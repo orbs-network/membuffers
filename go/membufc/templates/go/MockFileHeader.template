@@ -2,7 +2,7 @@
 package {{.PackageName}}
 
 import (
-	"github.com/maraino/go-mock"
+	"github.com/orbs-network/go-mock"
 {{range .Imports}}	"{{.}}"
 {{end -}}
 )
