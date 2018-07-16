@@ -11,7 +11,7 @@ message TransactionData {
     uint32 protocol_version = 1;
     uint64 virtual_chain = 2;
     repeated TransactionSender sender = 3;
-    int64 time_stamp = 4;
+    uint64 time_stamp = 4;
 }
 
 message TransactionSender {

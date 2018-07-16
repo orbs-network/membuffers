@@ -7,11 +7,11 @@ type MessageWriter interface {
 }
 
 type InternalBuilder struct {
-	Size Offset
+	size Offset
 }
 
 func (w *InternalBuilder) Reset() {
-	w.Size = 0
+	w.size = 0
 }
 
 // override me
@@ -31,53 +31,53 @@ func (w *InternalBuilder) CalcRequiredSize() Offset {
 }
 
 func (w *InternalBuilder) GetSize() Offset {
-	return w.Size
+	return w.size
 }
 
 func (w *InternalBuilder) WriteUint8(buf []byte, v uint8) {
-	w.Size = alignOffsetToType(w.Size, TypeUint8)
+	w.size = alignOffsetToType(w.size, TypeUint8)
 	if buf != nil {
-		WriteUint8(buf[w.Size:], v)
+		WriteUint8(buf[w.size:], v)
 	}
-	w.Size += FieldSizes[TypeUint8]
+	w.size += FieldSizes[TypeUint8]
 }
 
 func (w *InternalBuilder) WriteUint16(buf []byte, v uint16) {
-	w.Size = alignOffsetToType(w.Size, TypeUint16)
+	w.size = alignOffsetToType(w.size, TypeUint16)
 	if buf != nil {
-		WriteUint16(buf[w.Size:], v)
+		WriteUint16(buf[w.size:], v)
 	}
-	w.Size += FieldSizes[TypeUint16]
+	w.size += FieldSizes[TypeUint16]
 }
 
 func (w *InternalBuilder) WriteUint32(buf []byte, v uint32) {
-	w.Size = alignOffsetToType(w.Size, TypeUint32)
+	w.size = alignOffsetToType(w.size, TypeUint32)
 	if buf != nil {
-		WriteUint32(buf[w.Size:], v)
+		WriteUint32(buf[w.size:], v)
 	}
-	w.Size += FieldSizes[TypeUint32]
+	w.size += FieldSizes[TypeUint32]
 }
 
 func (w *InternalBuilder) WriteUint64(buf []byte, v uint64) {
-	w.Size = alignOffsetToType(w.Size, TypeUint64)
+	w.size = alignOffsetToType(w.size, TypeUint64)
 	if buf != nil {
-		WriteUint64(buf[w.Size:], v)
+		WriteUint64(buf[w.size:], v)
 	}
-	w.Size += FieldSizes[TypeUint64]
+	w.size += FieldSizes[TypeUint64]
 }
 
 func (w *InternalBuilder) WriteBytes(buf []byte, v []byte) {
-	w.Size = alignOffsetToType(w.Size, TypeBytes)
+	w.size = alignOffsetToType(w.size, TypeBytes)
 	if buf != nil {
-		WriteOffset(buf[w.Size:], Offset(len(v)))
+		WriteOffset(buf[w.size:], Offset(len(v)))
 	}
-	w.Size += FieldSizes[TypeBytes]
-	w.Size = alignDynamicFieldContentOffset(w.Size, TypeBytes)
+	w.size += FieldSizes[TypeBytes]
+	w.size = alignDynamicFieldContentOffset(w.size, TypeBytes)
 	if v != nil {
 		if buf != nil {
-			copy(buf[w.Size:], v)
+			copy(buf[w.size:], v)
 		}
-		w.Size += Offset(len(v))
+		w.size += Offset(len(v))
 	}
 }
 
@@ -86,103 +86,103 @@ func (w *InternalBuilder) WriteString(buf []byte, v string) {
 }
 
 func (w *InternalBuilder) WriteUnionIndex(buf []byte, unionIndex uint16) {
-	w.Size = alignOffsetToType(w.Size, TypeUnion)
+	w.size = alignOffsetToType(w.size, TypeUnion)
 	if buf != nil {
-		WriteUnionType(buf[w.Size:], unionIndex)
+		WriteUnionType(buf[w.size:], unionIndex)
 	}
-	w.Size += FieldSizes[TypeUnion]
+	w.size += FieldSizes[TypeUnion]
 }
 
 func (w *InternalBuilder) WriteUint8Array(buf []byte, v []uint8) {
-	w.Size = alignOffsetToType(w.Size, TypeUint8Array)
+	w.size = alignOffsetToType(w.size, TypeUint8Array)
 	if buf != nil {
-		WriteOffset(buf[w.Size:], Offset(len(v)) * FieldSizes[TypeUint8])
+		WriteOffset(buf[w.size:], Offset(len(v)) * FieldSizes[TypeUint8])
 	}
-	w.Size += FieldSizes[TypeUint8Array]
-	w.Size = alignDynamicFieldContentOffset(w.Size, TypeUint8Array)
+	w.size += FieldSizes[TypeUint8Array]
+	w.size = alignDynamicFieldContentOffset(w.size, TypeUint8Array)
 	for _, vv := range v {
 		w.WriteUint8(buf, vv)
 	}
 }
 
 func (w *InternalBuilder) WriteUint16Array(buf []byte, v []uint16) {
-	w.Size = alignOffsetToType(w.Size, TypeUint16Array)
+	w.size = alignOffsetToType(w.size, TypeUint16Array)
 	if buf != nil {
-		WriteOffset(buf[w.Size:], Offset(len(v)) * FieldSizes[TypeUint16])
+		WriteOffset(buf[w.size:], Offset(len(v)) * FieldSizes[TypeUint16])
 	}
-	w.Size += FieldSizes[TypeUint16Array]
-	w.Size = alignDynamicFieldContentOffset(w.Size, TypeUint16Array)
+	w.size += FieldSizes[TypeUint16Array]
+	w.size = alignDynamicFieldContentOffset(w.size, TypeUint16Array)
 	for _, vv := range v {
 		w.WriteUint16(buf, vv)
 	}
 }
 
 func (w *InternalBuilder) WriteUint32Array(buf []byte, v []uint32) {
-	w.Size = alignOffsetToType(w.Size, TypeUint32Array)
+	w.size = alignOffsetToType(w.size, TypeUint32Array)
 	if buf != nil {
-		WriteOffset(buf[w.Size:], Offset(len(v)) * FieldSizes[TypeUint32])
+		WriteOffset(buf[w.size:], Offset(len(v)) * FieldSizes[TypeUint32])
 	}
-	w.Size += FieldSizes[TypeUint32Array]
-	w.Size = alignDynamicFieldContentOffset(w.Size, TypeUint32Array)
+	w.size += FieldSizes[TypeUint32Array]
+	w.size = alignDynamicFieldContentOffset(w.size, TypeUint32Array)
 	for _, vv := range v {
 		w.WriteUint32(buf, vv)
 	}
 }
 
 func (w *InternalBuilder) WriteUint64Array(buf []byte, v []uint64) {
-	w.Size = alignOffsetToType(w.Size, TypeUint64Array)
+	w.size = alignOffsetToType(w.size, TypeUint64Array)
 	if buf != nil {
-		WriteOffset(buf[w.Size:], Offset(len(v)) * FieldSizes[TypeUint64])
+		WriteOffset(buf[w.size:], Offset(len(v)) * FieldSizes[TypeUint64])
 	}
-	w.Size += FieldSizes[TypeUint64Array]
-	w.Size = alignDynamicFieldContentOffset(w.Size, TypeUint64Array)
+	w.size += FieldSizes[TypeUint64Array]
+	w.size = alignDynamicFieldContentOffset(w.size, TypeUint64Array)
 	for _, vv := range v {
 		w.WriteUint64(buf, vv)
 	}
 }
 
 func (w *InternalBuilder) WriteBytesArray(buf []byte, v [][]byte) {
-	w.Size = alignOffsetToType(w.Size, TypeBytesArray)
-	sizePlaceholderOffset := w.Size
-	w.Size += FieldSizes[TypeBytesArray]
-	w.Size = alignDynamicFieldContentOffset(w.Size, TypeBytesArray)
-	contentSizeStartOffset := w.Size
+	w.size = alignOffsetToType(w.size, TypeBytesArray)
+	sizePlaceholderOffset := w.size
+	w.size += FieldSizes[TypeBytesArray]
+	w.size = alignDynamicFieldContentOffset(w.size, TypeBytesArray)
+	contentSizeStartOffset := w.size
 	for _, vv := range v {
 		w.WriteBytes(buf, vv)
 	}
-	contentSize := w.Size - contentSizeStartOffset
+	contentSize := w.size - contentSizeStartOffset
 	if buf != nil {
 		WriteOffset(buf[sizePlaceholderOffset:], contentSize)
 	}
 }
 
 func (w *InternalBuilder) WriteStringArray(buf []byte, v []string) {
-	w.Size = alignOffsetToType(w.Size, TypeStringArray)
-	sizePlaceholderOffset := w.Size
-	w.Size += FieldSizes[TypeStringArray]
-	w.Size = alignDynamicFieldContentOffset(w.Size, TypeStringArray)
-	contentSizeStartOffset := w.Size
+	w.size = alignOffsetToType(w.size, TypeStringArray)
+	sizePlaceholderOffset := w.size
+	w.size += FieldSizes[TypeStringArray]
+	w.size = alignDynamicFieldContentOffset(w.size, TypeStringArray)
+	contentSizeStartOffset := w.size
 	for _, vv := range v {
 		w.WriteString(buf, vv)
 	}
-	contentSize := w.Size - contentSizeStartOffset
+	contentSize := w.size - contentSizeStartOffset
 	if buf != nil {
 		WriteOffset(buf[sizePlaceholderOffset:], contentSize)
 	}
 }
 
 func (w *InternalBuilder) WriteMessage(buf []byte, v MessageWriter) (err error) {
-	w.Size = alignOffsetToType(w.Size, TypeMessage)
-	sizePlaceholderOffset := w.Size
-	w.Size += FieldSizes[TypeMessage]
-	w.Size = alignDynamicFieldContentOffset(w.Size, TypeMessage)
+	w.size = alignOffsetToType(w.size, TypeMessage)
+	sizePlaceholderOffset := w.size
+	w.size += FieldSizes[TypeMessage]
+	w.size = alignDynamicFieldContentOffset(w.size, TypeMessage)
 	if buf != nil {
-		err = v.Write(buf[w.Size:])
+		err = v.Write(buf[w.size:])
 	} else {
 		err = v.Write(nil)
 	}
 	contentSize := v.GetSize()
-	w.Size += contentSize
+	w.size += contentSize
 	if buf != nil {
 		WriteOffset(buf[sizePlaceholderOffset:], contentSize)
 	}
@@ -190,18 +190,18 @@ func (w *InternalBuilder) WriteMessage(buf []byte, v MessageWriter) (err error) 
 }
 
 func (w *InternalBuilder) WriteMessageArray(buf []byte, v []MessageWriter) (err error) {
-	w.Size = alignOffsetToType(w.Size, TypeMessageArray)
-	sizePlaceholderOffset := w.Size
-	w.Size += FieldSizes[TypeMessageArray]
-	w.Size = alignDynamicFieldContentOffset(w.Size, TypeMessageArray)
-	contentSizeStartOffset := w.Size
+	w.size = alignOffsetToType(w.size, TypeMessageArray)
+	sizePlaceholderOffset := w.size
+	w.size += FieldSizes[TypeMessageArray]
+	w.size = alignDynamicFieldContentOffset(w.size, TypeMessageArray)
+	contentSizeStartOffset := w.size
 	for _, vv := range v {
 		err = w.WriteMessage(buf, vv)
 		if err != nil {
 			return
 		}
 	}
-	contentSize := w.Size - contentSizeStartOffset
+	contentSize := w.size - contentSizeStartOffset
 	if buf != nil {
 		WriteOffset(buf[sizePlaceholderOffset:], contentSize)
 	}

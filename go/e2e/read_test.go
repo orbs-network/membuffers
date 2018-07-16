@@ -113,10 +113,10 @@ func TestReadUnion(t *testing.T) {
 			if arg.IsTypeData() {
 				t.Fatalf("first union is a data although it is not")
 			}
-			if arg.Type() != types.MethodCallArgumentTypeNum {
+			if arg.Type() != types.METHOD_CALL_ARGUMENT_TYPE_NUM {
 				t.Fatalf("first union is incorrect enum value")
 			}
-			num := arg.TypeNum()
+			num := arg.Num()
 			if num != 0x01020304 {
 				t.Fatalf("first union instead of expected got %v", num)
 			}
@@ -128,10 +128,10 @@ func TestReadUnion(t *testing.T) {
 			if arg.IsTypeData() {
 				t.Fatalf("second union is a data although it is not")
 			}
-			if arg.Type() != types.MethodCallArgumentTypeStr {
+			if arg.Type() != types.METHOD_CALL_ARGUMENT_TYPE_STR {
 				t.Fatalf("second union is incorrect enum value")
 			}
-			str := arg.TypeStr()
+			str := arg.Str()
 			if str != "arg" {
 				t.Fatalf("second union instead of expected got %v", str)
 			}

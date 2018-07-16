@@ -2,7 +2,7 @@
 package options
 
 import (
-	"github.com/maraino/go-mock"
+	"github.com/orbs-network/go-mock"
 	"github.com/orbs-network/membuffers/go/membufc/e2e/protos/options/handlers"
 )
 

@@ -2,7 +2,7 @@
 package handlers
 
 import (
-	"github.com/maraino/go-mock"
+	"github.com/orbs-network/go-mock"
 )
 
 /////////////////////////////////////////////////////////////////////////////

@@ -67,7 +67,7 @@ func (i *Iterator) NextMessage() (buf []byte, size Offset) {
 		i.cursor = i.endCursor
 		return []byte{}, 0
 	}
-	resBuf := i.m.Bytes[i.cursor:i.cursor+resSize]
+	resBuf := i.m.bytes[i.cursor:i.cursor+resSize]
 	i.cursor += resSize
 	i.cursor = alignDynamicFieldContentOffset(i.cursor, TypeMessageArray)
 	return resBuf, resSize
@@ -85,7 +85,7 @@ func (i *Iterator) NextBytes() []byte {
 		i.cursor = i.endCursor
 		return []byte{}
 	}
-	resBuf := i.m.Bytes[i.cursor:i.cursor+resSize]
+	resBuf := i.m.bytes[i.cursor:i.cursor+resSize]
 	i.cursor += resSize
 	i.cursor = alignDynamicFieldContentOffset(i.cursor, TypeBytesArray)
 	return resBuf
