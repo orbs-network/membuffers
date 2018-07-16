@@ -4,6 +4,7 @@ package dep2
 import (
 	"github.com/orbs-network/membuffers/go"
 	"fmt"
+	"bytes"
 )
 
 /////////////////////////////////////////////////////////////////////////////
@@ -38,6 +39,10 @@ func (x *SamePackageDependencyMessage) IsValid() bool {
 
 func (x *SamePackageDependencyMessage) Raw() []byte {
 	return x._message.RawBuffer()
+}
+
+func (x *SamePackageDependencyMessage) Equal(y *SamePackageDependencyMessage) bool {
+  return bytes.Equal(x.Raw(), y.Raw())
 }
 
 func (x *SamePackageDependencyMessage) Field() string {

@@ -4,6 +4,7 @@ package types
 import (
 	"github.com/orbs-network/membuffers/go"
 	"fmt"
+	"bytes"
 )
 
 /////////////////////////////////////////////////////////////////////////////
@@ -38,6 +39,10 @@ func (x *ExampleMessage) IsValid() bool {
 
 func (x *ExampleMessage) Raw() []byte {
 	return x._message.RawBuffer()
+}
+
+func (x *ExampleMessage) Equal(y *ExampleMessage) bool {
+  return bytes.Equal(x.Raw(), y.Raw())
 }
 
 func (x *ExampleMessage) Str() string {
@@ -135,6 +140,10 @@ func (x *ComplexUnion) IsValid() bool {
 
 func (x *ComplexUnion) Raw() []byte {
 	return x._message.RawBuffer()
+}
+
+func (x *ComplexUnion) Equal(y *ComplexUnion) bool {
+  return bytes.Equal(x.Raw(), y.Raw())
 }
 
 type ComplexUnionOption uint16

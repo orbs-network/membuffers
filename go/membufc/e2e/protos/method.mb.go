@@ -4,6 +4,7 @@ package types
 import (
 	"github.com/orbs-network/membuffers/go"
 	"fmt"
+	"bytes"
 )
 
 /////////////////////////////////////////////////////////////////////////////
@@ -39,6 +40,10 @@ func (x *Method) IsValid() bool {
 
 func (x *Method) Raw() []byte {
 	return x._message.RawBuffer()
+}
+
+func (x *Method) Equal(y *Method) bool {
+  return bytes.Equal(x.Raw(), y.Raw())
 }
 
 func (x *Method) Name() string {
@@ -179,6 +184,10 @@ func (x *MethodCallArgument) IsValid() bool {
 
 func (x *MethodCallArgument) Raw() []byte {
 	return x._message.RawBuffer()
+}
+
+func (x *MethodCallArgument) Equal(y *MethodCallArgument) bool {
+  return bytes.Equal(x.Raw(), y.Raw())
 }
 
 type MethodCallArgumentType uint16

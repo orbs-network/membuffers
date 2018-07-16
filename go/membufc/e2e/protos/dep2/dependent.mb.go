@@ -4,6 +4,7 @@ package dep2
 import (
 	"github.com/orbs-network/membuffers/go"
 	"fmt"
+	"bytes"
 	"github.com/orbs-network/membuffers/go/membufc/e2e/protos/dep1"
 	"github.com/orbs-network/membuffers/go/membufc/e2e/protos/dep1/dep11"
 )
@@ -42,6 +43,10 @@ func (x *Dependent) IsValid() bool {
 
 func (x *Dependent) Raw() []byte {
 	return x._message.RawBuffer()
+}
+
+func (x *Dependent) Equal(y *Dependent) bool {
+  return bytes.Equal(x.Raw(), y.Raw())
 }
 
 func (x *Dependent) A() *dep1.DependencyMessage {

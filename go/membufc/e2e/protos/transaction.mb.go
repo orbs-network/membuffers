@@ -4,6 +4,7 @@ package types
 import (
 	"github.com/orbs-network/membuffers/go"
 	"fmt"
+	"bytes"
 )
 
 /////////////////////////////////////////////////////////////////////////////
@@ -40,6 +41,10 @@ func (x *Transaction) IsValid() bool {
 
 func (x *Transaction) Raw() []byte {
 	return x._message.RawBuffer()
+}
+
+func (x *Transaction) Equal(y *Transaction) bool {
+  return bytes.Equal(x.Raw(), y.Raw())
 }
 
 func (x *Transaction) Data() *TransactionData {
@@ -176,6 +181,10 @@ func (x *TransactionData) IsValid() bool {
 
 func (x *TransactionData) Raw() []byte {
 	return x._message.RawBuffer()
+}
+
+func (x *TransactionData) Equal(y *TransactionData) bool {
+  return bytes.Equal(x.Raw(), y.Raw())
 }
 
 func (x *TransactionData) ProtocolVersion() uint32 {
@@ -353,6 +362,10 @@ func (x *TransactionSender) IsValid() bool {
 
 func (x *TransactionSender) Raw() []byte {
 	return x._message.RawBuffer()
+}
+
+func (x *TransactionSender) Equal(y *TransactionSender) bool {
+  return bytes.Equal(x.Raw(), y.Raw())
 }
 
 func (x *TransactionSender) Name() string {

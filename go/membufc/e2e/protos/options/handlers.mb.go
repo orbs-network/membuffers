@@ -4,6 +4,7 @@ package options
 import (
 	"github.com/orbs-network/membuffers/go"
 	"fmt"
+	"bytes"
 	"github.com/orbs-network/membuffers/go/membufc/e2e/protos/options/handlers"
 )
 
@@ -48,6 +49,10 @@ func (x *ExampleMethodInput) IsValid() bool {
 
 func (x *ExampleMethodInput) Raw() []byte {
 	return x._message.RawBuffer()
+}
+
+func (x *ExampleMethodInput) Equal(y *ExampleMethodInput) bool {
+  return bytes.Equal(x.Raw(), y.Raw())
 }
 
 func (x *ExampleMethodInput) Arg() string {
@@ -144,6 +149,10 @@ func (x *ExampleMethodOutput) IsValid() bool {
 
 func (x *ExampleMethodOutput) Raw() []byte {
 	return x._message.RawBuffer()
+}
+
+func (x *ExampleMethodOutput) Equal(y *ExampleMethodOutput) bool {
+  return bytes.Equal(x.Raw(), y.Raw())
 }
 
 // builder

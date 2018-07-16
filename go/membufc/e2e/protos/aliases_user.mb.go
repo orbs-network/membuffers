@@ -4,6 +4,7 @@ package types
 import (
 	"github.com/orbs-network/membuffers/go"
 	"fmt"
+	"bytes"
 	"github.com/orbs-network/membuffers/go/membufc/e2e/protos/crypto"
 )
 
@@ -42,6 +43,10 @@ func (x *FileRecord) IsValid() bool {
 
 func (x *FileRecord) Raw() []byte {
 	return x._message.RawBuffer()
+}
+
+func (x *FileRecord) Equal(y *FileRecord) bool {
+  return bytes.Equal(x.Raw(), y.Raw())
 }
 
 func (x *FileRecord) Data() []byte {

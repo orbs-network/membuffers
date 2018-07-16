@@ -4,6 +4,7 @@ package handlers
 import (
 	"github.com/orbs-network/membuffers/go"
 	"fmt"
+	"bytes"
 )
 
 /////////////////////////////////////////////////////////////////////////////
@@ -52,6 +53,10 @@ func (x *SomeMessage) IsValid() bool {
 
 func (x *SomeMessage) Raw() []byte {
 	return x._message.RawBuffer()
+}
+
+func (x *SomeMessage) Equal(y *SomeMessage) bool {
+  return bytes.Equal(x.Raw(), y.Raw())
 }
 
 func (x *SomeMessage) Str() string {

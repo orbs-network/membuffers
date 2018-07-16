@@ -4,6 +4,7 @@ package types
 import (
 	"github.com/orbs-network/membuffers/go"
 	"fmt"
+	"bytes"
 )
 
 /////////////////////////////////////////////////////////////////////////////
@@ -47,6 +48,10 @@ func (x *WriteKeyInput) IsValid() bool {
 
 func (x *WriteKeyInput) Raw() []byte {
 	return x._message.RawBuffer()
+}
+
+func (x *WriteKeyInput) Equal(y *WriteKeyInput) bool {
+  return bytes.Equal(x.Raw(), y.Raw())
 }
 
 func (x *WriteKeyInput) Key() string {
@@ -163,6 +168,10 @@ func (x *WriteKeyOutput) Raw() []byte {
 	return x._message.RawBuffer()
 }
 
+func (x *WriteKeyOutput) Equal(y *WriteKeyOutput) bool {
+  return bytes.Equal(x.Raw(), y.Raw())
+}
+
 // builder
 
 type WriteKeyOutputBuilder struct {
@@ -240,6 +249,10 @@ func (x *ReadKeyInput) IsValid() bool {
 
 func (x *ReadKeyInput) Raw() []byte {
 	return x._message.RawBuffer()
+}
+
+func (x *ReadKeyInput) Equal(y *ReadKeyInput) bool {
+  return bytes.Equal(x.Raw(), y.Raw())
 }
 
 func (x *ReadKeyInput) Key() string {
@@ -337,6 +350,10 @@ func (x *ReadKeyOutput) IsValid() bool {
 
 func (x *ReadKeyOutput) Raw() []byte {
 	return x._message.RawBuffer()
+}
+
+func (x *ReadKeyOutput) Equal(y *ReadKeyOutput) bool {
+  return bytes.Equal(x.Raw(), y.Raw())
 }
 
 func (x *ReadKeyOutput) Value() uint32 {
