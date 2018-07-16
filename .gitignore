@@ -1,6 +1,9 @@
 
 # Created by https://www.gitignore.io/api/go,intellij
 
+### Compiled MemBuffers
+*.mb.go
+
 ### Go ###
 # Binaries for programs and plugins
 *.exe
