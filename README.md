@@ -150,19 +150,12 @@ Detailed documentation about the API is available [here](API.md). It shows concr
     
 ## Test
 
-1. Test the library (unit tests and end to end tests):
+1. Test the library and the compiler (unit tests and end to end tests):
 
     ```sh
     ./test.sh
     ```
-    
-2. Test the `membufc` compiler (end to end test):
-
-    ```sh
-    cd ./membufc
-    ./test.sh
-    ```
-    
+        
 ## Comparison to other libraries
 
 #### [Google Protobuf](https://developers.google.com/protocol-buffers/)
