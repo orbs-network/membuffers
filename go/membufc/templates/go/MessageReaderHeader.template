@@ -13,6 +13,12 @@ func (x *{{.MessageName}}) Raw() []byte {
 }
 
 func (x *{{.MessageName}}) Equal(y *{{.MessageName}}) bool {
+  if x == nil && y == nil {
+    return true
+  }
+  if x == nil || y == nil {
+    return false
+  }
   return bytes.Equal(x.Raw(), y.Raw())
 }
 

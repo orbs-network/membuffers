@@ -67,3 +67,21 @@ func TestEqualityForUnequalObjects(t *testing.T) {
 		t.Fatalf("Expected cmp.Equal to return false for (%v, %v)", m1, m2)
 	}
 }
+
+func TestEqualityForOneUninitializedObjectAndOneNil(t *testing.T) {
+	m1 := (&types.MethodBuilder{Name: "myMethod"}).Build()
+	var m2 *types.Method
+
+	if cmp.Equal(m1, m2) {
+		t.Fatalf("Expected cmp.Equal to return false for (%v, %v)", m1, m2)
+	}
+}
+
+func TestEqualityForTwoNilObjects(t *testing.T) {
+	var m1 *types.Method
+	var m2 *types.Method
+
+	if !cmp.Equal(m1, m2) {
+		t.Fatalf("Expected cmp.Equal to return true for (%v, %v)", m1, m2)
+	}
+}
