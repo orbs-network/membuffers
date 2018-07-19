@@ -59,7 +59,7 @@ The compiler executable is released on Homebrew. To release a new version follow
     2. Calc SHA256 over the source code gzip, eg:
     
         ```
-        curl https://github.com/orbs-network/membuffers/archive/1.0.1.tar.gz | openssl sha256
+        wget -nv -O- https://github.com/orbs-network/membuffers/archive/1.0.1.tar.gz | openssl sha256
         ```
         
     3. Change the SHA256 (line 7) to what you calculated
