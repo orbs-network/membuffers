@@ -10,7 +10,7 @@ import (
 	"path"
 )
 
-const MEMBUFC_VERSION = "0.0.16"
+const MEMBUFC_VERSION = "0.0.17"
 
 type config struct {
 	language string
