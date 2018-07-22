@@ -76,6 +76,9 @@ func (m *InternalMessage) lazyCalcOffsets() bool {
 }
 
 func (m *InternalMessage) IsValid() bool {
+	if m.bytes == nil {
+		panic("uninitialized membuffer, did you create it directly without a Builder or a Reader?")
+	}
 	return m.lazyCalcOffsets()
 }
 

@@ -85,3 +85,14 @@ func TestPartialValid(t *testing.T) {
 		t.Fatalf("transaction data is valid although it should not be")
 	}
 }
+
+func TestBadInitValid(t *testing.T) {
+	defer func() {
+		if p := recover(); p == nil {
+			t.Fatalf("Bad init of a membuffer did not panic")
+		}
+	}()
+	transaction := &types.Transaction{}
+	transaction.IsValid()
+	t.Fatalf("Bad init of a membuffer did not panic")
+}
