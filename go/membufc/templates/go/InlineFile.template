@@ -1,5 +1,23 @@
 // AUTO GENERATED FILE (by membufc proto compiler v{{.CompilerVersion}})
 package {{.PackageName}}
 
+import (
+	"fmt"
+{{if .HasBytes}}	"bytes"
+{{end}})
+
 {{range .InlineType}}type {{.Name}} {{.FieldGoType}}
+
+func (x {{.Name}}) String() string {
+  return fmt.Sprintf({{if ne .FieldGoType "string"}}"%x", {{end}}{{.FieldGoType}}(x))
+}
+
+func (x {{.Name}}) Equal(y {{.Name}}) bool {
+  return {{if eq .Alias "bytes"}}bytes.Equal(x, y){{else}}x == y{{end}}
+}
+
+func (x {{.Name}}) KeyForMap() {{if eq .Alias "bytes"}}string{{else}}{{.FieldGoType}}{{end}} {
+  return {{if eq .Alias "bytes"}}string(x){{else}}{{.FieldGoType}}(x){{end}}
+}
+
 {{end}}

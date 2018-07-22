@@ -17,6 +17,7 @@ type InlineType struct {
 
 func compileInlineFile(w io.Writer, file pbparser.ProtoFile, dependencyData map[string]dependencyData, compilerVersion string) {
 	inlines := []InlineType{}
+	hasBytes := false
 	for _, m := range file.Messages {
 		if len(m.Options) == 1 && m.Options[0].Name == "inline_type" {
 			goTypes := map[string]string{
@@ -29,6 +30,9 @@ func compileInlineFile(w io.Writer, file pbparser.ProtoFile, dependencyData map[
 			}
 			fieldGoType, found := goTypes[m.Options[0].Value]
 			if found {
+				if fieldGoType == "[]byte" {
+					hasBytes = true
+				}
 				inlines = append(inlines, InlineType{
 					Name: convertFieldNameToGoCase(m.Name),
 					Alias: m.Options[0].Value,
@@ -42,10 +46,12 @@ func compileInlineFile(w io.Writer, file pbparser.ProtoFile, dependencyData map[
 		PackageName string
 		InlineType []InlineType
 		CompilerVersion string
+		HasBytes bool
 	}{
 		PackageName: file.PackageName,
 		InlineType: inlines,
 		CompilerVersion: compilerVersion,
+		HasBytes: hasBytes,
 	})
 }
 

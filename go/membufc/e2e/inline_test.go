@@ -36,4 +36,32 @@ func TestReadWriteWithInline(t *testing.T) {
 	if record.BlockHeight() != 0x22 {
 		t.Fatalf("FileRecord.BlockHeight is not as expected")
 	}
+	if record.Hash().String() != "040506" {
+		t.Fatalf("String: FileRecord.Hash is not as expected")
+	}
+	if record.BlockHeight().String() != "22" {
+		t.Fatalf("String: FileRecord.BlockHeight is not as expected")
+	}
+	if !record.Hash().Equal(crypto.Sha256{0x04,0x05,0x06}) {
+		t.Fatalf("Equal == : FileRecord.Hash is not as expected")
+	}
+	if record.Hash().Equal(crypto.Sha256{0x05,0x06,0x07}) {
+		t.Fatalf("Equal != : FileRecord.Hash is not as expected")
+	}
+	if !record.BlockHeight().Equal(0x22) {
+		t.Fatalf("Equal == : FileRecord.BlockHeight is not as expected")
+	}
+	if record.BlockHeight().Equal(0x23) {
+		t.Fatalf("Equal != : FileRecord.BlockHeight is not as expected")
+	}
+	m1 := make(map[string]bool)
+	m1[record.Hash().KeyForMap()] = true
+	if !m1[record.Hash().KeyForMap()] {
+		t.Fatalf("FileRecord.Hash cannot be used as a key in a map")
+	}
+	m2 := make(map[uint64]bool)
+	m2[record.BlockHeight().KeyForMap()] = true
+	if !m2[record.BlockHeight().KeyForMap()] {
+		t.Fatalf("FileRecord.BlockHeight cannot be used as a key in a map")
+	}
 }
