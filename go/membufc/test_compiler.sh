@@ -1,3 +1,5 @@
+go test .
+
 go run *.go -m `find . -name "*.proto"`
 go test ./e2e
 
