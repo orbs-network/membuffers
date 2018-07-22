@@ -48,6 +48,12 @@ The compiler executable is released on Homebrew. To release a new version follow
 
 1. Push to git a new tag with the version number (eg. `1.0.1`)
 
+    1. Usually the commit will have the version number changed under const `MEMBUFC_VERSION` in the compiler code in:
+    
+        ```
+        https://github.com/orbs-network/membuffers/blob/master/go/membufc/main.go
+        ```
+
 2. Edit the file `https://github.com/orbs-network/homebrew-membuffers/blob/master/membufc.rb`
 
     1. Change the source URL (line 6) to the correct version number, eg:
