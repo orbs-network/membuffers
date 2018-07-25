@@ -7,6 +7,9 @@ type {{.MessageName}} struct {
 }
 
 func (x *{{.MessageName}}) String() string {
+	if x == nil {
+		return "<nil>"
+	}
 	return fmt.Sprintf("{{`{`}}{{range .MessageFields}}{{.FieldName}}:%s,{{end}}{{`}`}}"{{range .MessageFields}}, x.String{{.FieldName}}(){{end}})
 }
 {{range .MessageFields}}

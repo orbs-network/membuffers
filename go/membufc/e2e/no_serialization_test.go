@@ -96,3 +96,11 @@ func TestNSContainers(t *testing.T) {
 		t.Fatalf("String: instead of expected got %s", container.String())
 	}
 }
+
+func TestEmptyNSContainer(t *testing.T) {
+	emptyContainer := &types.ExampleContainer{}
+
+	if emptyContainer.String() != `{Message1:<nil>,Container1:<nil>,Containers2:[],}` {
+		t.Fatalf("empty container String returned %s", emptyContainer.String())
+	}
+}

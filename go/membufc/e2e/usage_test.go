@@ -225,5 +225,18 @@ func TestQuickBuildTransaction(t *testing.T) {
 	if transaction.Type() != types.NETWORK_TYPE_RESERVED {
 		t.Fatalf("Type: instead of expected got %v", transaction.Type())
 	}
-	//t.Fatal(transaction.String())
+}
+
+func TestEmptyTransaction(t *testing.T) {
+	transaction := (&types.TransactionBuilder{}).Build()
+
+	if !transaction.IsValid() {
+		t.Fatal("empty transaction returned not IsValid")
+	}
+	if len(transaction.Raw()) == 0 {
+		t.Fatal("empty transaction returned empty buffer")
+	}
+	if transaction.String() != `{Data:{ProtocolVersion:0,VirtualChain:0,Sender:[],TimeStamp:0,},Signature:,Type:NETWORK_TYPE_MAIN_NET,}` {
+		t.Fatalf("empty transaction String returned %s", transaction.String())
+	}
 }
