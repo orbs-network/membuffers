@@ -21,7 +21,7 @@ func (x *{{.MessageName}}) Raw{{.MessageField.FieldName}}Array() []byte {
 func (x *{{.MessageName}}) String{{.MessageField.FieldName}}() (res string) {
 	res = "["
 	for i := x.{{.MessageField.FieldName}}Iterator(); i.HasNext(); {
-		res += {{if .MessageField.IsEnum}}i.Next{{.MessageField.FieldName}}().String(){{else}}fmt.Sprintf({{if ne .MessageField.FieldGoType "string"}}"%x", {{end}}i.Next{{.MessageField.FieldName}}()){{end}} + ","
+		res += {{if .MessageField.IsEnum}}i.Next{{.MessageField.FieldName}}().String(){{else}}fmt.Sprintf({{if ne .MessageField.FieldGoType "string"}}{{if .MessageField.IsInline}}"%s"{{else}}"%x"{{end}}, {{end}}i.Next{{.MessageField.FieldName}}()){{end}} + ","
 	}
 	res += "]"
 	return

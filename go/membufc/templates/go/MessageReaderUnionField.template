@@ -24,7 +24,7 @@ func (x *{{.MessageName}}) {{.FieldName}}() {{.FieldGoType}} {
 }
 
 func (x *{{.MessageName}}) String{{.FieldName}}() string {
-{{if .IsEnum}}	return x.{{.FieldName}}().String(){{else}}	return fmt.Sprintf({{if ne .FieldGoType "string"}}"%x", {{end}}x.{{.FieldName}}()){{end}}
+{{if .IsEnum}}	return x.{{.FieldName}}().String(){{else}}	return fmt.Sprintf({{if ne .FieldGoType "string"}}{{if .IsInline}}"%s"{{else}}"%x"{{end}}, {{end}}x.{{.FieldName}}()){{end}}
 }
 
 func (x *{{.MessageName}}) Mutate{{.FieldName}}(v {{.FieldGoType}}) error {

@@ -11,6 +11,6 @@ func (x *{{.MessageName}}) Mutate{{.MessageField.FieldName}}(v {{.MessageField.F
 }
 
 func (x *{{.MessageName}}) String{{.MessageField.FieldName}}() string {
-{{if .MessageField.IsEnum}}	return x.{{.MessageField.FieldName}}().String(){{else}}	return fmt.Sprintf({{if ne .MessageField.FieldGoType "string"}}"%x", {{end}}x.{{.MessageField.FieldName}}()){{end}}
+{{if .MessageField.IsEnum}}	return x.{{.MessageField.FieldName}}().String(){{else}}	return fmt.Sprintf({{if ne .MessageField.FieldGoType "string"}}{{if .MessageField.IsInline}}"%s"{{else}}"%x"{{end}}, {{end}}x.{{.MessageField.FieldName}}()){{end}}
 }
 
