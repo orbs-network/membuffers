@@ -92,4 +92,7 @@ func TestNSContainers(t *testing.T) {
 	if len(container.Containers2) != 3 {
 		t.Fatalf("Containers2: instead of expected len got %v", len(container.Containers2))
 	}
+	if container.String() != `{Message1:{Field:hello,},Container1:{Name:john,},Containers2:[{Name:lucy,},{Name:linda,},{Name:nancy,},],}` {
+		t.Fatalf("String: instead of expected got %s", container.String())
+	}
 }

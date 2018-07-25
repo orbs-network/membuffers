@@ -71,12 +71,14 @@ func addHeader(w io.Writer, file *pbparser.ProtoFile, dependencyData map[string]
 	t.Execute(w, struct {
 		PackageName string
 		Imports []string
+		HasMembuffers bool
 		HasMessages bool
 		CompilerVersion string
 	}{
 		PackageName: file.PackageName,
 		Imports: unique(imports),
-		HasMessages: len(file.Messages) > 0 && serializeServiceArgs,
+		HasMembuffers: len(file.Messages) > 0 && serializeServiceArgs,
+		HasMessages: len(file.Messages) > 0,
 		CompilerVersion: compilerVersion,
 	})
 }
