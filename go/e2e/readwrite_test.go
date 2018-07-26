@@ -223,3 +223,36 @@ func TestInsufficientBuffer(t *testing.T) {
 		t.Fatalf("did not receive error while writing in builder")
 	}
 }
+
+func TestEmptyMessageUnion(t *testing.T) {
+	// write
+	builder := &types.MessageUnionWrapperBuilder{}
+	buf := make([]byte, builder.CalcRequiredSize())
+	err := builder.Write(buf)
+	if err != nil {
+		t.Fatalf("error while writing in builder")
+	}
+
+	// read
+	wrapper := types.MessageUnionWrapperReader(buf)
+	if wrapper.Hmu().Address() != 0xffff {
+		t.Fatalf("union type is not invalid (-1)")
+	}
+	if wrapper.Hmu().Address() == types.HAS_MESSAGE_UNION_ADDRESS_TYPE_1 {
+		t.Fatalf("union type is not invalid (-1)")
+	}
+	if wrapper.Hmu().IsAddressType1() {
+		t.Fatalf("union type is not the default (zero)")
+	}
+	if wrapper.String() != `{Hmu:{Address:(Unknown),},}` {
+		t.Fatalf("String is not as expected: %s", wrapper.String())
+	}
+	defer func() {
+		r := recover()
+		if r.(string) != `Accessed union field of incorrect type, did you check which union type it is first?` {
+			t.Fatal("accessing a wrong field did not trigger the correct panic")
+		}
+	}()
+	wrapper.Hmu().Type1().UserName()
+	t.Fatal("accessing a wrong field according to type did not panic")
+}

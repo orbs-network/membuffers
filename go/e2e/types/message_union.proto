@@ -1,0 +1,22 @@
+syntax = "proto3";
+package types;
+
+message MessageUnionWrapper {
+    HasMessageUnion hmu = 1;
+}
+
+message HasMessageUnion {
+    oneof address {
+        AddressType1 type1 = 1;
+        AddressType2 type2 = 2;
+    }
+}
+
+message AddressType1 {
+    string user_name = 1;
+}
+
+message AddressType2 {
+    string first_name = 1;
+    string last_name = 2;
+}

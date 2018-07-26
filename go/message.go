@@ -285,6 +285,22 @@ func (m *InternalMessage) SetString(fieldNum int, v string) error {
 	return m.SetBytes(fieldNum, []byte(v))
 }
 
+func (m *InternalMessage) GetUnionIndex(fieldNum int, unionNum int) uint16 {
+	const invalidUnionIndex = 0xffff
+	if !m.lazyCalcOffsets() || fieldNum >= len(m.offsets) {
+		return invalidUnionIndex
+	}
+	off := m.offsets[fieldNum]
+	unionType := GetUnionType(m.bytes[off:])
+	off += FieldSizes[TypeUnion]
+	if unionNum >= len(m.unions) || int(unionType) >= len(m.unions[unionNum]) {
+		return invalidUnionIndex
+	}
+	fieldType := m.unions[unionNum][unionType]
+	off = alignOffsetToType(off, fieldType)
+	return unionType
+}
+
 func (m *InternalMessage) IsUnionIndex(fieldNum int, unionNum int, unionIndex uint16) (bool, Offset) {
 	if !m.lazyCalcOffsets() || fieldNum >= len(m.offsets) {
 		return false, 0

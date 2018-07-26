@@ -7,7 +7,7 @@ const (
 )
 
 func (x *{{.MessageName}}) {{.UnionName}}() {{.MessageName}}{{.UnionName}} {
-	return {{.MessageName}}{{.UnionName}}(x._message.GetUint16({{.FieldIndex}}))
+	return {{.MessageName}}{{.UnionName}}(x._message.GetUnionIndex({{.FieldIndex}}, {{$UnionNum}}))
 }
 
 {{- range .UnionFields}}
@@ -19,7 +19,10 @@ func (x *{{.MessageName}}) Is{{$UnionName}}{{.FieldName}}() bool {
 
 {{if not .IsMessage -}}
 func (x *{{.MessageName}}) {{.FieldName}}() {{.FieldGoType}} {
-	_, off := x._message.IsUnionIndex({{$ParentFieldIndex}}, {{$UnionNum}}, {{.FieldIndex}})
+	is, off := x._message.IsUnionIndex({{$ParentFieldIndex}}, {{$UnionNum}}, {{.FieldIndex}})
+	if !is {
+		panic("Accessed union field of incorrect type, did you check which union type it is first?")
+	}
 	return {{if or .IsEnum .IsInline}}{{.FieldGoType}}({{end}}x._message.Get{{.TypeAccessor}}InOffset(off){{if or .IsEnum .IsInline}}){{end}}
 }
 
@@ -37,7 +40,10 @@ func (x *{{.MessageName}}) Mutate{{.FieldName}}(v {{.FieldGoType}}) error {
 }
 {{- else -}}
 func (x *{{.MessageName}}) {{.FieldName}}() *{{.FieldGoType}} {
-	_, off := x._message.IsUnionIndex({{$ParentFieldIndex}}, {{$UnionNum}}, {{.FieldIndex}})
+	is, off := x._message.IsUnionIndex({{$ParentFieldIndex}}, {{$UnionNum}}, {{.FieldIndex}})
+	if !is {
+		panic("Accessed union field of incorrect type, did you check which union type it is first?")
+	}
 	b, s := x._message.GetMessageInOffset(off)
 	return {{.FieldGoType}}Reader(b[:s])
 }
