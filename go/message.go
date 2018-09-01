@@ -111,6 +111,32 @@ func (m *InternalMessage) RawBufferForField(fieldNum int, unionNum int) []byte {
 	}
 }
 
+func (m *InternalMessage) RawBufferWithHeaderForField(fieldNum int, unionNum int) []byte {
+	if !m.lazyCalcOffsets() || fieldNum >= len(m.offsets) || fieldNum >= len(m.scheme) {
+		return []byte{}
+	}
+	fieldType := m.scheme[fieldNum]
+	off := m.offsets[fieldNum]
+	fieldHeaderOff := off
+	if fieldType == TypeUnion {
+		unionType := GetUnionType(m.bytes[off:])
+		off += FieldSizes[TypeUnion]
+		if unionNum >= len(m.unions) || int(unionType) >= len(m.unions[unionNum]) {
+			return []byte{}
+		}
+		fieldType = m.unions[unionNum][unionType]
+		off = alignOffsetToType(off, fieldType)
+	}
+	if FieldDynamic[fieldType] {
+		contentSize := GetOffset(m.bytes[off:])
+		off += FieldSizes[fieldType]
+		off = alignDynamicFieldContentOffset(off, fieldType)
+		return m.bytes[fieldHeaderOff:off+contentSize]
+	} else {
+		return m.bytes[fieldHeaderOff:off+FieldSizes[fieldType]]
+	}
+}
+
 func (m *InternalMessage) GetOffsetInOffset(off Offset) Offset {
 	return GetOffset(m.bytes[off:])
 }

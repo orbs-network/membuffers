@@ -7,6 +7,10 @@ func (x *{{.MessageName}}) Raw{{.MessageField.FieldName}}() []byte {
 	return x._message.RawBufferForField({{.MessageField.FieldIndex}}, 0)
 }
 
+func (x *{{.MessageName}}) Raw{{.MessageField.FieldName}}WithHeader() []byte {
+	return x._message.RawBufferWithHeaderForField({{.MessageField.FieldIndex}}, 0)
+}
+
 func (x *{{.MessageName}}) String{{.MessageField.FieldName}}() string {
 	return x.{{.MessageField.FieldName}}().String()
 }

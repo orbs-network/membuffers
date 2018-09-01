@@ -57,6 +57,10 @@ func (x *{{.MessageName}}) Raw{{.UnionName}}() []byte {
 	return x._message.RawBufferForField({{.FieldIndex}}, {{.UnionNum}})
 }
 
+func (x *{{.MessageName}}) Raw{{.UnionName}}WithHeader() []byte {
+	return x._message.RawBufferWithHeaderForField({{.FieldIndex}}, {{.UnionNum}})
+}
+
 func (x *{{.MessageName}}) String{{.UnionName}}() string {
 	switch x.{{.UnionName}}() {
 	{{range .UnionFields -}}
