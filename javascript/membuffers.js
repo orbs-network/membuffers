@@ -52,6 +52,42 @@ const FieldAlignment = Object.freeze({
   [FieldTypes.TypeStringArray]: 4,
 });
 
+const FieldDynamic = Object.freeze({
+  [FieldTypes.TypeMessage]: true,
+  [FieldTypes.TypeBytes]: true,
+  [FieldTypes.TypeString]: true,
+  [FieldTypes.TypeUnion]: true,
+  [FieldTypes.TypeUint8]: false,
+  [FieldTypes.TypeUint16]: false,
+  [FieldTypes.TypeUint32]: false,
+  [FieldTypes.TypeUint64]: false,
+  [FieldTypes.TypeUint8Array]: true,
+  [FieldTypes.TypeUint16Array]: true,
+  [FieldTypes.TypeUint32Array]: true,
+  [FieldTypes.TypeUint64Array]: true,
+  [FieldTypes.TypeMessageArray]: true,
+  [FieldTypes.TypeBytesArray]: true,
+  [FieldTypes.TypeStringArray]: true,
+});
+
+const FieldDynamicContentAlignment = Object.freeze({
+  [FieldTypes.TypeMessage]: 4,
+  [FieldTypes.TypeBytes]: 1,
+  [FieldTypes.TypeString]: 1,
+  [FieldTypes.TypeUnion]: 0,
+  [FieldTypes.TypeUint8]: 0,
+  [FieldTypes.TypeUint16]: 0,
+  [FieldTypes.TypeUint32]: 0,
+  [FieldTypes.TypeUint64]: 0,
+  [FieldTypes.TypeUint8Array]: 1,
+  [FieldTypes.TypeUint16Array]: 2,
+  [FieldTypes.TypeUint32Array]: 4,
+  [FieldTypes.TypeUint64Array]: 4,
+  [FieldTypes.TypeMessageArray]: 4,
+  [FieldTypes.TypeBytesArray]: 4,
+  [FieldTypes.TypeStringArray]: 4,
+});
+
 export class InternalMessage {
 
   constructor(buf, size, scheme, unions) {
@@ -68,6 +104,11 @@ export class InternalMessage {
     return Math.floor((off + fieldSize - 1) / fieldSize) * fieldSize;
   }
 
+  alignDynamicFieldContentOffset(off, fieldType) {
+    const contentAlignment = FieldDynamicContentAlignment[fieldType];
+    return Math.floor((off + contentAlignment - 1) / contentAlignment) * contentAlignment;
+  }
+
   lazyCalcOffsets() {
     if (this.offsets !== null) {
       return true;
@@ -76,7 +117,9 @@ export class InternalMessage {
     let off = 0;
     let unionNum = 0;
     for (let fieldNum = 0; fieldNum < this.scheme.length; fieldNum++) {
-      const fieldType = this.scheme[fieldNum];
+      let fieldType = this.scheme[fieldNum];
+
+      // write the current offset
       off = this.alignOffsetToType(off, fieldType);
       if (off >= this.size) {
         return false;
@@ -84,7 +127,30 @@ export class InternalMessage {
       res[fieldNum] = off;
 
       // skip over the content to the next field
-      off += FieldSizes[fieldType];
+      if (fieldType == FieldTypes.TypeUnion) {
+        if (off + FieldSizes[TypeUnion] > this.size) {
+          return false;
+        }
+        const unionType = this.view.getUint16(off, true);
+        off += FieldSizes[TypeUnion];
+        if (unionNum >= this.unions.length || unionType >= this.unions[unionNum].length) {
+          return false;
+        }
+        fieldType = this.unions[unionNum][unionType];
+        unionNum += 1;
+        off = this.alignOffsetToType(off, fieldType);
+      }
+      if (FieldDynamic[fieldType]) {
+        if (off + FieldSizes[fieldType] > this.size) {
+          return false;
+        }
+        const contentSize = this.view.getUint32(off, true);
+        off += FieldSizes[fieldType];
+        off = this.alignDynamicFieldContentOffset(off, fieldType);
+        off += contentSize;
+      } else {
+        off += FieldSizes[fieldType];
+      }
     }
     if (off > this.size) {
       return false;
