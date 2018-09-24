@@ -1,0 +1,30 @@
+{
+  "name": "membuffers",
+  "version": "0.0.1",
+  "description": "High performance memory efficient serialization library with direct wire access",
+  "main": "membuffers.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/orbs-network/membuffers.git"
+  },
+  "keywords": [
+    "membuffers",
+    "serialization"
+  ],
+  "author": "Tal Kol (talkol@gmail.com)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/orbs-network/membuffers/issues"
+  },
+  "homepage": "https://github.com/orbs-network/membuffers#readme",
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-jest": "^23.6.0",
+    "babel-preset-env": "^1.7.0",
+    "jest": "^23.6.0",
+    "regenerator-runtime": "^0.12.1"
+  }
+}
