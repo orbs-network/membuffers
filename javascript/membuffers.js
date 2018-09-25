@@ -91,11 +91,11 @@ const FieldDynamicContentAlignment = Object.freeze({
 export class InternalMessage {
 
   constructor(buf, size, scheme, unions) {
-    this.bytes = buf;
+    this.bytes = buf; // buf should be Uint8Array (a view over an ArrayBuffer)
     this.size = size;
     this.scheme = scheme;
     this.unions = unions;
-    this.view = new DataView(buf);
+    this.dataView = new DataView(buf.buffer);
     this.offsets = null; // map: fieldNum -> offset in bytes
   }
 
@@ -131,7 +131,7 @@ export class InternalMessage {
         if (off + FieldSizes[TypeUnion] > this.size) {
           return false;
         }
-        const unionType = this.view.getUint16(off, true);
+        const unionType = this.dataView.getUint16(off, true);
         off += FieldSizes[TypeUnion];
         if (unionNum >= this.unions.length || unionType >= this.unions[unionNum].length) {
           return false;
@@ -144,7 +144,7 @@ export class InternalMessage {
         if (off + FieldSizes[fieldType] > this.size) {
           return false;
         }
-        const contentSize = this.view.getUint32(off, true);
+        const contentSize = this.dataView.getUint32(off, true);
         off += FieldSizes[fieldType];
         off = this.alignDynamicFieldContentOffset(off, fieldType);
         off += contentSize;
@@ -159,8 +159,19 @@ export class InternalMessage {
     return true;
   }
 
+  isValid() {
+    if (this.bytes === undefined) {
+      throw `uninitialized membuffer, did you create it directly without a Builder or a Reader?`;
+    }
+    return this.lazyCalcOffsets();
+  }
+
+  rawBuffer() {
+    return this.bytes.subarray(0, this.size)
+  }
+
   getUint32InOffset(off) {
-    return this.view.getUint32(off, true);
+    return this.dataView.getUint32(off, true);
   }
 
   getUint32(fieldNum) {
