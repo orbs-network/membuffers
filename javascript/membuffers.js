@@ -221,6 +221,30 @@ export class InternalMessage {
     }
   }
 
+  getUint8InOffset(off) {
+    return this.dataView.getUint8(off, true);
+  }
+
+  getUint8(fieldNum) {
+    if (!this.lazyCalcOffsets() || fieldNum >= Object.keys(this.offsets).length) {
+      return 0;
+    }
+    const off = this.offsets[fieldNum];
+    return this.getUint8InOffset(off);
+  }
+
+  getUint16InOffset(off) {
+    return this.dataView.getUint16(off, true);
+  }
+
+  getUint16(fieldNum) {
+    if (!this.lazyCalcOffsets() || fieldNum >= Object.keys(this.offsets).length) {
+      return 0;
+    }
+    const off = this.offsets[fieldNum];
+    return this.getUint16InOffset(off);
+  }
+
   getUint32InOffset(off) {
     return this.dataView.getUint32(off, true);
   }
