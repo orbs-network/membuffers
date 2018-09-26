@@ -167,7 +167,7 @@ export class InternalMessage {
   }
 
   rawBuffer() {
-    return this.bytes.subarray(0, this.size)
+    return this.bytes.subarray(0, this.size);
   }
 
   rawBufferForField(fieldNum, unionNum) {
@@ -192,6 +192,32 @@ export class InternalMessage {
       return this.bytes.subarray(off, off+contentSize);
     } else {
       return this.bytes.subarray(off, off+FieldSizes[fieldType]);
+    }
+  }
+
+  rawBufferWithHeaderForField(fieldNum, unionNum) {
+    if (!this.lazyCalcOffsets() || fieldNum >= Object.keys(this.offsets).length || fieldNum >= this.scheme.length) {
+      return new Uint8Array();
+    }
+    let fieldType = this.scheme[fieldNum];
+    let off = this.offsets[fieldNum];
+    const fieldHeaderOff = off;
+    if (fieldType == FieldTypes.TypeUnion) {
+      const unionType = this.dataView.getUint16(off, true);
+      off += FieldSizes[FieldTypes.TypeUnion];
+      if (unionNum >= this.unions.length || unionType >= this.unions[unionNum].length) {
+        return new Uint8Array();
+      }
+      fieldType = this.unions[unionNum][unionType];
+      off = this.alignOffsetToType(off, fieldType);
+    }
+    if (FieldDynamic[fieldType]) {
+      const contentSize = this.dataView.getUint32(off, true);
+      off += FieldSizes[fieldType];
+      off = this.alignDynamicFieldContentOffset(off, fieldType);
+      return this.bytes.subarray(fieldHeaderOff, off+contentSize);
+    } else {
+      return this.bytes.subarray(fieldHeaderOff, off+FieldSizes[fieldType]);
     }
   }
 
