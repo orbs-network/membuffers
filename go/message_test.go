@@ -106,7 +106,7 @@ var rawBufferForField = []struct{
 		[][]FieldType{{TypeUint32,TypeUint8,TypeMessage,TypeString}},
 		0,
 		0,
-		[]byte{0x033},
+		[]byte{0x33},
 	},
 	{
 		[]byte{0x00,0x00,0x00,0x00, 0x33,0x44,0x55,0x66},
