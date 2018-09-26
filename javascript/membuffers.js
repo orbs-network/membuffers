@@ -269,6 +269,21 @@ export class InternalMessage {
     return this.getUint64InOffset(off);
   }
 
+  getMessageInOffset(off) {
+    const contentSize = this.dataView.getUint32(off, true);
+    off += FieldSizes[FieldTypes.TypeMessage];
+    off = this.alignDynamicFieldContentOffset(off, FieldTypes.TypeMessage);
+    return this.bytes.subarray(off, off+contentSize);
+  }
+
+  getMessage(fieldNum) {
+    if (!this.lazyCalcOffsets() || fieldNum >= Object.keys(this.offsets).length) {
+      return new Uint8Array();
+    }
+    const off = this.offsets[fieldNum];
+    return this.getMessageInOffset(off);
+  }
+
   getBytesInOffset(off) {
     const contentSize = this.dataView.getUint32(off, true);
     off += FieldSizes[FieldTypes.TypeBytes];

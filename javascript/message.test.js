@@ -495,6 +495,67 @@ test('TestMessageReadString', () => {
   }
 });
 
+test('TestMessageReadMessage', () => {
+  const tests = [
+    {
+      buf: new Uint8Array([0x00,0x00,0x00,0x00]),
+      scheme: [FieldTypes.TypeMessage],
+      unions: [],
+      fieldNum: 0,
+      expectedBuf: new Uint8Array(),
+      expectedSize: 0,
+    },
+    {
+      buf: new Uint8Array([0x03,0x00,0x00,0x00, 0x01,0x02,0x03]),
+      scheme: [FieldTypes.TypeMessage],
+      unions: [],
+      fieldNum: 0,
+      expectedBuf: new Uint8Array([0x01,0x02,0x03]),
+      expectedSize: 3,
+    },
+    {
+      buf: new Uint8Array([0x03,0x00,0x00,0x00, 0x01,0x02,0x03, 0x00, 0x02,0x00,0x00,0x00, 0x04,0x05]),
+      scheme: [FieldTypes.TypeMessage,FieldTypes.TypeMessage],
+      unions: [],
+      fieldNum: 1,
+      expectedBuf: new Uint8Array([0x04,0x05]),
+      expectedSize: 2,
+    },
+    {
+      buf: new Uint8Array([0x44,0x33,0x22,0x11]),
+      scheme: [FieldTypes.TypeMessage],
+      unions: [],
+      fieldNum: 0,
+      expectedBuf: new Uint8Array(),
+      expectedSize: 0,
+    },
+    {
+      buf: new Uint8Array([0x44,0x33,0x22]),
+      scheme: [FieldTypes.TypeMessage],
+      unions: [],
+      fieldNum: 0,
+      expectedBuf: new Uint8Array(),
+      expectedSize: 0,
+    },
+    {
+      buf: new Uint8Array([0x03,0x00,0x00,0x00, 0x01,0x02]),
+      scheme: [FieldTypes.TypeMessage],
+      unions: [],
+      fieldNum: 0,
+      expectedBuf: new Uint8Array(),
+      expectedSize: 0,
+    },
+  ];
+
+  for (const tt of tests) {
+    const m = new InternalMessage(tt.buf, tt.buf.byteLength, tt.scheme, tt.unions);
+    const s = m.getMessage(tt.fieldNum);
+    // console.log(tt); // uncomment on failure to find out where
+    expect(s).toBeEqualToUint8Array(tt.expectedBuf);
+    expect(s.byteLength).toBe(tt.expectedSize);
+  }
+});
+
 function ch(char) {
   return char.charCodeAt(0);
 }
