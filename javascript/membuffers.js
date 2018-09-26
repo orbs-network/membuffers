@@ -257,6 +257,18 @@ export class InternalMessage {
     return this.getUint32InOffset(off);
   }
 
+  getUint64InOffset(off) {
+    return this.dataView.getBigUint64(off, true);
+  }
+
+  getUint64(fieldNum) {
+    if (!this.lazyCalcOffsets() || fieldNum >= Object.keys(this.offsets).length) {
+      return BigInt(0);
+    }
+    const off = this.offsets[fieldNum];
+    return this.getUint64InOffset(off);
+  }
+
 }
 
 export class InternalBuilder {

@@ -340,6 +340,32 @@ test('TestMessageReadUint16', () => {
   }
 });
 
+test('TestMessageReadUint64', () => {
+  const tests = [
+    {
+      buf: new Uint8Array([0x44,0x33,0x22,0x11, 0x88,0x77,0x66,0x55,0x44,0x33,0x22,0x11]),
+      scheme: [FieldTypes.TypeUint32,FieldTypes.TypeUint64],
+      unions: [],
+      fieldNum: 1,
+      expected: BigInt('0x1122334455667788'),
+    },
+    {
+      buf: new Uint8Array([0x44,0x00,0x00,0x00, 0x88,0x77,0x66,0x55,0x44,0x33,0x22,0x11]),
+      scheme: [FieldTypes.TypeUint8,FieldTypes.TypeUint64],
+      unions: [],
+      fieldNum: 1,
+      expected: BigInt('0x1122334455667788'),
+    },
+  ];
+
+  for (const tt of tests) {
+    const m = new InternalMessage(tt.buf, tt.buf.byteLength, tt.scheme, tt.unions);
+    const s = m.getUint64(tt.fieldNum);
+    // console.log(tt); // uncomment on failure to find out where
+    expect(s).toBe(tt.expected);
+  }
+});
+
 function ch(char) {
   return char.charCodeAt(0);
 }
