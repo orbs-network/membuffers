@@ -366,6 +366,135 @@ test('TestMessageReadUint64', () => {
   }
 });
 
+test('TestMessageReadBytes', () => {
+  const tests = [
+    {
+      buf: new Uint8Array([0x00,0x00,0x00,0x00]),
+      scheme: [FieldTypes.TypeBytes],
+      unions: [],
+      fieldNum: 0,
+      expected: new Uint8Array(),
+    },
+    {
+      buf: new Uint8Array([0x03,0x00,0x00,0x00, 0x22,0x23,0x24]),
+      scheme: [FieldTypes.TypeBytes],
+      unions: [],
+      fieldNum: 0,
+      expected: new Uint8Array([0x22,0x23,0x24]),
+    },
+    {
+      buf: new Uint8Array([0x03,0x00,0x00,0x00, 0x22,0x23,0x24, 0x00, 0x02,0x00,0x00,0x00, 0x77,0x88]),
+      scheme: [FieldTypes.TypeBytes,FieldTypes.TypeBytes],
+      unions: [],
+      fieldNum: 1,
+      expected: new Uint8Array([0x77,0x88]),
+    },
+    {
+      buf: new Uint8Array([0x01, 0x00,0x00,0x00, 0x03,0x00,0x00,0x00, 0x11,0x22,0x33, 0x00, 0x88,0x77,0x66,0x55]),
+      scheme: [FieldTypes.TypeUint8,FieldTypes.TypeBytes,FieldTypes.TypeUint32],
+      unions: [],
+      fieldNum: 1,
+      expected: new Uint8Array([0x11,0x22,0x33]),
+    },
+    {
+      buf: new Uint8Array([0x01,0x01,0x01, 0x00, 0x03,0x00,0x00,0x00, 0x11,0x22,0x33, 0x00, 0x88,0x77,0x66,0x55]),
+      scheme: [FieldTypes.TypeUint8,FieldTypes.TypeUint8,FieldTypes.TypeUint8,FieldTypes.TypeBytes,FieldTypes.TypeUint32],
+      unions: [],
+      fieldNum: 3,
+      expected: new Uint8Array([0x11,0x22,0x33]),
+    },
+    {
+      buf: new Uint8Array([0x05,0x00,0x00,0x00, 0x01,0x02,0x03,0x04,0x05, 0x00,0x00,0x00, 0x03,0x00,0x00,0x00, 0x11,0x22,0x33, 0x00, 0x88,0x77,0x66,0x55]),
+      scheme: [FieldTypes.TypeMessage,FieldTypes.TypeBytes,FieldTypes.TypeUint32],
+      unions: [],
+      fieldNum: 1,
+      expected: new Uint8Array([0x11,0x22,0x33]),
+    },
+    {
+      buf: new Uint8Array([0x44,0x33,0x22,0x11]),
+      scheme: [FieldTypes.TypeBytes],
+      unions: [],
+      fieldNum: 0,
+      expected: new Uint8Array(),
+    },
+    {
+      buf: new Uint8Array([0x44,0x33,0x22]),
+      scheme: [FieldTypes.TypeBytes],
+      unions: [],
+      fieldNum: 0,
+      expected: new Uint8Array(),
+    },
+    {
+      buf: new Uint8Array([0x03,0x00,0x00,0x00, 0x11,0x22]),
+      scheme: [FieldTypes.TypeBytes],
+      unions: [],
+      fieldNum: 0,
+      expected: new Uint8Array(),
+    },
+  ];
+
+  for (const tt of tests) {
+    const m = new InternalMessage(tt.buf, tt.buf.byteLength, tt.scheme, tt.unions);
+    const s = m.getBytes(tt.fieldNum);
+    // console.log(tt); // uncomment on failure to find out where
+    expect(s).toBeEqualToUint8Array(tt.expected);
+  }
+});
+
+test('TestMessageReadString', () => {
+  const tests = [
+    {
+      buf: new Uint8Array([0x00,0x00,0x00,0x00]),
+      scheme: [FieldTypes.TypeString],
+      unions: [],
+      fieldNum: 0,
+      expected: "",
+    },
+    {
+      buf: new Uint8Array([0x03,0x00,0x00,0x00, ch('a'),ch('b'),ch('c')]),
+      scheme: [FieldTypes.TypeString],
+      unions: [],
+      fieldNum: 0,
+      expected: "abc",
+    },
+    {
+      buf: new Uint8Array([0x03,0x00,0x00,0x00, ch('a'),ch('b'),ch('c'), 0x00, 0x02,0x00,0x00,0x00, ch('d'),ch('e')]),
+      scheme: [FieldTypes.TypeString,FieldTypes.TypeString],
+      unions: [],
+      fieldNum: 1,
+      expected: "de",
+    },
+    {
+      buf: new Uint8Array([0x44,0x33,0x22,0x11]),
+      scheme: [FieldTypes.TypeString],
+      unions: [],
+      fieldNum: 0,
+      expected: "",
+    },
+    {
+      buf: new Uint8Array([0x44,0x33,0x22]),
+      scheme: [FieldTypes.TypeString],
+      unions: [],
+      fieldNum: 0,
+      expected: "",
+    },
+    {
+      buf: new Uint8Array([0x03,0x00,0x00,0x00, ch('a'),ch('b')]),
+      scheme: [FieldTypes.TypeString],
+      unions: [],
+      fieldNum: 0,
+      expected: "",
+    },
+  ];
+
+  for (const tt of tests) {
+    const m = new InternalMessage(tt.buf, tt.buf.byteLength, tt.scheme, tt.unions);
+    const s = m.getString(tt.fieldNum);
+    // console.log(tt); // uncomment on failure to find out where
+    expect(s).toBe(tt.expected);
+  }
+});
+
 function ch(char) {
   return char.charCodeAt(0);
 }

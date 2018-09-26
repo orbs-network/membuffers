@@ -269,8 +269,60 @@ export class InternalMessage {
     return this.getUint64InOffset(off);
   }
 
+  getBytesInOffset(off) {
+    const contentSize = this.dataView.getUint32(off, true);
+    off += FieldSizes[FieldTypes.TypeBytes];
+    off = this.alignDynamicFieldContentOffset(off, FieldTypes.TypeBytes);
+    if (off+contentSize > this.bytes.byteLength) {
+      return new Uint8Array();
+    }
+    return this.bytes.subarray(off, off+contentSize);
+  }
+
+  getBytes(fieldNum) {
+    if (!this.lazyCalcOffsets() || fieldNum >= Object.keys(this.offsets).length) {
+      return new Uint8Array();
+    }
+    const off = this.offsets[fieldNum];
+    return this.getBytesInOffset(off);
+  }
+
+  getStringInOffset(off) {
+    const b = this.getBytesInOffset(off);
+    return getTextDecoder().decode(b);
+  }
+
+  getString(fieldNum) {
+    const b = this.getBytes(fieldNum);
+    return getTextDecoder().decode(b);
+  }
+
 }
 
 export class InternalBuilder {
 
+}
+
+let textEncoder = null;
+function getTextEncoder() {
+  if (textEncoder === null) {
+    if (typeof TextEncoder === "undefined") { // node.js does not support TextEncoder
+      textEncoder = new (require('text-encoding').TextEncoder)();
+    } else {
+      textEncoder = new TextEncoder();
+    }
+  }
+  return textEncoder;
+}
+
+let textDecoder = null;
+function getTextDecoder() {
+  if (textDecoder === null) {
+    if (typeof TextDecoder === "undefined") { // node.js does not support TextDecoder
+      textDecoder = new (require('text-encoding').TextDecoder)("utf-8");
+    } else {
+      textDecoder = new TextDecoder("utf-8");
+    }
+  }
+  return textDecoder;
 }
