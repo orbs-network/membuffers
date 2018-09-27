@@ -312,6 +312,37 @@ export class InternalMessage {
     return getTextDecoder().decode(b);
   }
 
+  getUnionIndex(fieldNum, unionNum) {
+    const invalidUnionIndex = 0xffff;
+    if (!this.lazyCalcOffsets() || fieldNum >= Object.keys(this.offsets).length) {
+      return invalidUnionIndex;
+    }
+    let off = this.offsets[fieldNum];
+    const unionType = this.dataView.getUint16(off, true);
+    off += FieldSizes[FieldTypes.TypeUnion];
+    if (unionNum >= this.unions.length || unionType >= this.unions[unionNum].length) {
+      return invalidUnionIndex;
+    }
+    const fieldType = this.unions[unionNum][unionType];
+    off = this.alignOffsetToType(off, fieldType);
+    return unionType;
+  }
+
+  isUnionIndex(fieldNum, unionNum, unionIndex) {
+    if (!this.lazyCalcOffsets() || fieldNum >= Object.keys(this.offsets).length) {
+      return [false, 0];
+    }
+    let off = this.offsets[fieldNum];
+    const unionType = this.dataView.getUint16(off, true);
+    off += FieldSizes[FieldTypes.TypeUnion];
+    if (unionNum >= this.unions.length || unionType >= this.unions[unionNum].length) {
+      return [false, 0];
+    }
+    const fieldType = this.unions[unionNum][unionType];
+    off = this.alignOffsetToType(off, fieldType);
+    return [unionType == unionIndex, off];
+  }
+
 }
 
 export class InternalBuilder {

@@ -556,6 +556,129 @@ test('TestMessageReadMessage', () => {
   }
 });
 
+test('TestMessageReadUnion', () => {
+  const tests = [
+    {
+      buf: new Uint8Array([0x00,0x00,0x00,0x00, 0x01,0x02,0x03,0x04]),
+      scheme: [FieldTypes.TypeUnion],
+      unions: [[FieldTypes.TypeUint32,FieldTypes.TypeUint8]],
+      fieldNum: 0,
+      unionNum: 0,
+      unionIndex: 0,
+      expectedIs: true,
+      expectedOff: 4,
+    },
+    {
+      buf: new Uint8Array([0x00,0x00,0x00,0x00, 0x01,0x02,0x03,0x04]),
+      scheme: [FieldTypes.TypeUnion],
+      unions: [[FieldTypes.TypeUint32,FieldTypes.TypeUint8]],
+      fieldNum: 0,
+      unionNum: 0,
+      unionIndex: 1,
+      expectedIs: false,
+      expectedOff: 4,
+    },
+    {
+      buf: new Uint8Array([0x01,0x00,0x00,0x00, 0x01,0x02,0x03,0x04]),
+      scheme: [FieldTypes.TypeUnion],
+      unions: [[FieldTypes.TypeUint32,FieldTypes.TypeUint8]],
+      fieldNum: 0,
+      unionNum: 0,
+      unionIndex: 1,
+      expectedIs: true,
+      expectedOff: 2,
+    },
+    {
+      buf: new Uint8Array([0x01,0x00,0x11,0x00, 0x00,0x00,0x22,0x23]),
+      scheme: [FieldTypes.TypeUnion,FieldTypes.TypeUnion],
+      unions: [[FieldTypes.TypeUint32,FieldTypes.TypeUint8],[FieldTypes.TypeUint16,FieldTypes.TypeUint8,FieldTypes.TypeUint32]],
+      fieldNum: 1,
+      unionNum: 1,
+      unionIndex: 0,
+      expectedIs: true,
+      expectedOff: 6,
+    },
+    {
+      buf: new Uint8Array([0x00,0x00,0x00,0x00, 0x11,0x22,0x33,0x44, 0x00,0x00,0x22,0x23]),
+      scheme: [FieldTypes.TypeUnion,FieldTypes.TypeUnion],
+      unions: [[FieldTypes.TypeUint32,FieldTypes.TypeUint8],[FieldTypes.TypeUint16,FieldTypes.TypeUint8,FieldTypes.TypeUint32]],
+      fieldNum: 1,
+      unionNum: 1,
+      unionIndex: 0,
+      expectedIs: true,
+      expectedOff: 10,
+    },
+    {
+      buf: new Uint8Array([0x00,0x00,0x00,0x00, 0x11,0x22,0x33,0x44, 0x02,0x00,0x00,0x00, 0x01,0x02,0x03,0x04]),
+      scheme: [FieldTypes.TypeUnion,FieldTypes.TypeUnion],
+      unions: [[FieldTypes.TypeUint32,FieldTypes.TypeUint8],[FieldTypes.TypeUint16,FieldTypes.TypeUint8,FieldTypes.TypeUint32]],
+      fieldNum: 1,
+      unionNum: 1,
+      unionIndex: 2,
+      expectedIs: true,
+      expectedOff: 12,
+    },
+    {
+      buf: new Uint8Array([0x22,0x22,0x22,0x22, 0x02,0x00,0x00,0x00, 0x05,0x00,0x00,0x00, 0x01,0x02,0x03,0x04, 0x05,0x00,0x01,0x00, 0x17]),
+      scheme: [FieldTypes.TypeUint32,FieldTypes.TypeUnion,FieldTypes.TypeUnion],
+      unions: [[FieldTypes.TypeUint32,FieldTypes.TypeUint8,FieldTypes.TypeMessage],[FieldTypes.TypeUint16,FieldTypes.TypeUint8,FieldTypes.TypeUint32]],
+      fieldNum: 2,
+      unionNum: 1,
+      unionIndex: 1,
+      expectedIs: true,
+      expectedOff: 20,
+    },
+    {
+      buf: new Uint8Array([0x22,0x22,0x22,0x22, 0x07,0x00,0x00,0x00, 0x05,0x00,0x00,0x00, 0x01,0x02,0x03,0x04, 0x05,0x00,0x01,0x00, 0x17]),
+      scheme: [FieldTypes.TypeUint32,FieldTypes.TypeUnion,FieldTypes.TypeUnion],
+      unions: [[FieldTypes.TypeUint32,FieldTypes.TypeUint8,FieldTypes.TypeMessage],[FieldTypes.TypeUint16,FieldTypes.TypeUint8,FieldTypes.TypeUint32]],
+      fieldNum: 2,
+      unionNum: 1,
+      unionIndex: 1,
+      expectedIs: false,
+      expectedOff: 0,
+    },
+    {
+      buf: new Uint8Array([0x22,0x22,0x22,0x22, 0x02,0x00,0x00,0x00, 0x05,0x00,0x00,0x00, 0x01,0x02,0x03,0x04, 0x05,0x00,0x01]),
+      scheme: [FieldTypes.TypeUint32,FieldTypes.TypeUnion,FieldTypes.TypeUnion],
+      unions: [[FieldTypes.TypeUint32,FieldTypes.TypeUint8,FieldTypes.TypeMessage],[FieldTypes.TypeUint16,FieldTypes.TypeUint8,FieldTypes.TypeUint32]],
+      fieldNum: 2,
+      unionNum: 1,
+      unionIndex: 1,
+      expectedIs: false,
+      expectedOff: 0,
+    },
+    {
+      buf: new Uint8Array([0x22,0x22,0x22,0x22, 0x02,0x00,0x00,0x00, 0x05,0x00,0x00,0x00, 0x01,0x02,0x03,0x04, 0x05,0x00,0x01,0x00]),
+      scheme: [FieldTypes.TypeUint32,FieldTypes.TypeUnion,FieldTypes.TypeUnion],
+      unions: [[FieldTypes.TypeUint32,FieldTypes.TypeUint8,FieldTypes.TypeMessage],[FieldTypes.TypeUint16,FieldTypes.TypeUint8,FieldTypes.TypeUint32]],
+      fieldNum: 2,
+      unionNum: 1,
+      unionIndex: 1,
+      expectedIs: false,
+      expectedOff: 0,
+    },
+    {
+      buf: new Uint8Array([0x22,0x22,0x22,0x22, 0x02,0x00,0x00,0x00, 0x05,0x00,0x00,0x00, 0x01,0x02,0x03,0x04, 0x05,0x00,0x00,0x00, 0x11]),
+      scheme: [FieldTypes.TypeUint32,FieldTypes.TypeUnion,FieldTypes.TypeUnion],
+      unions: [[FieldTypes.TypeUint32,FieldTypes.TypeUint8,FieldTypes.TypeMessage],[FieldTypes.TypeUint16,FieldTypes.TypeUint8,FieldTypes.TypeUint32]],
+      fieldNum: 2,
+      unionNum: 1,
+      unionIndex: 1,
+      expectedIs: false,
+      expectedOff: 0,
+    },
+  ];
+
+  for (const tt of tests) {
+    const m = new InternalMessage(tt.buf, tt.buf.byteLength, tt.scheme, tt.unions);
+    const [is, off] = m.isUnionIndex(tt.fieldNum, tt.unionNum, tt.unionIndex);
+    // console.log(tt); // uncomment on failure to find out where
+    expect(is).toBe(tt.expectedIs);
+    expect(off).toBe(tt.expectedOff);
+  }
+});
+
 function ch(char) {
   return char.charCodeAt(0);
 }
