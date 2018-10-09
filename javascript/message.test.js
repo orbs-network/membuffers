@@ -1,5 +1,7 @@
 import {} from './matcher-extensions';
-import {FieldTypes, InternalMessage} from './membuffers';
+import {FieldTypes} from './types';
+import {InternalMessage} from './message';
+import {ch} from './text';
 
 test('TestMessageRawBuffer', () => {
   const tests = [
@@ -966,7 +968,3 @@ test('TestMessageMutateString', () => {
     expect(tt.buf).toBeEqualToUint8Array(tt.expected);
   }
 });
-
-function ch(char) {
-  return char.charCodeAt(0);
-}
