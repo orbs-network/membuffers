@@ -755,6 +755,98 @@ test('TestMessageMutateUint32', () => {
   }
 });
 
+test('TestMessageMutateUint8', () => {
+  const tests = [
+    {
+      buf: new Uint8Array([0x44,0x33,0x22,0x11,0x88,0x99]),
+      scheme: [FieldTypes.TypeUint32,FieldTypes.TypeUint8,FieldTypes.TypeUint8],
+      unions: [],
+      fieldNum: 2,
+      expected: new Uint8Array([0x44,0x33,0x22,0x11,0x88,0x55]),
+      err: false,
+    },
+  ];
+
+  for (const tt of tests) {
+    const m = new InternalMessage(tt.buf, tt.buf.byteLength, tt.scheme, tt.unions);
+    // console.log(tt); // uncomment on failure to find out where
+    if (tt.err) {
+      expect(() => {
+        m.setUint8(tt.fieldNum, 0x55);
+      }).toThrow();
+    } else {
+      expect(() => {
+        m.setUint8(tt.fieldNum, 0x55);
+      }).not.toThrow();
+    }
+    expect(tt.buf).toBeEqualToUint8Array(tt.expected);
+  }
+});
+
+test('TestMessageMutateUint16', () => {
+  const tests = [
+    {
+      buf: new Uint8Array([0x44,0x33,0x22,0x11,0x88,0x00,0x99,0xaa]),
+      scheme: [FieldTypes.TypeUint32,FieldTypes.TypeUint8,FieldTypes.TypeUint16],
+      unions: [],
+      fieldNum: 2,
+      expected: new Uint8Array([0x44,0x33,0x22,0x11,0x88,0x00,0x55,0x55]),
+      err: false,
+    },
+  ];
+
+  for (const tt of tests) {
+    const m = new InternalMessage(tt.buf, tt.buf.byteLength, tt.scheme, tt.unions);
+    // console.log(tt); // uncomment on failure to find out where
+    if (tt.err) {
+      expect(() => {
+        m.setUint16(tt.fieldNum, 0x5555);
+      }).toThrow();
+    } else {
+      expect(() => {
+        m.setUint16(tt.fieldNum, 0x5555);
+      }).not.toThrow();
+    }
+    expect(tt.buf).toBeEqualToUint8Array(tt.expected);
+  }
+});
+
+test('TestMessageMutateUint64', () => {
+  const tests = [
+    {
+      buf: new Uint8Array([0x44,0x33,0x22,0x11, 0x88,0x77,0x66,0x55,0x44,0x33,0x22,0x11]),
+      scheme: [FieldTypes.TypeUint32,FieldTypes.TypeUint64],
+      unions: [],
+      fieldNum: 1,
+      expected: new Uint8Array([0x44,0x33,0x22,0x11, 0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55]),
+      err: false,
+    },
+    {
+      buf: new Uint8Array([0x44,0x00,0x00,0x00, 0x88,0x77,0x66,0x55,0x44,0x33,0x22,0x11]),
+      scheme: [FieldTypes.TypeUint8,FieldTypes.TypeUint64],
+      unions: [],
+      fieldNum: 1,
+      expected: new Uint8Array([0x44,0x00,0x00,0x00, 0x55,0x55,0x55,0x55,0x55,0x55,0x55,0x55]),
+      err: false,
+    },
+  ];
+
+  for (const tt of tests) {
+    const m = new InternalMessage(tt.buf, tt.buf.byteLength, tt.scheme, tt.unions);
+    // console.log(tt); // uncomment on failure to find out where
+    if (tt.err) {
+      expect(() => {
+        m.setUint64(tt.fieldNum, BigInt('0x5555555555555555'));
+      }).toThrow();
+    } else {
+      expect(() => {
+        m.setUint64(tt.fieldNum, BigInt('0x5555555555555555'));
+      }).not.toThrow();
+    }
+    expect(tt.buf).toBeEqualToUint8Array(tt.expected);
+  }
+});
+
 function ch(char) {
   return char.charCodeAt(0);
 }

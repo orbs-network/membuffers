@@ -225,6 +225,10 @@ export class InternalMessage {
     return this.dataView.getUint8(off, true);
   }
 
+  setUint8InOffset(off, v) {
+    return this.dataView.setUint8(off, v, true);
+  }
+
   getUint8(fieldNum) {
     if (!this.lazyCalcOffsets() || fieldNum >= Object.keys(this.offsets).length) {
       return 0;
@@ -233,8 +237,20 @@ export class InternalMessage {
     return this.getUint8InOffset(off);
   }
 
+  setUint8(fieldNum, v) {
+    if (!this.lazyCalcOffsets() || fieldNum >= Object.keys(this.offsets).length) {
+      throw new Error("invalid field");
+    }
+    const off = this.offsets[fieldNum];
+    return this.setUint8InOffset(off, v);
+  }
+
   getUint16InOffset(off) {
     return this.dataView.getUint16(off, true);
+  }
+
+  setUint16InOffset(off, v) {
+    return this.dataView.setUint16(off, v, true);
   }
 
   getUint16(fieldNum) {
@@ -245,12 +261,20 @@ export class InternalMessage {
     return this.getUint16InOffset(off);
   }
 
+  setUint16(fieldNum, v) {
+    if (!this.lazyCalcOffsets() || fieldNum >= Object.keys(this.offsets).length) {
+      throw new Error("invalid field");
+    }
+    const off = this.offsets[fieldNum];
+    return this.setUint16InOffset(off, v);
+  }
+
   getUint32InOffset(off) {
     return this.dataView.getUint32(off, true);
   }
 
   setUint32InOffset(off, v) {
-    this.dataView.setUint32(off, v, true);
+    return this.dataView.setUint32(off, v, true);
   }
 
   getUint32(fieldNum) {
@@ -273,12 +297,24 @@ export class InternalMessage {
     return this.dataView.getBigUint64(off, true);
   }
 
+  setUint64InOffset(off, v) {
+    return this.dataView.setBigUint64(off, v, true);
+  }
+
   getUint64(fieldNum) {
     if (!this.lazyCalcOffsets() || fieldNum >= Object.keys(this.offsets).length) {
       return BigInt(0);
     }
     const off = this.offsets[fieldNum];
     return this.getUint64InOffset(off);
+  }
+
+  setUint64(fieldNum, v) {
+    if (!this.lazyCalcOffsets() || fieldNum >= Object.keys(this.offsets).length) {
+      throw new Error("invalid field");
+    }
+    const off = this.offsets[fieldNum];
+    return this.setUint64InOffset(off, v);
   }
 
   getMessageInOffset(off) {
