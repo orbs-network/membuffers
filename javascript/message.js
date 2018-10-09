@@ -1,4 +1,5 @@
 import {FieldTypes, FieldSizes, FieldAlignment, FieldDynamic, FieldDynamicContentAlignment} from './types';
+import {Iterator} from "./iterator";
 import {getTextEncoder, getTextDecoder} from './text';
 
 export class InternalMessage {
@@ -328,6 +329,66 @@ export class InternalMessage {
     const fieldType = this.unions[unionNum][unionType];
     off = this.alignOffsetToType(off, fieldType);
     return [unionType == unionIndex, off];
+  }
+
+  getUint8ArrayIteratorInOffset(off) {
+    const contentSize = this.dataView.getUint32(off, true);
+    off += FieldSizes[FieldTypes.TypeUint8Array];
+    off = this.alignDynamicFieldContentOffset(off, FieldTypes.TypeUint8Array);
+    return new Iterator(off, off+contentSize, FieldTypes.TypeUint8, this);
+  }
+
+  getUint8ArrayIterator(fieldNum) {
+    if (!this.lazyCalcOffsets() || fieldNum >= Object.keys(this.offsets).length) {
+      return new Iterator(0, 0, FieldTypes.TypeUint8, this);
+    }
+    const off = this.offsets[fieldNum];
+    return this.getUint8ArrayIteratorInOffset(off);
+  }
+
+  getUint16ArrayIteratorInOffset(off) {
+    const contentSize = this.dataView.getUint32(off, true);
+    off += FieldSizes[FieldTypes.TypeUint32Array];
+    off = this.alignDynamicFieldContentOffset(off, FieldTypes.TypeUint16Array);
+    return new Iterator(off, off+contentSize, FieldTypes.TypeUint16, this);
+  }
+
+  getUint16ArrayIterator(fieldNum) {
+    if (!this.lazyCalcOffsets() || fieldNum >= Object.keys(this.offsets).length) {
+      return new Iterator(0, 0, FieldTypes.TypeUint16, this);
+    }
+    const off = this.offsets[fieldNum];
+    return this.getUint16ArrayIteratorInOffset(off);
+  }
+
+  getUint32ArrayIteratorInOffset(off) {
+    const contentSize = this.dataView.getUint32(off, true);
+    off += FieldSizes[FieldTypes.TypeUint32Array];
+    off = this.alignDynamicFieldContentOffset(off, FieldTypes.TypeUint32Array);
+    return new Iterator(off, off+contentSize, FieldTypes.TypeUint32, this);
+  }
+
+  getUint32ArrayIterator(fieldNum) {
+    if (!this.lazyCalcOffsets() || fieldNum >= Object.keys(this.offsets).length) {
+      return new Iterator(0, 0, FieldTypes.TypeUint32, this);
+    }
+    const off = this.offsets[fieldNum];
+    return this.getUint32ArrayIteratorInOffset(off);
+  }
+
+  getUint64ArrayIteratorInOffset(off) {
+    const contentSize = this.dataView.getUint32(off, true);
+    off += FieldSizes[FieldTypes.TypeUint64Array];
+    off = this.alignDynamicFieldContentOffset(off, FieldTypes.TypeUint64Array);
+    return new Iterator(off, off+contentSize, FieldTypes.TypeUint64, this);
+  }
+
+  getUint64ArrayIterator(fieldNum) {
+    if (!this.lazyCalcOffsets() || fieldNum >= Object.keys(this.offsets).length) {
+      return new Iterator(0, 0, FieldTypes.TypeUint64, this);
+    }
+    const off = this.offsets[fieldNum];
+    return this.getUint64ArrayIteratorInOffset(off);
   }
 
 }

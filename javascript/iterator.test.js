@@ -1,0 +1,103 @@
+import {} from './matcher-extensions';
+import {FieldTypes} from './types';
+import {InternalMessage} from "./message";
+
+test('TestIteratorUint32', () => {
+  const tests = [
+    {
+      buf: new Uint8Array([0x0c,0x00,0x00,0x00, 0x13,0x00,0x00,0x00, 0x14,0x00,0x00,0x00, 0x15,0x00,0x00,0x00]),
+      scheme: [FieldTypes.TypeUint32Array],
+      unions: [],
+      expected: [0x13,0x14,0x15],
+    },
+    {
+      buf: new Uint8Array([0x08,0x00,0x00,0x00, 0x88,0x00,0x00,0x00, 0x11,0x22,0x33]),
+      scheme: [FieldTypes.TypeUint32Array],
+      unions: [],
+      expected: [],
+    },
+    {
+      buf: new Uint8Array([0x07,0x00,0x00,0x00, 0x05,0x00,0x00,0x00, 0x11,0x22,0x33]),
+      scheme: [FieldTypes.TypeUint32Array],
+      unions: [],
+      expected: [0x05, 0x00],
+    },
+  ];
+
+  for (const tt of tests) {
+    const m = new InternalMessage(tt.buf, tt.buf.byteLength, tt.scheme, tt.unions);
+    const iterator = m.getUint32ArrayIterator(0);
+    const res = [];
+    for (const v of iterator) {
+      res.push(v);
+    }
+    // console.log(tt); // uncomment on failure to find out where
+    expect(res).toEqual(tt.expected);
+  }
+});
+
+test('TestIteratorUint8', () => {
+  const tests = [
+    {
+      buf: new Uint8Array([0x03,0x00,0x00,0x00, 0x13, 0x14, 0x15]),
+      scheme: [FieldTypes.TypeUint8Array],
+      unions: [],
+      expected: [0x13,0x14,0x15],
+    },
+  ];
+
+  for (const tt of tests) {
+    const m = new InternalMessage(tt.buf, tt.buf.byteLength, tt.scheme, tt.unions);
+    const iterator = m.getUint8ArrayIterator(0);
+    const res = [];
+    for (const v of iterator) {
+      res.push(v);
+    }
+    // console.log(tt); // uncomment on failure to find out where
+    expect(res).toEqual(tt.expected);
+  }
+});
+
+test('TestIteratorUint16', () => {
+  const tests = [
+    {
+      buf: new Uint8Array([0x06,0x00,0x00,0x00, 0x13,0x00, 0x14,0x00, 0x15,0x00]),
+      scheme: [FieldTypes.TypeUint16Array],
+      unions: [],
+      expected: [0x13,0x14,0x15],
+    },
+  ];
+
+  for (const tt of tests) {
+    const m = new InternalMessage(tt.buf, tt.buf.byteLength, tt.scheme, tt.unions);
+    const iterator = m.getUint16ArrayIterator(0);
+    const res = [];
+    for (const v of iterator) {
+      res.push(v);
+    }
+    // console.log(tt); // uncomment on failure to find out where
+    expect(res).toEqual(tt.expected);
+  }
+});
+
+test('TestIteratorUint64', () => {
+  const tests = [
+    {
+      buf: new Uint8Array([0x18,0x00,0x00,0x00, 0x13,0x00,0x00,0x00,0x00,0x00,0x00,0x00, 0x14,0x00,0x00,0x00,0x00,0x00,0x00,0x00, 0x15,0x00,0x00,0x00,0x00,0x00,0x00,0x00]),
+      scheme: [FieldTypes.TypeUint64Array],
+      unions: [],
+      expected: [BigInt(0x13),BigInt(0x14),BigInt(0x15)],
+    },
+  ];
+
+  for (const tt of tests) {
+    const m = new InternalMessage(tt.buf, tt.buf.byteLength, tt.scheme, tt.unions);
+    const iterator = m.getUint64ArrayIterator(0);
+    const res = [];
+    for (const v of iterator) {
+      res.push(v);
+    }
+    // console.log(tt); // uncomment on failure to find out where
+    expect(res).toEqual(tt.expected);
+  }
+});

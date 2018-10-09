@@ -1,7 +1,7 @@
 import {} from './matcher-extensions';
 import {FieldTypes} from './types';
-import {InternalMessage} from './message';
 import {ch} from './text';
+import {InternalMessage} from './message';
 
 test('TestMessageRawBuffer', () => {
   const tests = [
