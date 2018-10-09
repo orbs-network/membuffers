@@ -139,7 +139,7 @@ Detailed documentation about the API is available [here](API.md). It shows concr
      go get github.com/orbs-network/membuffers/go/...
      ```
 
-* Install the `membufc` compiler:
+2. Install the `membufc` compiler:
 
     ```sh
     brew install orbs-network/membuffers/membufc
@@ -150,7 +150,15 @@ Detailed documentation about the API is available [here](API.md). It shows concr
     
 ## Test
 
-1. Test the library and the compiler (unit tests and end to end tests):
+1. Make sure [`packr`](https://github.com/gobuffalo/packr) is installed.
+    
+    ```sh
+    which packr
+    # if not found:
+    go get -u github.com/gobuffalo/packr/...
+    ``` 
+
+2. Test the library and the compiler (unit tests and end to end tests):
 
     ```sh
     ./test.sh

@@ -459,7 +459,7 @@ func (m *InternalMessage) GetBytesArrayIterator(fieldNum int) *Iterator {
 		return &Iterator{0,0,TypeBytes,m}
 	}
 	off := m.offsets[fieldNum]
-	return m.GetMessageArrayIteratorInOffset(off)
+	return m.GetBytesArrayIteratorInOffset(off)
 }
 
 func (m *InternalMessage) GetStringArrayIteratorInOffset(off Offset) *Iterator {
@@ -479,5 +479,5 @@ func (m *InternalMessage) GetStringArrayIterator(fieldNum int) *Iterator {
 		return &Iterator{0,0,TypeString,m}
 	}
 	off := m.offsets[fieldNum]
-	return m.GetMessageArrayIteratorInOffset(off)
+	return m.GetStringArrayIteratorInOffset(off)
 }

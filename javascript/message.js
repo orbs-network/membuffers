@@ -410,4 +410,34 @@ export class InternalMessage {
     return this.getMessageArrayIteratorInOffset(off);
   }
 
+  getBytesArrayIteratorInOffset(off) {
+    const contentSize = this.dataView.getUint32(off, true);
+    off += FieldSizes[FieldTypes.TypeMessageArray];
+    off = this.alignDynamicFieldContentOffset(off, FieldTypes.TypeBytesArray);
+    return new Iterator(off, off+contentSize, FieldTypes.TypeBytes, this);
+  }
+
+  getBytesArrayIterator(fieldNum) {
+    if (!this.lazyCalcOffsets() || fieldNum >= Object.keys(this.offsets).length) {
+      return new Iterator(0, 0, FieldTypes.TypeBytes, this);
+    }
+    const off = this.offsets[fieldNum];
+    return this.getBytesArrayIteratorInOffset(off);
+  }
+
+  getStringArrayIteratorInOffset(off) {
+    const contentSize = this.dataView.getUint32(off, true);
+    off += FieldSizes[FieldTypes.TypeStringArray];
+    off = this.alignDynamicFieldContentOffset(off, FieldTypes.TypeStringArray);
+    return new Iterator(off, off+contentSize, FieldTypes.TypeString, this);
+  }
+
+  getStringArrayIterator(fieldNum) {
+    if (!this.lazyCalcOffsets() || fieldNum >= Object.keys(this.offsets).length) {
+      return new Iterator(0, 0, FieldTypes.TypeString, this);
+    }
+    const off = this.offsets[fieldNum];
+    return this.getStringArrayIteratorInOffset(off);
+  }
+
 }

@@ -1,4 +1,5 @@
 import {FieldTypes, FieldSizes, FieldAlignment, FieldDynamic, FieldDynamicContentAlignment} from './types';
+import {getTextDecoder} from "./text";
 
 export class Iterator {
 
@@ -75,6 +76,29 @@ export class Iterator {
     return [resBuf, resSize];
   }
 
+  nextBytes() {
+    if (this.cursor+FieldSizes[FieldTypes.TypeBytes] > this.endCursor) {
+      this.cursor = this.endCursor;
+      return new Uint8Array();
+    }
+    const resSize = this.m.getOffsetInOffset(this.cursor);
+    this.cursor += FieldSizes[FieldTypes.TypeBytes];
+    this.cursor = this.m.alignDynamicFieldContentOffset(this.cursor, FieldTypes.TypeBytes);
+    if (this.cursor+resSize > this.endCursor) {
+      this.cursor = this.endCursor;
+      return new Uint8Array();
+    }
+    const resBuf = this.m.bytes.subarray(this.cursor, this.cursor+resSize);
+    this.cursor += resSize;
+    this.cursor = this.m.alignDynamicFieldContentOffset(this.cursor, FieldTypes.TypeBytesArray);
+    return resBuf;
+  }
+
+  nextString() {
+    const b = this.nextBytes();
+    return getTextDecoder().decode(b);
+  }
+
   [Symbol.iterator]() {
     return {
       next: () => {
@@ -90,6 +114,10 @@ export class Iterator {
               return {value: this.nextUint64(), done: false};
             case FieldTypes.TypeMessage:
               return {value: this.nextMessage(), done: false};
+            case FieldTypes.TypeBytes:
+              return {value: this.nextBytes(), done: false};
+            case FieldTypes.TypeString:
+              return {value: this.nextString(), done: false};
             default:
               throw new Error("unsupported array type");
           }
