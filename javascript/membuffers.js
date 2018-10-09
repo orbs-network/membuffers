@@ -249,12 +249,24 @@ export class InternalMessage {
     return this.dataView.getUint32(off, true);
   }
 
+  setUint32InOffset(off, v) {
+    this.dataView.setUint32(off, v, true);
+  }
+
   getUint32(fieldNum) {
     if (!this.lazyCalcOffsets() || fieldNum >= Object.keys(this.offsets).length) {
       return 0;
     }
     const off = this.offsets[fieldNum];
     return this.getUint32InOffset(off);
+  }
+
+  setUint32(fieldNum, v) {
+    if (!this.lazyCalcOffsets() || fieldNum >= Object.keys(this.offsets).length) {
+      throw new Error("invalid field");
+    }
+    const off = this.offsets[fieldNum];
+    return this.setUint32InOffset(off, v);
   }
 
   getUint64InOffset(off) {
