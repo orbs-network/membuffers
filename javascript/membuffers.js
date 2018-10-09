@@ -342,6 +342,16 @@ export class InternalMessage {
     return this.bytes.subarray(off, off+contentSize);
   }
 
+  setBytesInOffset(off, v) {
+    const contentSize = this.dataView.getUint32(off, true);
+    if (contentSize != v.byteLength) {
+      throw new Error("size mismatch");
+    }
+    off += FieldSizes[FieldTypes.TypeBytes];
+    off = this.alignDynamicFieldContentOffset(off, FieldTypes.TypeBytes);
+    return this.bytes.set(v, off);
+  }
+
   getBytes(fieldNum) {
     if (!this.lazyCalcOffsets() || fieldNum >= Object.keys(this.offsets).length) {
       return new Uint8Array();
@@ -350,14 +360,30 @@ export class InternalMessage {
     return this.getBytesInOffset(off);
   }
 
+  setBytes(fieldNum, v) {
+    if (!this.lazyCalcOffsets() || fieldNum >= Object.keys(this.offsets).length) {
+      throw new Error("invalid field");
+    }
+    const off = this.offsets[fieldNum];
+    return this.setBytesInOffset(off, v);
+  }
+
   getStringInOffset(off) {
     const b = this.getBytesInOffset(off);
     return getTextDecoder().decode(b);
   }
 
+  setStringInOffset(off, v) {
+    return this.setBytesInOffset(off, getTextEncoder().encode(v));
+  }
+
   getString(fieldNum) {
     const b = this.getBytes(fieldNum);
     return getTextDecoder().decode(b);
+  }
+
+  setString(fieldNum, v) {
+    return this.setBytes(fieldNum, getTextEncoder().encode(v));
   }
 
   getUnionIndex(fieldNum, unionNum) {
