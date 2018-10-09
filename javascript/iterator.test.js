@@ -101,3 +101,49 @@ test('TestIteratorUint64', () => {
     expect(res).toEqual(tt.expected);
   }
 });
+
+test('TestIteratorMessage', () => {
+  const tests = [
+    {
+      buf: new Uint8Array([0x1b,0x00,0x00,0x00, 0x03,0x00,0x00,0x00, 0x01,0x02,0x03,0x00, 0x05,0x00,0x00,0x00, 0x01,0x02,0x03,0x04, 0x05,0x00,0x00,0x00, 0x03,0x00,0x00,0x00, 0x01,0x02,0x03]),
+      scheme: [FieldTypes.TypeMessageArray],
+      unions: [],
+      expectedSizes: [0x03,0x05,0x03],
+    },
+    {
+      buf: new Uint8Array([0x08,0x00,0x00,0x00, 0x88,0x00,0x00,0x00, 0x11,0x22,0x33,0x44]),
+      scheme: [FieldTypes.TypeMessageArray],
+      unions: [],
+      expectedSizes: [0],
+    },
+    {
+      buf: new Uint8Array([0x08,0x00,0x00,0x00, 0x05,0x00,0x00,0x00, 0x11,0x22,0x33,0x44]),
+      scheme: [FieldTypes.TypeMessageArray],
+      unions: [],
+      expectedSizes: [0],
+    },
+    {
+      buf: new Uint8Array([0x09,0x00,0x00,0x00, 0x04,0x00,0x00,0x00, 0x11,0x22,0x33,0x44]),
+      scheme: [FieldTypes.TypeMessageArray],
+      unions: [],
+      expectedSizes: [],
+    },
+    {
+      buf: new Uint8Array([0x09,0x00,0x00,0x00, 0x04,0x00,0x00,0x00, 0x11,0x22,0x33,0x44,0x55]),
+      scheme: [FieldTypes.TypeMessageArray],
+      unions: [],
+      expectedSizes: [4,0],
+    },
+  ];
+
+  for (const tt of tests) {
+    const m = new InternalMessage(tt.buf, tt.buf.byteLength, tt.scheme, tt.unions);
+    const iterator = m.getMessageArrayIterator(0);
+    const res = [];
+    for (const [_, size] of iterator) {
+      res.push(size);
+    }
+    // console.log(tt); // uncomment on failure to find out where
+    expect(res).toEqual(tt.expectedSizes);
+  }
+});

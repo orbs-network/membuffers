@@ -57,6 +57,24 @@ export class Iterator {
     return res;
   }
 
+  nextMessage() {
+    if (this.cursor+FieldSizes[FieldTypes.TypeMessage] > this.endCursor) {
+      this.cursor = this.endCursor;
+      return [new Uint8Array(), 0];
+    }
+    const resSize = this.m.getOffsetInOffset(this.cursor);
+    this.cursor += FieldSizes[FieldTypes.TypeMessage];
+    this.cursor = this.m.alignDynamicFieldContentOffset(this.cursor, FieldTypes.TypeMessage);
+    if (this.cursor+resSize > this.endCursor) {
+      this.cursor = this.endCursor;
+      return [new Uint8Array(), 0];
+    }
+    const resBuf = this.m.bytes.subarray(this.cursor, this.cursor+resSize);
+    this.cursor += resSize;
+    this.cursor = this.m.alignDynamicFieldContentOffset(this.cursor, FieldTypes.TypeMessageArray);
+    return [resBuf, resSize];
+  }
+
   [Symbol.iterator]() {
     return {
       next: () => {
@@ -70,6 +88,8 @@ export class Iterator {
               return {value: this.nextUint32(), done: false};
             case FieldTypes.TypeUint64:
               return {value: this.nextUint64(), done: false};
+            case FieldTypes.TypeMessage:
+              return {value: this.nextMessage(), done: false};
             default:
               throw new Error("unsupported array type");
           }

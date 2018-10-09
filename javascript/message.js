@@ -135,6 +135,10 @@ export class InternalMessage {
     }
   }
 
+  getOffsetInOffset(off) {
+    return this.dataView.getUint32(off, true);
+  }
+
   getUint8InOffset(off) {
     return this.dataView.getUint8(off, true);
   }
@@ -389,6 +393,21 @@ export class InternalMessage {
     }
     const off = this.offsets[fieldNum];
     return this.getUint64ArrayIteratorInOffset(off);
+  }
+
+  getMessageArrayIteratorInOffset(off) {
+    const contentSize = this.dataView.getUint32(off, true);
+    off += FieldSizes[FieldTypes.TypeMessageArray];
+    off = this.alignDynamicFieldContentOffset(off, FieldTypes.TypeMessageArray);
+    return new Iterator(off, off+contentSize, FieldTypes.TypeMessage, this);
+  }
+
+  getMessageArrayIterator(fieldNum) {
+    if (!this.lazyCalcOffsets() || fieldNum >= Object.keys(this.offsets).length) {
+      return new Iterator(0, 0, FieldTypes.TypeMessage, this);
+    }
+    const off = this.offsets[fieldNum];
+    return this.getMessageArrayIteratorInOffset(off);
   }
 
 }
