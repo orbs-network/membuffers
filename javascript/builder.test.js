@@ -83,3 +83,63 @@ test('TestBuilderString', () => {
   const expected2 = new Uint8Array([0x05,0x00,0x00,0x00, ch('h'),ch('e'),ch('l'),ch('l'),ch('o'),0x00,0x00,0x00, 0x05,0x00,0x00,0x00, ch('h'),ch('e'),ch('l'),ch('l'),ch('o')]);
   expect(buf).toBeEqualToUint8Array(expected2);
 });
+
+test('TestBuilderUnionIndex', () => {
+  const w = new InternalBuilder();
+  const v = 0x01;
+  w.writeUnionIndex(null, v);
+  expect(w.size).toBe(2);
+  const buf = new Uint8Array(w.size);
+  w.reset();
+  w.writeUnionIndex(buf, v);
+  const expected = new Uint8Array([0x01,0x00]);
+  expect(buf).toBeEqualToUint8Array(expected);
+});
+
+test('TestBuilderUint8Array', () => {
+  const w = new InternalBuilder();
+  const v = [0x01,0x02,0x03];
+  w.writeUint8Array(null, v);
+  expect(w.size).toBe(7);
+  const buf = new Uint8Array(w.size);
+  w.reset();
+  w.writeUint8Array(buf, v);
+  const expected = new Uint8Array([0x03,0x00,0x00,0x00, 0x01,0x02,0x03]);
+  expect(buf).toBeEqualToUint8Array(expected);
+});
+
+test('TestBuilderUint16Array', () => {
+  const w = new InternalBuilder();
+  const v = [0x01,0x02,0x03];
+  w.writeUint16Array(null, v);
+  expect(w.size).toBe(10);
+  const buf = new Uint8Array(w.size);
+  w.reset();
+  w.writeUint16Array(buf, v);
+  const expected = new Uint8Array([0x06,0x00,0x00,0x00, 0x01,0x00, 0x02,0x00, 0x03,0x00]);
+  expect(buf).toBeEqualToUint8Array(expected);
+});
+
+test('TestBuilderUint32Array', () => {
+  const w = new InternalBuilder();
+  const v = [0x01,0x02,0x03];
+  w.writeUint32Array(null, v);
+  expect(w.size).toBe(16);
+  const buf = new Uint8Array(w.size);
+  w.reset();
+  w.writeUint32Array(buf, v);
+  const expected = new Uint8Array([0x0c,0x00,0x00,0x00, 0x01,0x00,0x00,0x00, 0x02,0x00,0x00,0x00, 0x03,0x00,0x00,0x00]);
+  expect(buf).toBeEqualToUint8Array(expected);
+});
+
+test('TestBuilderUint64Array', () => {
+  const w = new InternalBuilder();
+  const v = [BigInt(0x01),BigInt(0x02),BigInt(0x03)];
+  w.writeUint64Array(null, v);
+  expect(w.size).toBe(28);
+  const buf = new Uint8Array(w.size);
+  w.reset();
+  w.writeUint64Array(buf, v);
+  const expected = new Uint8Array([0x18,0x00,0x00,0x00, 0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00, 0x02,0x00,0x00,0x00,0x00,0x00,0x00,0x00, 0x03,0x00,0x00,0x00,0x00,0x00,0x00,0x00]);
+  expect(buf).toBeEqualToUint8Array(expected);
+});
