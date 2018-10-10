@@ -1,4 +1,5 @@
-import {FieldTypes, FieldSizes, FieldAlignment, FieldDynamic, FieldDynamicContentAlignment} from './types';
+import {alignDynamicFieldContentOffset} from './message';
+import {FieldTypes, FieldSizes} from './types';
 import {getTextDecoder} from "./text";
 
 export class Iterator {
@@ -21,7 +22,7 @@ export class Iterator {
     }
     const res = this.m.getUint8InOffset(this.cursor);
     this.cursor += FieldSizes[FieldTypes.TypeUint8];
-    this.cursor = this.m.alignDynamicFieldContentOffset(this.cursor, FieldTypes.TypeUint8Array);
+    this.cursor = alignDynamicFieldContentOffset(this.cursor, FieldTypes.TypeUint8Array);
     return res;
   }
 
@@ -32,7 +33,7 @@ export class Iterator {
     }
     const res = this.m.getUint16InOffset(this.cursor);
     this.cursor += FieldSizes[FieldTypes.TypeUint16];
-    this.cursor = this.m.alignDynamicFieldContentOffset(this.cursor, FieldTypes.TypeUint16Array);
+    this.cursor = alignDynamicFieldContentOffset(this.cursor, FieldTypes.TypeUint16Array);
     return res;
   }
 
@@ -43,7 +44,7 @@ export class Iterator {
     }
     const res = this.m.getUint32InOffset(this.cursor);
     this.cursor += FieldSizes[FieldTypes.TypeUint32];
-    this.cursor = this.m.alignDynamicFieldContentOffset(this.cursor, FieldTypes.TypeUint32Array);
+    this.cursor = alignDynamicFieldContentOffset(this.cursor, FieldTypes.TypeUint32Array);
     return res;
   }
 
@@ -54,7 +55,7 @@ export class Iterator {
     }
     const res = this.m.getUint64InOffset(this.cursor);
     this.cursor += FieldSizes[FieldTypes.TypeUint64];
-    this.cursor = this.m.alignDynamicFieldContentOffset(this.cursor, FieldTypes.TypeUint64Array);
+    this.cursor = alignDynamicFieldContentOffset(this.cursor, FieldTypes.TypeUint64Array);
     return res;
   }
 
@@ -65,14 +66,14 @@ export class Iterator {
     }
     const resSize = this.m.getOffsetInOffset(this.cursor);
     this.cursor += FieldSizes[FieldTypes.TypeMessage];
-    this.cursor = this.m.alignDynamicFieldContentOffset(this.cursor, FieldTypes.TypeMessage);
+    this.cursor = alignDynamicFieldContentOffset(this.cursor, FieldTypes.TypeMessage);
     if (this.cursor+resSize > this.endCursor) {
       this.cursor = this.endCursor;
       return [new Uint8Array(), 0];
     }
     const resBuf = this.m.bytes.subarray(this.cursor, this.cursor+resSize);
     this.cursor += resSize;
-    this.cursor = this.m.alignDynamicFieldContentOffset(this.cursor, FieldTypes.TypeMessageArray);
+    this.cursor = alignDynamicFieldContentOffset(this.cursor, FieldTypes.TypeMessageArray);
     return [resBuf, resSize];
   }
 
@@ -83,14 +84,14 @@ export class Iterator {
     }
     const resSize = this.m.getOffsetInOffset(this.cursor);
     this.cursor += FieldSizes[FieldTypes.TypeBytes];
-    this.cursor = this.m.alignDynamicFieldContentOffset(this.cursor, FieldTypes.TypeBytes);
+    this.cursor = alignDynamicFieldContentOffset(this.cursor, FieldTypes.TypeBytes);
     if (this.cursor+resSize > this.endCursor) {
       this.cursor = this.endCursor;
       return new Uint8Array();
     }
     const resBuf = this.m.bytes.subarray(this.cursor, this.cursor+resSize);
     this.cursor += resSize;
-    this.cursor = this.m.alignDynamicFieldContentOffset(this.cursor, FieldTypes.TypeBytesArray);
+    this.cursor = alignDynamicFieldContentOffset(this.cursor, FieldTypes.TypeBytesArray);
     return resBuf;
   }
 

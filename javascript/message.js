@@ -2,6 +2,16 @@ import {FieldTypes, FieldSizes, FieldAlignment, FieldDynamic, FieldDynamicConten
 import {Iterator} from "./iterator";
 import {getTextEncoder, getTextDecoder} from './text';
 
+export function alignOffsetToType(off, fieldType) {
+  const fieldSize = FieldAlignment[fieldType];
+  return Math.floor((off + fieldSize - 1) / fieldSize) * fieldSize;
+}
+
+export function alignDynamicFieldContentOffset(off, fieldType) {
+  const contentAlignment = FieldDynamicContentAlignment[fieldType];
+  return Math.floor((off + contentAlignment - 1) / contentAlignment) * contentAlignment;
+}
+
 export class InternalMessage {
 
   constructor(buf, size, scheme, unions) {
@@ -11,16 +21,6 @@ export class InternalMessage {
     this.unions = unions;
     this.dataView = new DataView(buf.buffer);
     this.offsets = null; // map: fieldNum -> offset in bytes
-  }
-
-  alignOffsetToType(off, fieldType) {
-    const fieldSize = FieldAlignment[fieldType];
-    return Math.floor((off + fieldSize - 1) / fieldSize) * fieldSize;
-  }
-
-  alignDynamicFieldContentOffset(off, fieldType) {
-    const contentAlignment = FieldDynamicContentAlignment[fieldType];
-    return Math.floor((off + contentAlignment - 1) / contentAlignment) * contentAlignment;
   }
 
   lazyCalcOffsets() {
@@ -34,7 +34,7 @@ export class InternalMessage {
       let fieldType = this.scheme[fieldNum];
 
       // write the current offset
-      off = this.alignOffsetToType(off, fieldType);
+      off = alignOffsetToType(off, fieldType);
       if (off >= this.size) {
         return false;
       }
@@ -52,7 +52,7 @@ export class InternalMessage {
         }
         fieldType = this.unions[unionNum][unionType];
         unionNum += 1;
-        off = this.alignOffsetToType(off, fieldType);
+        off = alignOffsetToType(off, fieldType);
       }
       if (FieldDynamic[fieldType]) {
         if (off + FieldSizes[fieldType] > this.size) {
@@ -60,7 +60,7 @@ export class InternalMessage {
         }
         const contentSize = this.dataView.getUint32(off, true);
         off += FieldSizes[fieldType];
-        off = this.alignDynamicFieldContentOffset(off, fieldType);
+        off = alignDynamicFieldContentOffset(off, fieldType);
         off += contentSize;
       } else {
         off += FieldSizes[fieldType];
@@ -97,12 +97,12 @@ export class InternalMessage {
         return new Uint8Array();
       }
       fieldType = this.unions[unionNum][unionType];
-      off = this.alignOffsetToType(off, fieldType);
+      off = alignOffsetToType(off, fieldType);
     }
     if (FieldDynamic[fieldType]) {
       const contentSize = this.dataView.getUint32(off, true);
       off += FieldSizes[fieldType];
-      off = this.alignDynamicFieldContentOffset(off, fieldType);
+      off = alignDynamicFieldContentOffset(off, fieldType);
       return this.bytes.subarray(off, off+contentSize);
     } else {
       return this.bytes.subarray(off, off+FieldSizes[fieldType]);
@@ -123,12 +123,12 @@ export class InternalMessage {
         return new Uint8Array();
       }
       fieldType = this.unions[unionNum][unionType];
-      off = this.alignOffsetToType(off, fieldType);
+      off = alignOffsetToType(off, fieldType);
     }
     if (FieldDynamic[fieldType]) {
       const contentSize = this.dataView.getUint32(off, true);
       off += FieldSizes[fieldType];
-      off = this.alignDynamicFieldContentOffset(off, fieldType);
+      off = alignDynamicFieldContentOffset(off, fieldType);
       return this.bytes.subarray(fieldHeaderOff, off+contentSize);
     } else {
       return this.bytes.subarray(fieldHeaderOff, off+FieldSizes[fieldType]);
@@ -238,7 +238,7 @@ export class InternalMessage {
   getMessageInOffset(off) {
     const contentSize = this.dataView.getUint32(off, true);
     off += FieldSizes[FieldTypes.TypeMessage];
-    off = this.alignDynamicFieldContentOffset(off, FieldTypes.TypeMessage);
+    off = alignDynamicFieldContentOffset(off, FieldTypes.TypeMessage);
     return this.bytes.subarray(off, off+contentSize);
   }
 
@@ -253,7 +253,7 @@ export class InternalMessage {
   getBytesInOffset(off) {
     const contentSize = this.dataView.getUint32(off, true);
     off += FieldSizes[FieldTypes.TypeBytes];
-    off = this.alignDynamicFieldContentOffset(off, FieldTypes.TypeBytes);
+    off = alignDynamicFieldContentOffset(off, FieldTypes.TypeBytes);
     if (off+contentSize > this.bytes.byteLength) {
       return new Uint8Array();
     }
@@ -266,7 +266,7 @@ export class InternalMessage {
       throw new Error("size mismatch");
     }
     off += FieldSizes[FieldTypes.TypeBytes];
-    off = this.alignDynamicFieldContentOffset(off, FieldTypes.TypeBytes);
+    off = alignDynamicFieldContentOffset(off, FieldTypes.TypeBytes);
     return this.bytes.set(v, off);
   }
 
@@ -316,7 +316,7 @@ export class InternalMessage {
       return invalidUnionIndex;
     }
     const fieldType = this.unions[unionNum][unionType];
-    off = this.alignOffsetToType(off, fieldType);
+    off = alignOffsetToType(off, fieldType);
     return unionType;
   }
 
@@ -331,14 +331,14 @@ export class InternalMessage {
       return [false, 0];
     }
     const fieldType = this.unions[unionNum][unionType];
-    off = this.alignOffsetToType(off, fieldType);
+    off = alignOffsetToType(off, fieldType);
     return [unionType == unionIndex, off];
   }
 
   getUint8ArrayIteratorInOffset(off) {
     const contentSize = this.dataView.getUint32(off, true);
     off += FieldSizes[FieldTypes.TypeUint8Array];
-    off = this.alignDynamicFieldContentOffset(off, FieldTypes.TypeUint8Array);
+    off = alignDynamicFieldContentOffset(off, FieldTypes.TypeUint8Array);
     return new Iterator(off, off+contentSize, FieldTypes.TypeUint8, this);
   }
 
@@ -353,7 +353,7 @@ export class InternalMessage {
   getUint16ArrayIteratorInOffset(off) {
     const contentSize = this.dataView.getUint32(off, true);
     off += FieldSizes[FieldTypes.TypeUint32Array];
-    off = this.alignDynamicFieldContentOffset(off, FieldTypes.TypeUint16Array);
+    off = alignDynamicFieldContentOffset(off, FieldTypes.TypeUint16Array);
     return new Iterator(off, off+contentSize, FieldTypes.TypeUint16, this);
   }
 
@@ -368,7 +368,7 @@ export class InternalMessage {
   getUint32ArrayIteratorInOffset(off) {
     const contentSize = this.dataView.getUint32(off, true);
     off += FieldSizes[FieldTypes.TypeUint32Array];
-    off = this.alignDynamicFieldContentOffset(off, FieldTypes.TypeUint32Array);
+    off = alignDynamicFieldContentOffset(off, FieldTypes.TypeUint32Array);
     return new Iterator(off, off+contentSize, FieldTypes.TypeUint32, this);
   }
 
@@ -383,7 +383,7 @@ export class InternalMessage {
   getUint64ArrayIteratorInOffset(off) {
     const contentSize = this.dataView.getUint32(off, true);
     off += FieldSizes[FieldTypes.TypeUint64Array];
-    off = this.alignDynamicFieldContentOffset(off, FieldTypes.TypeUint64Array);
+    off = alignDynamicFieldContentOffset(off, FieldTypes.TypeUint64Array);
     return new Iterator(off, off+contentSize, FieldTypes.TypeUint64, this);
   }
 
@@ -398,7 +398,7 @@ export class InternalMessage {
   getMessageArrayIteratorInOffset(off) {
     const contentSize = this.dataView.getUint32(off, true);
     off += FieldSizes[FieldTypes.TypeMessageArray];
-    off = this.alignDynamicFieldContentOffset(off, FieldTypes.TypeMessageArray);
+    off = alignDynamicFieldContentOffset(off, FieldTypes.TypeMessageArray);
     return new Iterator(off, off+contentSize, FieldTypes.TypeMessage, this);
   }
 
@@ -413,7 +413,7 @@ export class InternalMessage {
   getBytesArrayIteratorInOffset(off) {
     const contentSize = this.dataView.getUint32(off, true);
     off += FieldSizes[FieldTypes.TypeMessageArray];
-    off = this.alignDynamicFieldContentOffset(off, FieldTypes.TypeBytesArray);
+    off = alignDynamicFieldContentOffset(off, FieldTypes.TypeBytesArray);
     return new Iterator(off, off+contentSize, FieldTypes.TypeBytes, this);
   }
 
@@ -428,7 +428,7 @@ export class InternalMessage {
   getStringArrayIteratorInOffset(off) {
     const contentSize = this.dataView.getUint32(off, true);
     off += FieldSizes[FieldTypes.TypeStringArray];
-    off = this.alignDynamicFieldContentOffset(off, FieldTypes.TypeStringArray);
+    off = alignDynamicFieldContentOffset(off, FieldTypes.TypeStringArray);
     return new Iterator(off, off+contentSize, FieldTypes.TypeString, this);
   }
 

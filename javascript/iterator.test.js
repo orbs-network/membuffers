@@ -1,4 +1,4 @@
-import {} from './matcher-extensions';
+import './matcher-extensions';
 import {FieldTypes} from './types';
 import {ch} from './text';
 import {InternalMessage} from "./message";
