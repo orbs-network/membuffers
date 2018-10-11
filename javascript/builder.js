@@ -133,4 +133,34 @@ export class InternalBuilder {
     }
   }
 
+  writeBytesArray(buf, v) {
+    this.size = alignOffsetToType(this.size, FieldTypes.TypeBytesArray);
+    const sizePlaceholderOffset = this.size;
+    this.size += FieldSizes[FieldTypes.TypeBytesArray];
+    this.size = alignDynamicFieldContentOffset(this.size, FieldTypes.TypeBytesArray);
+    const contentSizeStartOffset = this.size;
+    for (const vv of v) {
+      this.writeBytes(buf, vv);
+    }
+    const contentSize = this.size - contentSizeStartOffset;
+    if (buf) {
+      new DataView(buf.buffer).setUint32(sizePlaceholderOffset, contentSize, true);
+    }
+  }
+
+  writeStringArray(buf, v) {
+    this.size = alignOffsetToType(this.size, FieldTypes.TypeStringArray);
+    const sizePlaceholderOffset = this.size;
+    this.size += FieldSizes[FieldTypes.TypeStringArray];
+    this.size = alignDynamicFieldContentOffset(this.size, FieldTypes.TypeStringArray);
+    const contentSizeStartOffset = this.size;
+    for (const vv of v) {
+      this.writeString(buf, vv);
+    }
+    const contentSize = this.size - contentSizeStartOffset;
+    if (buf) {
+      new DataView(buf.buffer).setUint32(sizePlaceholderOffset, contentSize, true);
+    }
+  }
+
 }
