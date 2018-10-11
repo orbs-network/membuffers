@@ -167,3 +167,33 @@ test('TestBuilderStringArray', () => {
   const expected = new Uint8Array([0x0e,0x00,0x00,0x00, 0x03,0x00,0x00,0x00, ch('j'),ch('a'),ch('y'),0x00, 0x02,0x00,0x00,0x00, ch('l'),ch('o')]);
   expect(buf).toBeEqualToUint8Array(expected);
 });
+
+class ExampleMessageBuilder {
+  constructor() {
+    this.builder = new InternalBuilder();
+  }
+  write(buf) {
+    this.builder.reset();
+    this.builder.writeUint8(buf, 0x17);
+    this.builder.writeUint32(buf, 0x033);
+  }
+  getSize() {
+    return this.builder.getSize();
+  }
+  calcRequiredSize() {
+    this.write(null);
+    return this.builder.getSize();
+  }
+}
+
+test('TestBuilderMessage', () => {
+  const w = new InternalBuilder();
+  const v = new ExampleMessageBuilder();
+  w.writeMessage(null, v);
+  expect(w.size).toBe(12);
+  const buf = new Uint8Array(w.size);
+  w.reset();
+  w.writeMessage(buf, v);
+  const expected = new Uint8Array([0x08,0x00,0x00,0x00, 0x17,0x00,0x00,0x00, 0x33,0x00,0x00,0x00]);
+  expect(buf).toBeEqualToUint8Array(expected);
+});

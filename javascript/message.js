@@ -19,7 +19,7 @@ export class InternalMessage {
     this.size = size;
     this.scheme = scheme;
     this.unions = unions;
-    this.dataView = new DataView(buf.buffer);
+    this.dataView = new DataView(buf.buffer, buf.byteOffset);
     this.offsets = null; // map: fieldNum -> offset in bytes
   }
 

@@ -24,7 +24,7 @@ export class InternalBuilder {
   writeUint8(buf, v) {
     this.size = alignOffsetToType(this.size, FieldTypes.TypeUint8);
     if (buf) {
-      new DataView(buf.buffer).setUint8(this.size, v, true);
+      new DataView(buf.buffer, buf.byteOffset).setUint8(this.size, v, true);
     }
     this.size += FieldSizes[FieldTypes.TypeUint8];
   }
@@ -32,7 +32,7 @@ export class InternalBuilder {
   writeUint16(buf, v) {
     this.size = alignOffsetToType(this.size, FieldTypes.TypeUint16);
     if (buf) {
-      new DataView(buf.buffer).setUint16(this.size, v, true);
+      new DataView(buf.buffer, buf.byteOffset).setUint16(this.size, v, true);
     }
     this.size += FieldSizes[FieldTypes.TypeUint16];
   }
@@ -40,7 +40,7 @@ export class InternalBuilder {
   writeUint32(buf, v) {
     this.size = alignOffsetToType(this.size, FieldTypes.TypeUint32);
     if (buf) {
-      new DataView(buf.buffer).setUint32(this.size, v, true);
+      new DataView(buf.buffer, buf.byteOffset).setUint32(this.size, v, true);
     }
     this.size += FieldSizes[FieldTypes.TypeUint32];
   }
@@ -48,13 +48,13 @@ export class InternalBuilder {
   writeUint64(buf, v) {
     this.size = alignOffsetToType(this.size, FieldTypes.TypeUint64);
     if (buf) {
-      new DataView(buf.buffer).setBigUint64(this.size, v, true);
+      new DataView(buf.buffer, buf.byteOffset).setBigUint64(this.size, v, true);
     }
     this.size += FieldSizes[FieldTypes.TypeUint64];
   }
 
   writeBytes(buf, v) {
-    const dataView = (buf) ? new DataView(buf.buffer) : undefined;
+    const dataView = (buf) ? new DataView(buf.buffer, buf.byteOffset) : undefined;
     this.size = alignOffsetToType(this.size, FieldTypes.TypeBytes);
     if (buf) {
       if (v) {
@@ -80,7 +80,7 @@ export class InternalBuilder {
   writeUnionIndex(buf, unionIndex) {
     this.size = alignOffsetToType(this.size, FieldTypes.TypeUnion);
     if (buf) {
-      new DataView(buf.buffer).setUint16(this.size, unionIndex, true);
+      new DataView(buf.buffer, buf.byteOffset).setUint16(this.size, unionIndex, true);
     }
     this.size += FieldSizes[FieldTypes.TypeUnion];
   }
@@ -88,7 +88,7 @@ export class InternalBuilder {
   writeUint8Array(buf, v) {
     this.size = alignOffsetToType(this.size, FieldTypes.TypeUint8Array);
     if (buf) {
-      new DataView(buf.buffer).setUint32(this.size, v.length * FieldSizes[FieldTypes.TypeUint8], true);
+      new DataView(buf.buffer, buf.byteOffset).setUint32(this.size, v.length * FieldSizes[FieldTypes.TypeUint8], true);
     }
     this.size += FieldSizes[FieldTypes.TypeUint8Array];
     this.size = alignDynamicFieldContentOffset(this.size, FieldTypes.TypeUint8Array);
@@ -100,7 +100,7 @@ export class InternalBuilder {
   writeUint16Array(buf, v) {
     this.size = alignOffsetToType(this.size, FieldTypes.TypeUint16Array);
     if (buf) {
-      new DataView(buf.buffer).setUint32(this.size, v.length * FieldSizes[FieldTypes.TypeUint16], true);
+      new DataView(buf.buffer, buf.byteOffset).setUint32(this.size, v.length * FieldSizes[FieldTypes.TypeUint16], true);
     }
     this.size += FieldSizes[FieldTypes.TypeUint16Array];
     this.size = alignDynamicFieldContentOffset(this.size, FieldTypes.TypeUint16Array);
@@ -112,7 +112,7 @@ export class InternalBuilder {
   writeUint32Array(buf, v) {
     this.size = alignOffsetToType(this.size, FieldTypes.TypeUint32Array);
     if (buf) {
-      new DataView(buf.buffer).setUint32(this.size, v.length * FieldSizes[FieldTypes.TypeUint32], true);
+      new DataView(buf.buffer, buf.byteOffset).setUint32(this.size, v.length * FieldSizes[FieldTypes.TypeUint32], true);
     }
     this.size += FieldSizes[FieldTypes.TypeUint32Array];
     this.size = alignDynamicFieldContentOffset(this.size, FieldTypes.TypeUint32Array);
@@ -124,7 +124,7 @@ export class InternalBuilder {
   writeUint64Array(buf, v) {
     this.size = alignOffsetToType(this.size, FieldTypes.TypeUint64Array);
     if (buf) {
-      new DataView(buf.buffer).setUint32(this.size, v.length * FieldSizes[FieldTypes.TypeUint64], true);
+      new DataView(buf.buffer, buf.byteOffset).setUint32(this.size, v.length * FieldSizes[FieldTypes.TypeUint64], true);
     }
     this.size += FieldSizes[FieldTypes.TypeUint64Array];
     this.size = alignDynamicFieldContentOffset(this.size, FieldTypes.TypeUint64Array);
@@ -144,7 +144,7 @@ export class InternalBuilder {
     }
     const contentSize = this.size - contentSizeStartOffset;
     if (buf) {
-      new DataView(buf.buffer).setUint32(sizePlaceholderOffset, contentSize, true);
+      new DataView(buf.buffer, buf.byteOffset).setUint32(sizePlaceholderOffset, contentSize, true);
     }
   }
 
@@ -159,7 +159,24 @@ export class InternalBuilder {
     }
     const contentSize = this.size - contentSizeStartOffset;
     if (buf) {
-      new DataView(buf.buffer).setUint32(sizePlaceholderOffset, contentSize, true);
+      new DataView(buf.buffer, buf.byteOffset).setUint32(sizePlaceholderOffset, contentSize, true);
+    }
+  }
+
+  writeMessage(buf, v) {
+    this.size = alignOffsetToType(this.size, FieldTypes.TypeMessage);
+    const sizePlaceholderOffset = this.size;
+    this.size += FieldSizes[FieldTypes.TypeMessage];
+    this.size = alignDynamicFieldContentOffset(this.size, FieldTypes.TypeMessage);
+    if (buf) {
+      v.write(buf.subarray(this.size));
+    } else {
+      v.write(null);
+    }
+    const contentSize = v.getSize();
+    this.size += contentSize;
+    if (buf) {
+      new DataView(buf.buffer, buf.byteOffset).setUint32(sizePlaceholderOffset, contentSize, true);
     }
   }
 
