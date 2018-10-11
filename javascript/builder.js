@@ -180,4 +180,19 @@ export class InternalBuilder {
     }
   }
 
+  writeMessageArray(buf, v) {
+    this.size = alignOffsetToType(this.size, FieldTypes.TypeMessageArray);
+    const sizePlaceholderOffset = this.size;
+    this.size += FieldSizes[FieldTypes.TypeMessageArray];
+    this.size = alignDynamicFieldContentOffset(this.size, FieldTypes.TypeMessageArray);
+    const contentSizeStartOffset = this.size;
+    for (const vv of v) {
+      this.writeMessage(buf, vv);
+    }
+    const contentSize = this.size - contentSizeStartOffset;
+    if (buf) {
+      new DataView(buf.buffer, buf.byteOffset).setUint32(sizePlaceholderOffset, contentSize, true);
+    }
+  }
+
 }
