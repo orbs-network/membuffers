@@ -1,7 +1,7 @@
 pushd .
 
 echo ""
-echo "***** TESTING LIBRARY *****"
+echo "***** TESTING GO LIBRARY *****"
 echo ""
 echo "  Running ./go/test_lib.sh"
 echo ""
@@ -17,5 +17,18 @@ echo ""
 
 cd ./membufc
 ./test_compiler.sh
+
+popd
+
+pushd .
+
+echo ""
+echo "***** TESTING JS LIBRARY *****"
+echo ""
+echo "  Running ./javascript/test_lib.sh"
+echo ""
+
+cd ./javascript
+./test_lib.sh
 
 popd
