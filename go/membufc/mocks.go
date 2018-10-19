@@ -1,19 +1,19 @@
 package main
 
 import (
-	"io"
 	"github.com/orbs-network/pbparser"
+	"io"
 	"path"
 )
 
-func compileMockFile(w io.Writer, file pbparser.ProtoFile, dependencyData map[string]dependencyData, compilerVersion string) {
-	addMockHeader(w, &file, dependencyData, compilerVersion)
+func compileMockFile(w io.Writer, file pbparser.ProtoFile, dependencyData map[string]dependencyData, compilerVersion string, languageGoCtx bool) {
+	addMockHeader(w, &file, dependencyData, compilerVersion, languageGoCtx)
 	for _, s := range file.Services {
-		addMockService(w, file.PackageName, s, &file)
+		addMockService(w, file.PackageName, s, &file, languageGoCtx)
 	}
 }
 
-func addMockHeader(w io.Writer, file *pbparser.ProtoFile, dependencyData map[string]dependencyData, compilerVersion string) {
+func addMockHeader(w io.Writer, file *pbparser.ProtoFile, dependencyData map[string]dependencyData, compilerVersion string, languageGoCtx bool) {
 	var goPackage string
 	implementHandlers := []NameWithAndWithoutImport{}
 	registerHandlers := []NameWithAndWithoutImport{}
@@ -45,22 +45,24 @@ func addMockHeader(w io.Writer, file *pbparser.ProtoFile, dependencyData map[str
 	}
 	t := templateByBoxName("MockFileHeader.template")
 	t.Execute(w, struct {
-		PackageName string
-		Imports []string
+		PackageName     string
+		Imports         []string
 		CompilerVersion string
+		LanguageGoCtx   bool
 	}{
-		PackageName: file.PackageName,
-		Imports: unique(imports),
+		PackageName:     file.PackageName,
+		Imports:         unique(imports),
 		CompilerVersion: compilerVersion,
+		LanguageGoCtx:   languageGoCtx,
 	})
 }
 
-func addMockService(w io.Writer, packageName string, s pbparser.ServiceElement, file *pbparser.ProtoFile) {
+func addMockService(w io.Writer, packageName string, s pbparser.ServiceElement, file *pbparser.ProtoFile, languageGoCtx bool) {
 	methods := []ServiceMethod{}
 	for _, rpc := range s.RPCs {
 		method := ServiceMethod{
-			Name: rpc.Name,
-			Input: removeLocalPackagePrefix(packageName, rpc.RequestType.Name()),
+			Name:   rpc.Name,
+			Input:  removeLocalPackagePrefix(packageName, rpc.RequestType.Name()),
 			Output: removeLocalPackagePrefix(packageName, rpc.ResponseType.Name()),
 		}
 		methods = append(methods, method)
@@ -77,14 +79,16 @@ func addMockService(w io.Writer, packageName string, s pbparser.ServiceElement, 
 	}
 	t := templateByBoxName("MockService.template")
 	t.Execute(w, struct {
-		ServiceName string
-		Methods []ServiceMethod
-		RegisterHandlers []NameWithAndWithoutImport
+		ServiceName       string
+		Methods           []ServiceMethod
+		RegisterHandlers  []NameWithAndWithoutImport
 		ImplementHandlers []NameWithAndWithoutImport
+		LanguageGoCtx     bool
 	}{
-		ServiceName: s.Name,
-		Methods: methods,
-		RegisterHandlers: registerHandlers,
+		ServiceName:       s.Name,
+		Methods:           methods,
+		RegisterHandlers:  registerHandlers,
 		ImplementHandlers: implementHandlers,
+		LanguageGoCtx:     languageGoCtx,
 	})
 }

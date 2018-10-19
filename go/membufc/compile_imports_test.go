@@ -1,14 +1,14 @@
 package main
 
 import (
-	"testing"
 	"bytes"
+	"fmt"
 	"github.com/orbs-network/pbparser"
-	"go/token"
-	"go/parser"
 	"go/ast"
 	"go/format"
-	"fmt"
+	"go/parser"
+	"go/token"
+	"testing"
 )
 
 func TestCompilingEmptyProto(t *testing.T) {
@@ -75,7 +75,7 @@ func hasImport(compiled *ast.File, importName string) bool {
 
 func compile(proto pbparser.ProtoFile) (*ast.File, error) {
 	w := bytes.Buffer{}
-	compileProtoFile(&w, proto, make(map[string]dependencyData), MEMBUFC_VERSION)
+	compileProtoFile(&w, proto, make(map[string]dependencyData), MEMBUFC_VERSION, false)
 	fset := token.NewFileSet()
 	compiled, err := parser.ParseFile(fset, "", w.String(), parser.ImportsOnly)
 	return compiled, err
@@ -86,7 +86,7 @@ func importsToString(specs []*ast.ImportSpec) string {
 	fset := token.NewFileSet()
 	for i, spec := range specs {
 		format.Node(&w, fset, spec)
-		if i < len(specs) - 1 {
+		if i < len(specs)-1 {
 			w.WriteByte(',')
 		}
 	}

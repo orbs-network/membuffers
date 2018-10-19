@@ -1,21 +1,22 @@
 package main
 
 import (
-	"os"
-	"strings"
+	"errors"
 	"fmt"
 	"github.com/orbs-network/pbparser"
 	"io"
-	"errors"
+	"os"
 	"path"
+	"strings"
 )
 
-const MEMBUFC_VERSION = "0.0.19"
+const MEMBUFC_VERSION = "0.0.20"
 
 type config struct {
-	language string
-	mock bool
-	files []string
+	language      string   // which output language to generate (eg. "go")
+	languageGoCtx bool     // should go language contexts be added to all interfaces
+	mock          bool     // should mock services be created in addition to interfaces
+	files         []string // input files
 }
 
 var conf = config{}
@@ -42,6 +43,8 @@ func handleFlag(flag string) {
 		conf.mock = true
 	case "--mock":
 		conf.mock = true
+	case "--go-ctx":
+		conf.languageGoCtx = true
 	default:
 		fmt.Println("ERROR: Unknown command line flag:", flag)
 		displayUsage()
@@ -60,6 +63,7 @@ func displayUsage() {
 	fmt.Println("  -h, --help       Show this usage text and exit.")
 	fmt.Println("  -g, --go         Set output file language to Go.")
 	fmt.Println("  -m, --mock       Generate mocks for services as well.")
+	fmt.Println("  --go-ctx         Add context argument to all output Go service methods.")
 	os.Exit(0)
 }
 
@@ -111,7 +115,7 @@ func main() {
 		if isInlineFile(&protoFile) {
 			compileInlineFile(out, protoFile, p.moduleToRelative, MEMBUFC_VERSION)
 		} else {
-			compileProtoFile(out, protoFile, p.moduleToRelative, MEMBUFC_VERSION)
+			compileProtoFile(out, protoFile, p.moduleToRelative, MEMBUFC_VERSION, conf.languageGoCtx)
 		}
 		fmt.Println("Created file:\t", outPath)
 		if len(protoFile.Services) > 0 && conf.mock {
@@ -122,7 +126,7 @@ func main() {
 				os.Exit(1)
 			}
 			defer out.Close()
-			compileMockFile(out, protoFile, p.moduleToRelative, MEMBUFC_VERSION)
+			compileMockFile(out, protoFile, p.moduleToRelative, MEMBUFC_VERSION, conf.languageGoCtx)
 			fmt.Println("Created mock file:\t", outPath)
 		}
 		fmt.Println()
@@ -131,12 +135,13 @@ func main() {
 
 type dependencyData struct {
 	relative string
-	path string
+	path     string
 }
 type importProvider struct {
-	protoFile string
+	protoFile        string
 	moduleToRelative map[string]dependencyData
 }
+
 func (i *importProvider) Provide(module string) (io.Reader, error) {
 	basePath := path.Dir(i.protoFile) + "/"
 	relativePath := ""

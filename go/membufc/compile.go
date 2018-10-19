@@ -1,13 +1,13 @@
 package main
 
 import (
+	"fmt"
+	"github.com/gobuffalo/packr"
 	"github.com/orbs-network/pbparser"
 	"io"
-	"text/template"
-	"fmt"
 	"os"
 	"path"
-	"github.com/gobuffalo/packr"
+	"text/template"
 )
 
 var box = packr.NewBox("./templates/go")
@@ -30,11 +30,11 @@ func templateByBoxName(name string) *template.Template {
 	return t
 }
 
-func compileProtoFile(w io.Writer, file pbparser.ProtoFile, dependencyData map[string]dependencyData, compilerVersion string) {
+func compileProtoFile(w io.Writer, file pbparser.ProtoFile, dependencyData map[string]dependencyData, compilerVersion string, languageGoCtx bool) {
 	serializeAllMessages := shouldSerializeAllMessages(&file)
-	addHeader(w, &file, dependencyData, serializeAllMessages, compilerVersion)
+	addHeader(w, &file, dependencyData, serializeAllMessages, compilerVersion, languageGoCtx)
 	for _, s := range file.Services {
-		addService(w, file.PackageName, s, &file)
+		addService(w, file.PackageName, s, &file, languageGoCtx)
 	}
 	for _, m := range file.Messages {
 		if !serializeAllMessages || !shouldSerializeMessage(m) {
@@ -46,7 +46,7 @@ func compileProtoFile(w io.Writer, file pbparser.ProtoFile, dependencyData map[s
 	addEnums(w, file.Enums)
 }
 
-func addHeader(w io.Writer, file *pbparser.ProtoFile, dependencyData map[string]dependencyData, serializeServiceArgs bool, compilerVersion string) {
+func addHeader(w io.Writer, file *pbparser.ProtoFile, dependencyData map[string]dependencyData, serializeServiceArgs bool, compilerVersion string, languageGoCtx bool) {
 	var goPackage string
 	for _, option := range file.Options {
 		if option.Name == "go_package" {
@@ -69,32 +69,36 @@ func addHeader(w io.Writer, file *pbparser.ProtoFile, dependencyData map[string]
 	}
 	t := templateByBoxName("MessageFileHeader.template")
 	t.Execute(w, struct {
-		PackageName string
-		Imports []string
-		HasMembuffers bool
-		HasMessages bool
+		PackageName     string
+		Imports         []string
+		HasMembuffers   bool
+		HasMessages     bool
+		HasServices     bool
 		CompilerVersion string
+		LanguageGoCtx   bool
 	}{
-		PackageName: file.PackageName,
-		Imports: unique(imports),
-		HasMembuffers: len(file.Messages) > 0 && serializeServiceArgs,
-		HasMessages: len(file.Messages) > 0,
+		PackageName:     file.PackageName,
+		Imports:         unique(imports),
+		HasMembuffers:   len(file.Messages) > 0 && serializeServiceArgs,
+		HasMessages:     len(file.Messages) > 0,
+		HasServices:     len(file.Services) > 0,
 		CompilerVersion: compilerVersion,
+		LanguageGoCtx:   languageGoCtx,
 	})
 }
 
-type ServiceMethod struct{
-	Name string
-	Input string
+type ServiceMethod struct {
+	Name   string
+	Input  string
 	Output string
 }
 
-func addService(w io.Writer, packageName string, s pbparser.ServiceElement, file *pbparser.ProtoFile) {
+func addService(w io.Writer, packageName string, s pbparser.ServiceElement, file *pbparser.ProtoFile, languageGoCtx bool) {
 	methods := []ServiceMethod{}
 	for _, rpc := range s.RPCs {
 		method := ServiceMethod{
-			Name: rpc.Name,
-			Input: removeLocalPackagePrefix(packageName, rpc.RequestType.Name()),
+			Name:   rpc.Name,
+			Input:  removeLocalPackagePrefix(packageName, rpc.RequestType.Name()),
 			Output: removeLocalPackagePrefix(packageName, rpc.ResponseType.Name()),
 		}
 		methods = append(methods, method)
@@ -111,15 +115,17 @@ func addService(w io.Writer, packageName string, s pbparser.ServiceElement, file
 	}
 	t := templateByBoxName("MessageService.template")
 	t.Execute(w, struct {
-		ServiceName string
-		Methods []ServiceMethod
-		RegisterHandlers []NameWithAndWithoutImport
+		ServiceName       string
+		Methods           []ServiceMethod
+		RegisterHandlers  []NameWithAndWithoutImport
 		ImplementHandlers []NameWithAndWithoutImport
+		LanguageGoCtx     bool
 	}{
-		ServiceName: s.Name,
-		Methods: methods,
-		RegisterHandlers: registerHandlers,
+		ServiceName:       s.Name,
+		Methods:           methods,
+		RegisterHandlers:  registerHandlers,
 		ImplementHandlers: implementHandlers,
+		LanguageGoCtx:     languageGoCtx,
 	})
 }
 
@@ -133,10 +139,10 @@ func addMessage(w io.Writer, packageName string, m pbparser.MessageElement, file
 	}
 	t := templateByBoxName("MessageHeader.template")
 	t.Execute(w, struct {
-		MessageName string
+		MessageName   string
 		MessageFields []MessageField
 	}{
-		MessageName: m.Name,
+		MessageName:   m.Name,
 		MessageFields: messageFields,
 	})
 	addMessageScheme(w, packageName, m.Name, m.Fields, m.OneOfs, enumNameToIndex)
@@ -156,10 +162,10 @@ func addMessageScheme(w io.Writer, packageName string, messageName string, field
 	}
 	t := templateByBoxName("MessageScheme.template")
 	t.Execute(w, struct {
-		MessageName string
+		MessageName   string
 		MessageFields []MessageField
 	}{
-		MessageName: messageName,
+		MessageName:   messageName,
 		MessageFields: messageFields,
 	})
 }
@@ -168,10 +174,10 @@ func addMessageUnions(w io.Writer, packageName string, messageName string, field
 	unionByIndex, _ := getMessageUnions(packageName, messageName, unions, enumNameToIndex)
 	t := templateByBoxName("MessageUnions.template")
 	t.Execute(w, struct {
-		MessageName string
+		MessageName  string
 		UnionByIndex [][]MessageField
 	}{
-		MessageName: messageName,
+		MessageName:  messageName,
 		UnionByIndex: unionByIndex,
 	})
 }
@@ -192,23 +198,23 @@ func addMessageReaderField(w io.Writer, packageName string, messageName string, 
 		t := templateByBoxName("MessageReaderUnionField.template")
 		t.Execute(w, struct {
 			MessageName string
-			UnionName string
-			FieldIndex int
-			UnionNum int
+			UnionName   string
+			FieldIndex  int
+			UnionNum    int
 			UnionFields []MessageField
 		}{
-			MessageName:  messageName,
-			UnionName: messageField.FieldName,
-			FieldIndex: messageField.FieldIndex,
- 			UnionNum: unionNameToIndex[messageField.FieldName],
- 			UnionFields: unionByIndex[unionNameToIndex[messageField.FieldName]],
+			MessageName: messageName,
+			UnionName:   messageField.FieldName,
+			FieldIndex:  messageField.FieldIndex,
+			UnionNum:    unionNameToIndex[messageField.FieldName],
+			UnionFields: unionByIndex[unionNameToIndex[messageField.FieldName]],
 		})
 		return
 	}
 	if !messageField.IsMessage && !messageField.IsArray {
 		t := templateByBoxName("MessageReaderMutableField.template")
 		t.Execute(w, struct {
-			MessageName string
+			MessageName  string
 			MessageField MessageField
 		}{
 			MessageName:  messageName,
@@ -219,7 +225,7 @@ func addMessageReaderField(w io.Writer, packageName string, messageName string, 
 	if messageField.IsMessage && !messageField.IsArray {
 		t := templateByBoxName("MessageReaderMessageField.template")
 		t.Execute(w, struct {
-			MessageName string
+			MessageName  string
 			MessageField MessageField
 		}{
 			MessageName:  messageName,
@@ -230,7 +236,7 @@ func addMessageReaderField(w io.Writer, packageName string, messageName string, 
 	if !messageField.IsMessage && messageField.IsArray {
 		t := templateByBoxName("MessageReaderMutableArrayField.template")
 		t.Execute(w, struct {
-			MessageName string
+			MessageName  string
 			MessageField MessageField
 		}{
 			MessageName:  messageName,
@@ -241,7 +247,7 @@ func addMessageReaderField(w io.Writer, packageName string, messageName string, 
 	if messageField.IsMessage && messageField.IsArray {
 		t := templateByBoxName("MessageReaderMessageArrayField.template")
 		t.Execute(w, struct {
-			MessageName string
+			MessageName  string
 			MessageField MessageField
 		}{
 			MessageName:  messageName,
@@ -260,14 +266,14 @@ func addMessageBuilder(w io.Writer, packageName string, messageName string, fiel
 	}
 	t := templateByBoxName("MessageBuilder.template")
 	t.Execute(w, struct {
-		MessageName string
-		MessageFields []MessageField
-		UnionByIndex [][]MessageField
+		MessageName      string
+		MessageFields    []MessageField
+		UnionByIndex     [][]MessageField
 		UnionNameToIndex map[string]int
 	}{
-		MessageName:   messageName,
-		MessageFields: messageFields,
-		UnionByIndex:  unionByIndex,
+		MessageName:      messageName,
+		MessageFields:    messageFields,
+		UnionByIndex:     unionByIndex,
 		UnionNameToIndex: unionNameToIndex,
 	})
 }
