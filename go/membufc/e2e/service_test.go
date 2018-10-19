@@ -1,13 +1,12 @@
 package e2e
 
 import (
-	"testing"
 	"github.com/orbs-network/membuffers/go/membufc/e2e/protos"
 	"github.com/pkg/errors"
+	"testing"
 )
 
 type stateStorageService struct {
-	types.StateStorage
 }
 
 func (s *stateStorageService) WriteKey(*types.WriteKeyInput) (*types.WriteKeyOutput, error) {
@@ -16,6 +15,10 @@ func (s *stateStorageService) WriteKey(*types.WriteKeyInput) (*types.WriteKeyOut
 
 func (s *stateStorageService) ReadKey(*types.ReadKeyInput) (*types.ReadKeyOutput, error) {
 	return nil, nil
+}
+
+func NewStateStorage() types.StateStorage {
+	return &stateStorageService{}
 }
 
 func TestServiceMock(t *testing.T) {

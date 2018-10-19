@@ -7,6 +7,8 @@ import (
 {{end -}}
 {{if .HasMessages}}	"fmt"
 {{end -}}
+{{if and .HasServices .LanguageGoCtx}}	"context"
+{{end -}}
 {{range .Imports}}	"{{.}}"
 {{end -}}
 )

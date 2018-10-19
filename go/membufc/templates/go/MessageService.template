@@ -1,12 +1,12 @@
 /////////////////////////////////////////////////////////////////////////////
-// service {{.ServiceName}}
+// service {{.ServiceName}}{{$LanguageGoCtx := .LanguageGoCtx}}
 
 type {{.ServiceName}} interface {
 {{- range .ImplementHandlers}}
 	{{.ImportName}}
 {{- end}}
 {{- range .Methods}}
-	{{.Name}}(input *{{.Input}}) (*{{.Output}}, error)
+	{{.Name}}({{if $LanguageGoCtx}}ctx context.Context, {{end}}input *{{.Input}}) (*{{.Output}}, error)
 {{- end}}
 {{- range .RegisterHandlers}}
 	Register{{.CleanName}}(handler {{.ImportName}})

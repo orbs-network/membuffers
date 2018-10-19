@@ -3,6 +3,8 @@ package {{.PackageName}}
 
 import (
 	"github.com/orbs-network/go-mock"
+{{if .LanguageGoCtx}}	"context"
+{{end -}}
 {{range .Imports}}	"{{.}}"
 {{end -}}
 )

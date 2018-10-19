@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// service {{.ServiceName}}{{$ServiceName := .ServiceName}}
+// service {{.ServiceName}}{{$ServiceName := .ServiceName}}{{$LanguageGoCtx := .LanguageGoCtx}}
 
 type Mock{{.ServiceName}} struct {
 	mock.Mock
@@ -9,8 +9,8 @@ type Mock{{.ServiceName}} struct {
 }
 
 {{range .Methods -}}
-func (s *Mock{{$ServiceName}}) {{.Name}}(input *{{.Input}}) (*{{.Output}}, error) {
-	ret := s.Called(input)
+func (s *Mock{{$ServiceName}}) {{.Name}}({{if $LanguageGoCtx}}ctx context.Context, {{end}}input *{{.Input}}) (*{{.Output}}, error) {
+	ret := s.Called({{if $LanguageGoCtx}}ctx, {{end}}input)
 	if out := ret.Get(0); out != nil {
 		return out.(*{{.Output}}), ret.Error(1)
 	} else {
