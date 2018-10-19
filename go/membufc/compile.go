@@ -69,21 +69,21 @@ func addHeader(w io.Writer, file *pbparser.ProtoFile, dependencyData map[string]
 	}
 	t := templateByBoxName("MessageFileHeader.template")
 	t.Execute(w, struct {
-		PackageName     string
-		Imports         []string
-		HasMembuffers   bool
-		HasMessages     bool
-		HasServices     bool
-		CompilerVersion string
-		LanguageGoCtx   bool
+		PackageName       string
+		Imports           []string
+		HasMembuffers     bool
+		HasMessages       bool
+		HasServiceMethods bool
+		CompilerVersion   string
+		LanguageGoCtx     bool
 	}{
-		PackageName:     file.PackageName,
-		Imports:         unique(imports),
-		HasMembuffers:   len(file.Messages) > 0 && serializeServiceArgs,
-		HasMessages:     len(file.Messages) > 0,
-		HasServices:     len(file.Services) > 0,
-		CompilerVersion: compilerVersion,
-		LanguageGoCtx:   languageGoCtx,
+		PackageName:       file.PackageName,
+		Imports:           unique(imports),
+		HasMembuffers:     len(file.Messages) > 0 && serializeServiceArgs,
+		HasMessages:       len(file.Messages) > 0,
+		HasServiceMethods: fileHasServiceMethods(file),
+		CompilerVersion:   compilerVersion,
+		LanguageGoCtx:     languageGoCtx,
 	})
 }
 

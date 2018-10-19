@@ -45,15 +45,17 @@ func addMockHeader(w io.Writer, file *pbparser.ProtoFile, dependencyData map[str
 	}
 	t := templateByBoxName("MockFileHeader.template")
 	t.Execute(w, struct {
-		PackageName     string
-		Imports         []string
-		CompilerVersion string
-		LanguageGoCtx   bool
+		PackageName       string
+		Imports           []string
+		HasServiceMethods bool
+		CompilerVersion   string
+		LanguageGoCtx     bool
 	}{
-		PackageName:     file.PackageName,
-		Imports:         unique(imports),
-		CompilerVersion: compilerVersion,
-		LanguageGoCtx:   languageGoCtx,
+		PackageName:       file.PackageName,
+		Imports:           unique(imports),
+		HasServiceMethods: fileHasServiceMethods(file),
+		CompilerVersion:   compilerVersion,
+		LanguageGoCtx:     languageGoCtx,
 	})
 }
 

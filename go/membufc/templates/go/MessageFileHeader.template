@@ -7,7 +7,7 @@ import (
 {{end -}}
 {{if .HasMessages}}	"fmt"
 {{end -}}
-{{if and .HasServices .LanguageGoCtx}}	"context"
+{{if and .HasServiceMethods .LanguageGoCtx}}	"context"
 {{end -}}
 {{range .Imports}}	"{{.}}"
 {{end -}}
