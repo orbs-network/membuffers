@@ -7,7 +7,8 @@ type MessageWriter interface {
 }
 
 type InternalBuilder struct {
-	size Offset
+	size     Offset
+	building bool
 }
 
 func (w *InternalBuilder) Reset() {
@@ -32,6 +33,17 @@ func (w *InternalBuilder) CalcRequiredSize() Offset {
 
 func (w *InternalBuilder) GetSize() Offset {
 	return w.size
+}
+
+func (w *InternalBuilder) NotifyBuildStart() {
+	if w.building {
+		panic("concurrent build: builder is not thread safe (started building from multiple goroutines)")
+	}
+	w.building = true // not a mutex for performance reasons
+}
+
+func (w *InternalBuilder) NotifyBuildEnd() {
+	w.building = false
 }
 
 func (w *InternalBuilder) WriteUint8(buf []byte, v uint8) {
@@ -96,7 +108,7 @@ func (w *InternalBuilder) WriteUnionIndex(buf []byte, unionIndex uint16) {
 func (w *InternalBuilder) WriteUint8Array(buf []byte, v []uint8) {
 	w.size = alignOffsetToType(w.size, TypeUint8Array)
 	if buf != nil {
-		WriteOffset(buf[w.size:], Offset(len(v)) * FieldSizes[TypeUint8])
+		WriteOffset(buf[w.size:], Offset(len(v))*FieldSizes[TypeUint8])
 	}
 	w.size += FieldSizes[TypeUint8Array]
 	w.size = alignDynamicFieldContentOffset(w.size, TypeUint8Array)
@@ -108,7 +120,7 @@ func (w *InternalBuilder) WriteUint8Array(buf []byte, v []uint8) {
 func (w *InternalBuilder) WriteUint16Array(buf []byte, v []uint16) {
 	w.size = alignOffsetToType(w.size, TypeUint16Array)
 	if buf != nil {
-		WriteOffset(buf[w.size:], Offset(len(v)) * FieldSizes[TypeUint16])
+		WriteOffset(buf[w.size:], Offset(len(v))*FieldSizes[TypeUint16])
 	}
 	w.size += FieldSizes[TypeUint16Array]
 	w.size = alignDynamicFieldContentOffset(w.size, TypeUint16Array)
@@ -120,7 +132,7 @@ func (w *InternalBuilder) WriteUint16Array(buf []byte, v []uint16) {
 func (w *InternalBuilder) WriteUint32Array(buf []byte, v []uint32) {
 	w.size = alignOffsetToType(w.size, TypeUint32Array)
 	if buf != nil {
-		WriteOffset(buf[w.size:], Offset(len(v)) * FieldSizes[TypeUint32])
+		WriteOffset(buf[w.size:], Offset(len(v))*FieldSizes[TypeUint32])
 	}
 	w.size += FieldSizes[TypeUint32Array]
 	w.size = alignDynamicFieldContentOffset(w.size, TypeUint32Array)
@@ -132,7 +144,7 @@ func (w *InternalBuilder) WriteUint32Array(buf []byte, v []uint32) {
 func (w *InternalBuilder) WriteUint64Array(buf []byte, v []uint64) {
 	w.size = alignOffsetToType(w.size, TypeUint64Array)
 	if buf != nil {
-		WriteOffset(buf[w.size:], Offset(len(v)) * FieldSizes[TypeUint64])
+		WriteOffset(buf[w.size:], Offset(len(v))*FieldSizes[TypeUint64])
 	}
 	w.size += FieldSizes[TypeUint64Array]
 	w.size = alignDynamicFieldContentOffset(w.size, TypeUint64Array)

@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-const MEMBUFC_VERSION = "0.0.20"
+const MEMBUFC_VERSION = "0.0.21"
 
 type config struct {
 	language      string   // which output language to generate (eg. "go")

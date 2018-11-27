@@ -31,6 +31,8 @@ func (w *{{.MessageName}}Builder) Write(buf []byte) (err error) {
 	if w == nil {
 		return
 	}
+	w._builder.NotifyBuildStart()
+	defer w._builder.NotifyBuildEnd()
 	defer func() {
 		if r := recover(); r != nil {
 			err = &membuffers.ErrBufferOverrun{}
