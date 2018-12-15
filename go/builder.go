@@ -27,6 +27,18 @@ func (w *InternalBuilder) Write(buf []byte) (err error) {
 	return nil
 }
 
+// instead of implementing Write with the actual fields, this allows to take a ready-made raw buffer
+func (w *InternalBuilder) WriteOverrideWithRawBuffer(buf []byte, overrideWithRawBuffer []byte) error {
+	if buf != nil {
+		if len(buf) < len(overrideWithRawBuffer) {
+			return &ErrBufferOverrun{}
+		}
+		copy(buf, overrideWithRawBuffer)
+	}
+	w.size = Offset(len(overrideWithRawBuffer))
+	return nil
+}
+
 func (w *InternalBuilder) CalcRequiredSize() Offset {
 	w.Write(nil)
 	return w.GetSize()

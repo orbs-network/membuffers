@@ -8,6 +8,7 @@ type {{.MessageName}}Builder struct {
 	// internal
 	// implements membuffers.Builder
 	_builder membuffers.InternalBuilder
+	_overrideWithRawBuffer []byte
 }
 {{range .MessageFields}}{{if and .IsArray .IsMessage}}
 func (w *{{.MessageName}}Builder) arrayOf{{.FieldName}}() []membuffers.MessageWriter {
@@ -38,6 +39,9 @@ func (w *{{.MessageName}}Builder) Write(buf []byte) (err error) {
 			err = &membuffers.ErrBufferOverrun{}
 		}
 	}()
+	if w._overrideWithRawBuffer != nil {
+		return w._builder.WriteOverrideWithRawBuffer(buf, w._overrideWithRawBuffer)
+	}
 	w._builder.Reset()
 	{{- range .MessageFields}}
 	{{- if .IsUnion}}
@@ -110,5 +114,9 @@ func (w *{{.MessageName}}Builder) Build() *{{.MessageName}} {
 		return nil
 	}
 	return {{.MessageName}}Reader(buf)
+}
+
+func {{.MessageName}}BuilderFromRaw(raw []byte) *{{.MessageName}}Builder {
+	return &{{.MessageName}}Builder{_overrideWithRawBuffer: raw}
 }
 
