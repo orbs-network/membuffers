@@ -1,6 +1,7 @@
 package membuffers
 
 type MessageWriter interface {
+	HexDump(prefix string, offsetFromStart Offset) (err error)
 	Write(buf []byte) (err error)
 	GetSize() Offset
 	CalcRequiredSize() Offset
