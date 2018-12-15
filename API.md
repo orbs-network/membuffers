@@ -204,18 +204,31 @@ var methodBytes []byte = ReadFromWire()
 method := MethodReader(methodBytes) // method is now a regular MemBuffer
 ```
 
-## Known limitations
+## Creating a Builder from a MemBuffer / raw bytes
 
-* You can't use provide an existing **MemBuffer** to a **Builder**
+Assume we have a field that is already encoded as a MemBuffer. Now, we want to place it inside another wrapper MemBuffer. How do we create the new MemBuffer? What's the API for doing that?
 
-  Let's think for a second how this can happen. Assume we have a field that is already encoded as a MemBuffer. Now, we want to place it inside another wrapper MemBuffer. How do we create the new MemBuffer? Well.. there's no API for that.
+Normally, to create a Builder, you must provide the values for all fields separately. Consider if you have a message inside a message, meaning a parent Builder that wraps a child Builder. If you have the data for the child Builder only in MemBuffer form, it can get annoying to pull every field out of the MemBuffer. 
+
+This is on purpose. If you get to a situation where you need to place an already serialized MemBuffer inside another new MemBuffer through a Builder, stop and think. This usually indicates some design problem because the entire purpose of MemBuffers is to avoid excessive copying. Placing an already serialized MemBuffer inside another MemBuffer must involve copying since the existing MemBuffer already has an underlying byte array that can't be increased in size.
   
-  This is on purpose. If you get to a situation where you need to place an already serialized MemBuffer inside another new MemBuffer through a Builder, stop and think. This usually indicates some architecture problem because the entire purpose of MemBuffers is to avoid excessive copying. Placing an already serialized MemBuffer inside another MemBuffer must involve copying since the existing MemBuffer already has an underlying byte array that can't be increased in size.
+So what design changes can you make in this situation? There are usually 3 alternatives, choose the most appropriate:
+
+  1. The wrapper MemBuffer should not be a MemBuffer at all. It should maybe be a plain old struct. If this is the case, mark it with `option serialize_message = false` in its .proto file.
   
-  So what can you do in this situation. There are usually 3 alternatives, choose the most appropriate:
+  2. Use a Builder and for every field access the field from the first MemBuffer. This basically means you're rebuilding it from scratch. This makes sense if the wrapper MemBuffer may be changed to a different serialization format and just by accident it's also a MemBuffer.
   
-    1. The wrapper MemBuffer should not be a MemBuffer at all. It should maybe be a plain old struct. If this is the case, mark it with `option serialize_message = false` in its .proto file.
-    
-    2. Use a Builder and for every field access the field from the first MemBuffer. This basically means you're rebuilding it from scratch. This makes sense if the wrapper MemBuffer may be changed to a different serialization format and just by accident it's also a MemBuffer.
-    
-    3. Mark the field in the wrapper MemBuffer as an opaque byte array. To do that, in the .proto file of the wrapper change the type of the internal MemBuffer to `bytes`. This means it's now opaque. When building the wrapper, provide the field bytes by calling `Raw()` on the first MemBuffer. If you ever want to access its fields from the wrapper MemBuffer, just use a reader. This approach usually makes sense when there's separation of concerns and some parts of the code should not be aware of the internal format of the field. 
+  3. Mark the field in the wrapper MemBuffer as an opaque byte array. To do that, in the .proto file of the wrapper change the type of the internal MemBuffer to `bytes`. This means it's now opaque. When building the wrapper, provide the field bytes by calling `Raw()` on the first MemBuffer. If you ever want to access its fields from the wrapper MemBuffer, just use a reader. This approach usually makes sense when there's separation of concerns and some parts of the code should not be aware of the internal format of the field. 
+
+If none of these work out and your mind is set on copying, this is indeed possible - although not recommended:
+
+```go
+tx1 := givenAsMemBuffer()
+
+builder := &types.TransactionBuilder{
+  Data:      types.TransactionDataBuilderFromRaw(tx1.Data().Raw()), // here we create a builder using a raw buffer (copying the data!)
+  Signature: []byte{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22},
+  Type:      types.NETWORK_TYPE_RESERVED,
+}
+tx2 := builder.Build()
+```
