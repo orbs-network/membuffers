@@ -6,6 +6,9 @@ node_modules
 ### Compiled MemBuffers
 *.mb.go
 
+### packr
+a_main-packr.go
+
 ### Go ###
 # Binaries for programs and plugins
 *.exe
