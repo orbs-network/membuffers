@@ -336,6 +336,40 @@ MemBuffers supports proto definitions using standard [Protobuf v3 schema](https:
 
   The schema supports specifying that any message should be compiled to a plain struct instead of a MemBuffer. This is useful for messages that have no need in being serialized. Read more about `option` extensions under `membufc` compiler [documentation](go/membufc/README.md).
 
+## Debugging
+
+#### Printing hex dumps of messages
+
+The `membufc` Go compiler will generate `HexDump()` methods on builders. You can use this method to dump a build result to stdout. This is useful for showing packet examples from your protocol to third-parties who may need to parse it directly without the MemBuffers library.  
+
+Using the example from the wire format above:
+
+```go
+builder := &types.TransactionBuilder{
+ Data: &types.TransactionDataBuilder{
+   ProtocolVersion: 0x01,
+   SenderAccount: 0x11223344,
+   ContractMethod: "abc",
+ },
+ Hash: []byte{0x55,0x56,0x57,0x58,0x59,},
+}
+
+builder.HexDump("", 0)
+```
+
+Will print to stdout:
+```
+0f000000 // Transaction.Data: message size (offset 0x0, size: 0x4)
+    0100 // TransactionData.ProtocolVersion: uint16 (offset 0x4, size: 0x2)
+    0000 // padding (offset 0x6, size: 0x2)
+    44332211 // TransactionData.SenderAccount: uint32 (offset 0x8, size: 0x4)
+    03000000 // TransactionData.ContractMethod: string size (offset 0xc, size: 0x4)
+        616263 // TransactionData.ContractMethod: string content (offset 0x10, size: 0x3)
+00 // padding (offset 0x13, size: 0x1)
+05000000 // Transaction.Hash: bytes size (offset 0x14, size: 0x4)
+    5556575859 // Transaction.Hash: bytes content (offset 0x18, size: 0x5)
+```
+
 ## License
 
 MIT
