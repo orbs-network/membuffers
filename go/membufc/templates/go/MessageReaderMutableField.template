@@ -5,7 +5,7 @@ func (x *{{.MessageName}}) {{.MessageField.FieldName}}() {{.MessageField.FieldGo
 func (x *{{.MessageName}}) Raw{{.MessageField.FieldName}}() []byte {
 	return x._message.RawBufferForField({{.MessageField.FieldIndex}}, 0)
 }
-{{if or (eq .MessageField.FieldGoType "string") (eq .MessageField.FieldGoType "[]byte")}}
+{{if or (eq .MessageField.FieldGoType "string") (eq .MessageField.FieldGoType "[]byte") (eq .MessageField.InlineUnderlyingGoType "string") (eq .MessageField.InlineUnderlyingGoType "[]byte")}}
 func (x *{{.MessageName}}) Raw{{.MessageField.FieldName}}WithHeader() []byte {
 	return x._message.RawBufferWithHeaderForField({{.MessageField.FieldIndex}}, 0)
 }
