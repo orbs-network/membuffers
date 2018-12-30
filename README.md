@@ -150,12 +150,13 @@ Detailed documentation about the API is available [here](API.md). It shows concr
     
 ## Test
 
-1. Make sure [`packr`](https://github.com/gobuffalo/packr) is installed.
+1. Make sure [`packr`](https://github.com/gobuffalo/packr) is installed and at commit `1aab567`.
     
     ```sh
     which packr
     # if not found:
     go get -u github.com/gobuffalo/packr/...
+    git checkout 1aab567
     ``` 
 
 2. Test the library and the compiler (unit tests and end to end tests):
