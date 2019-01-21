@@ -1,0 +1,6 @@
+[submodule "go/vendor/github.com/gobuffalo/packr"]
+	path = go/vendor/github.com/gobuffalo/packr
+	url = https://github.com/gobuffalo/packr
+[submodule "go/vendor/github.com/orbs-network/pbparser"]
+	path = go/vendor/github.com/orbs-network/pbparser
+	url = https://github.com/orbs-network/pbparser
