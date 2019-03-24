@@ -22,12 +22,12 @@
   "homepage": "https://github.com/orbs-network/membuffers#readme",
   "devDependencies": {
     "babel-core": "^6.26.3",
-    "babel-jest": "^23.6.0",
+    "babel-jest": "^24.5.0",
     "babel-preset-env": "^1.7.0",
-    "jest": "^23.6.0",
+    "jest": "^24.5.0",
     "regenerator-runtime": "^0.12.1"
   },
   "dependencies": {
-    "text-encoding": "^0.6.4"
+    "fast-text-encoding": "^1.0.0"
   }
 }
