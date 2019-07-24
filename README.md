@@ -1,5 +1,7 @@
 # MemBuffers
 
+[![CircleCI](https://circleci.com/gh/orbs-network/membuffers/tree/master.svg?style=svg)](https://circleci.com/gh/orbs-network/membuffers/tree/master)
+
 **MemBuffers** is an efficient cross platform serialization library. It allows you to directly access serialized data without unpacking/parsing it first. The wire format is deterministic and canonical, perfect for cryptographic fields and hashes. It uses **protobuf** schema (ver 3) to define messages but naturally encodes them in a different format.
 
 This standalone library was originally created as part of the [ORBS](https://www.orbs.com) blockchain project. Its features are designed to address the requirements of a highly performant system dealing with cryptography, hashes and signatures. 
