@@ -5,7 +5,10 @@ jobs:
       - image: itamararjuan/golang_with_node_aws
     steps:
       - checkout
-      - run: bash test.sh
+      - run:
+          command: bash test.sh
+          environment:
+            GOBIN: /usr/local/bin/
 
 workflows:
   version: 2
