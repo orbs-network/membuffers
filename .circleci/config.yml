@@ -8,11 +8,11 @@ jobs:
       - run: 
           command: ./.circleci/setup.sh
           environment:
-            GOBIN: /usr/local/bin/
+            GOBIN: /go/bin/
       - run:
           command: ./test.sh
           environment:
-            GOBIN: /usr/local/bin/
+            GOBIN: /go/bin/
 
 workflows:
   version: 2
