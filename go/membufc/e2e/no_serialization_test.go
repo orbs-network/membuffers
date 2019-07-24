@@ -7,9 +7,9 @@
 package e2e
 
 import (
+	"errors"
 	"github.com/orbs-network/membuffers/go/membufc/e2e/protos"
 	"testing"
-	"errors"
 )
 
 type stateStorageServiceNS struct {

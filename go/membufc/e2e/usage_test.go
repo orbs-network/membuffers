@@ -7,12 +7,12 @@
 package e2e
 
 import (
-	"testing"
 	"bytes"
-	"github.com/orbs-network/membuffers/go/membufc/e2e/protos"
 	"crypto/md5"
-	"github.com/orbs-network/membuffers/go/membufc/e2e/protos/dep2"
+	"github.com/orbs-network/membuffers/go/e2e/types"
 	"github.com/orbs-network/membuffers/go/membufc/e2e/protos/dep1/dep11"
+	"github.com/orbs-network/membuffers/go/membufc/e2e/protos/dep2"
+	"testing"
 )
 
 func hashBytes(buffer []byte) []byte {
@@ -25,21 +25,21 @@ func TestReadWriteTransaction(t *testing.T) {
 	builder := &types.TransactionBuilder{
 		Data: &types.TransactionDataBuilder{
 			ProtocolVersion: 0x01,
-			VirtualChain: 0x11223344,
+			VirtualChain:    0x11223344,
 			Sender: []*types.TransactionSenderBuilder{
 				&types.TransactionSenderBuilder{
-					Name: "johnny",
-					Friend: []string{"billy","jeff","alex"},
+					Name:   "johnny",
+					Friend: []string{"billy", "jeff", "alex"},
 				},
 				&types.TransactionSenderBuilder{
-					Name: "rachel",
-					Friend: []string{"jessica","sara"},
+					Name:   "rachel",
+					Friend: []string{"jessica", "sara"},
 				},
 			},
 			TimeStamp: 0x445566778899,
 		},
-		Signature: []byte{0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,},
-		Type: types.NETWORK_TYPE_RESERVED,
+		Signature: []byte{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,},
+		Type:      types.NETWORK_TYPE_RESERVED,
 	}
 	buf := make([]byte, builder.CalcRequiredSize())
 	err := builder.Write(buf)
@@ -58,7 +58,7 @@ func TestReadWriteTransaction(t *testing.T) {
 	if transaction.Data().TimeStamp() != 0x445566778899 {
 		t.Fatalf("TimeStamp: instead of expected got %v", transaction.Data().TimeStamp())
 	}
-	if !bytes.Equal(transaction.Signature(), []byte{0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,}) {
+	if !bytes.Equal(transaction.Signature(), []byte{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,}) {
 		t.Fatalf("Signature: instead of expected got %v", transaction.Signature())
 	}
 	if transaction.Type() != types.NETWORK_TYPE_RESERVED {
@@ -106,7 +106,7 @@ func TestReadWriteTransaction(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Signature: mutate to hash value failed: %v", err.Error())
 	}
-	if bytes.Equal(transaction.Signature(), []byte{0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,}) {
+	if bytes.Equal(transaction.Signature(), []byte{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,}) {
 		t.Fatalf("Signature: value did not change after mutation")
 	}
 }
@@ -126,7 +126,7 @@ func TestReadWriteMethod(t *testing.T) {
 			},
 			&types.MethodCallArgumentBuilder{
 				Type: types.METHOD_CALL_ARGUMENT_TYPE_DATA,
-				Data: []byte{0x01,0x02,0x03},
+				Data: []byte{0x01, 0x02, 0x03},
 			},
 		},
 	}
@@ -199,21 +199,21 @@ func TestQuickBuildTransaction(t *testing.T) {
 	transaction := (&types.TransactionBuilder{
 		Data: &types.TransactionDataBuilder{
 			ProtocolVersion: 0x01,
-			VirtualChain: 0x11223344,
+			VirtualChain:    0x11223344,
 			Sender: []*types.TransactionSenderBuilder{
 				&types.TransactionSenderBuilder{
-					Name: "johnny",
-					Friend: []string{"billy","jeff","alex"},
+					Name:   "johnny",
+					Friend: []string{"billy", "jeff", "alex"},
 				},
 				&types.TransactionSenderBuilder{
-					Name: "rachel",
-					Friend: []string{"jessica","sara"},
+					Name:   "rachel",
+					Friend: []string{"jessica", "sara"},
 				},
 			},
 			TimeStamp: 0x445566778899,
 		},
-		Signature: []byte{0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,},
-		Type: types.NETWORK_TYPE_RESERVED,
+		Signature: []byte{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,},
+		Type:      types.NETWORK_TYPE_RESERVED,
 	}).Build()
 
 	if transaction.Data().ProtocolVersion() != 0x01 {
@@ -225,7 +225,7 @@ func TestQuickBuildTransaction(t *testing.T) {
 	if transaction.Data().TimeStamp() != 0x445566778899 {
 		t.Fatalf("TimeStamp: instead of expected got %v", transaction.Data().TimeStamp())
 	}
-	if !bytes.Equal(transaction.Signature(), []byte{0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,}) {
+	if !bytes.Equal(transaction.Signature(), []byte{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,}) {
 		t.Fatalf("Signature: instead of expected got %v", transaction.Signature())
 	}
 	if transaction.Type() != types.NETWORK_TYPE_RESERVED {

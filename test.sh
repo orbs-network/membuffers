@@ -1,3 +1,5 @@
+#!/bin/bash -e
+
 pushd .
 
 echo ""
@@ -28,7 +30,7 @@ echo ""
 echo "  Running ./javascript/test_lib.sh"
 echo ""
 
-cd ./javascript
+cd javascript
 ./test_lib.sh
 
 popd

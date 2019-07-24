@@ -6,6 +6,10 @@ node_modules
 ### Compiled MemBuffers
 *.mb.go
 
+### JetBrains and VsCode
+.idea
+.vscode
+
 ### packr
 a_main-packr.go
 

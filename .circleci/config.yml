@@ -2,10 +2,10 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/golang:1.12
+      - image: itamararjuan/golang_with_node_aws
     steps:
       - checkout
-      - run: go test ./... -v
+      - run: bash test.sh
 
 workflows:
   version: 2

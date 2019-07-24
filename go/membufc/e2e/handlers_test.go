@@ -7,12 +7,12 @@
 package e2e
 
 import (
-	"testing"
-	"github.com/orbs-network/membuffers/go/membufc/e2e/protos/options"
 	"github.com/orbs-network/membuffers/go/membufc/e2e/protos/options/handlers"
+	"github.com/orbs-network/membuffers/go/membufc/e2e/protos/options"
+	"testing"
 )
 
-type implementsExampleService struct {}
+type implementsExampleService struct{}
 
 func NewImplementsExampleService() options.ExampleService {
 	return &implementsExampleService{}
@@ -29,7 +29,7 @@ func (m *implementsExampleService) SomeMethodINeedFromOthers(*handlers.SomeMessa
 	return nil, nil
 }
 
-type implementsServicesIProvideToOthersHandler struct {}
+type implementsServicesIProvideToOthersHandler struct{}
 
 func NewImplementsServicesIProvideToOthersHandler() handlers.ServicesIProvideToOthersHandler {
 	return &implementsServicesIProvideToOthersHandler{}

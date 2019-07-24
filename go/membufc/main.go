@@ -9,11 +9,12 @@ package main
 import (
 	"errors"
 	"fmt"
-	"github.com/orbs-network/pbparser"
 	"io"
 	"os"
 	"path"
 	"strings"
+
+	"github.com/orbs-network/pbparser"
 )
 
 const MEMBUFC_VERSION = "0.0.21"
@@ -106,9 +107,10 @@ func main() {
 			os.Exit(1)
 		}
 		p := importProvider{protoFile: path, moduleToRelative: make(map[string]dependencyData)}
+
 		protoFile, err := pbparser.Parse(in, &p)
 		if err != nil {
-			fmt.Println("ERROR:", err.Error())
+			fmt.Println("ERROR (pbparser):", err.Error())
 			os.Exit(1)
 		}
 		outPath := outputFileForPath(path, ".mb.go")
@@ -143,6 +145,7 @@ type dependencyData struct {
 	relative string
 	path     string
 }
+
 type importProvider struct {
 	protoFile        string
 	moduleToRelative map[string]dependencyData
@@ -152,6 +155,7 @@ func (i *importProvider) Provide(module string) (io.Reader, error) {
 	basePath := path.Dir(i.protoFile) + "/"
 	relativePath := ""
 	attempts := []string{}
+
 	for nesting := 0; nesting < 5; nesting++ {
 		attemptPath := basePath + relativePath + module
 		f, err := os.Open(attemptPath)

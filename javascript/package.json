@@ -28,6 +28,8 @@
     "regenerator-runtime": "^0.12.1"
   },
   "dependencies": {
-    "fast-text-encoding": "^1.0.0"
+    "@babel/preset-env": "^7.5.5",
+    "fast-text-encoding": "^1.0.0",
+    "text-encoding": "^0.7.0"
   }
 }
