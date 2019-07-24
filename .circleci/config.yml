@@ -6,9 +6,9 @@ jobs:
     steps:
       - checkout
       - run: 
-        command: ./.circleci/setup.sh
-        environment:
-          GOBIN: /usr/local/bin/
+          command: ./.circleci/setup.sh
+          environment:
+            GOBIN: /usr/local/bin/
       - run:
           command: ./test.sh
           environment:
