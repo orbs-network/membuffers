@@ -232,3 +232,13 @@ builder := &types.TransactionBuilder{
 }
 tx2 := builder.Build()
 ```
+
+## Thread safety
+
+* **MemBuffer** - Thread safe. A MemBuffer object is primarily a read-only construct therefore it's not very susceptible to thread issues. It is not protected by explicit mutexes for performance reasons. The delicate areas that may seem non thread safe are:
+
+  * Field updates (writes) to the MemBuffer. A MemBuffer is mapped directly to memory, the memory structure cannot change because of these updates. Updates can change data but not length. Multiple concurrent writes to a field may corrupt the field contents only but will not corrupt the MemBuffer structure.
+  
+  * Lazy calculation of offsets. A MemBuffer has an internal data structure used for caching the offsets of all fields. This cache is generated on first access for performance reasons. This cache can be created concurrently if accessed initially from multiple threads. This does not pose a problem because the cache is idempotent and creating the cache concurrently will always reach the same result.
+  
+* **Builder** - Not thread safe. A Builder is used for a short period to create a MemBuffer. Until the MemBuffer is created, the Builder should be used from a single thread.
