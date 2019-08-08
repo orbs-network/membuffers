@@ -6,6 +6,8 @@
 
 package membuffers
 
+import "sync"
+
 type InternalMessage struct {
 	bytes  []byte
 	size   Offset
@@ -14,6 +16,8 @@ type InternalMessage struct {
 
 	// lazily generated
 	offsets []Offset
+
+	sync.Mutex // only used by to trick race detector (see calc_offsets_mutex.go)
 }
 
 func (m *InternalMessage) Init(buf []byte, size Offset, scheme []FieldType, unions [][]FieldType) {
@@ -33,7 +37,7 @@ func alignDynamicFieldContentOffset(off Offset, fieldType FieldType) Offset {
 	return (off + contentAlignment - 1) / contentAlignment * contentAlignment
 }
 
-func (m *InternalMessage) lazyCalcOffsets() bool {
+func (m *InternalMessage) _lazyCalcOffsets() bool {
 	if m.offsets != nil {
 		return true
 	}
