@@ -43,8 +43,8 @@ export class InternalMessage {
 
             // write the current offset
             off = alignOffsetToType(off, fieldType);
-            if off === m.size { // This means we are at end of field (but may be postfix newer fields we ignore) stop parsing
-                break
+            if (off === m.size) { // This means we are at end of field (but may be postfix newer fields we ignore) stop parsing
+                break;
             } else if (off > this.size) {
                 return false;
             }
