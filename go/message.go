@@ -41,16 +41,18 @@ func (m *InternalMessage) _lazyCalcOffsets() bool {
 	if m.offsets != nil {
 		return true
 	}
-	res := make([]Offset, len(m.scheme))
+	res := make([]Offset, 0, len(m.scheme))
 	var off Offset = 0
 	var unionNum = 0
-	for fieldNum, fieldType := range m.scheme {
+	for _, fieldType := range m.scheme {
 		// write the current offset
 		off = alignOffsetToType(off, fieldType)
-		if off >= m.size {
+		if off == m.size { // This means we are at end of field (but may be postfix newer fields we ignore) stop parsing
+			break
+		} else if off > m.size {
 			return false
 		}
-		res[fieldNum] = off
+		res = append(res, off)
 
 		// skip over the content to the next field
 		if fieldType == TypeUnion {
@@ -78,7 +80,7 @@ func (m *InternalMessage) _lazyCalcOffsets() bool {
 			off += FieldSizes[fieldType]
 		}
 	}
-	if off > m.size {
+	if off > m.size || off == 0 { // past end of buffer or empty buffer fail
 		return false
 	}
 	m.offsets = res

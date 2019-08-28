@@ -43,7 +43,9 @@ export class InternalMessage {
 
             // write the current offset
             off = alignOffsetToType(off, fieldType);
-            if (off >= this.size) {
+            if off === m.size { // This means we are at end of field (but may be postfix newer fields we ignore) stop parsing
+                break
+            } else if (off > this.size) {
                 return false;
             }
             res[fieldNum] = off;
@@ -74,7 +76,7 @@ export class InternalMessage {
                 off += FieldSizes[fieldType];
             }
         }
-        if (off > this.size) {
+        if (off > this.size || off === 0) { // past end of buffer or empty buffer fail
             return false;
         }
         this.offsets = res;
