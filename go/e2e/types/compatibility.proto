@@ -47,3 +47,40 @@ message NestedWithPrimitivesV2 {
     OnlyPrimitivesV2 b = 2;
 }
 
+message NestedWithPrimitivesWithExtraFieldV2 {
+    uint32 a = 1;
+    OnlyPrimitivesV2 b = 2;
+    uint32 c = 3;
+}
+
+message NestedWithPrimitivesInMiddleV1 {
+    uint32 a = 1;
+    OnlyPrimitivesV1 b = 2;
+    uint32 c = 3;
+}
+
+message NestedWithPrimitivesInMiddleV2 {
+    uint32 a = 1;
+    OnlyPrimitivesV2 b = 2;
+    uint32 c = 3;
+}
+
+message WithSingleByteV1 {
+    uint32 a = 1;
+    ByteSize b = 2;
+    ByteSize c = 3;
+}
+
+message WithSingleByteV2 {
+    uint32 a = 1;
+    ByteSize b = 2;
+    ByteSize c = 3;
+    uint32 d = 4;
+}
+
+enum ByteSize {
+    Reserved = 0;
+    One = 1;
+    Two = 2;
+}
+
