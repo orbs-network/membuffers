@@ -1,0 +1,13 @@
+syntax = "proto3";
+package types;
+option go_package = "github.com/orbs-network/membuffers/go/e2e/types";
+
+message WithString {
+    uint32 i = 1;
+    string s = 2;
+}
+
+message WithInt {
+    uint32 i = 1;
+    uint32 j = 2;
+}
