@@ -1,0 +1,86 @@
+syntax = "proto3";
+package types;
+option go_package = "github.com/orbs-network/membuffers/go/e2e/types";
+
+import "e2e/types/inline/inline_compatibility.proto";
+
+message OnlyPrimitivesV1 {
+    uint32 a = 1;
+    uint32 b = 2;
+}
+
+message OnlyPrimitivesV2 {
+    uint32 a = 1;
+    uint32 b = 2;
+    uint32 c = 3;
+}
+
+message WithBytesV1 {
+    uint32 a = 1;
+    bytes b = 2;
+}
+
+message WithBytesV2 {
+    uint32 a = 1;
+    bytes b = 2;
+    uint32 c = 3;
+}
+
+message WithInlineV1 {
+    uint32 a = 1;
+    inline.InlineType b = 2;
+}
+
+message WithInlineV2 {
+    uint32 a = 1;
+    inline.InlineType b = 2;
+    uint32 c = 3;
+}
+
+message NestedWithPrimitivesV1 {
+    uint32 a = 1;
+    OnlyPrimitivesV1 b = 2;
+}
+
+message NestedWithPrimitivesV2 {
+    uint32 a = 1;
+    OnlyPrimitivesV2 b = 2;
+}
+
+message NestedWithPrimitivesWithExtraFieldV2 {
+    uint32 a = 1;
+    OnlyPrimitivesV2 b = 2;
+    uint32 c = 3;
+}
+
+message NestedWithPrimitivesInMiddleV1 {
+    uint32 a = 1;
+    OnlyPrimitivesV1 b = 2;
+    uint32 c = 3;
+}
+
+message NestedWithPrimitivesInMiddleV2 {
+    uint32 a = 1;
+    OnlyPrimitivesV2 b = 2;
+    uint32 c = 3;
+}
+
+message WithSingleByteV1 {
+    uint32 a = 1;
+    ByteSize b = 2;
+    ByteSize c = 3;
+}
+
+message WithSingleByteV2 {
+    uint32 a = 1;
+    ByteSize b = 2;
+    ByteSize c = 3;
+    uint32 d = 4;
+}
+
+enum ByteSize {
+    Reserved = 0;
+    One = 1;
+    Two = 2;
+}
+

@@ -1,0 +1,9 @@
+syntax = "proto3";
+package inline;
+
+option inline = true;
+
+message InlineType {
+    option inline_type = "bytes";
+    bytes value = 1;
+}
