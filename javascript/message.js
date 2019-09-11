@@ -31,12 +31,12 @@ class InternalMessage {
         let unionNum = 0;
         for (let fieldNum = 0; fieldNum < this.scheme.length; fieldNum++) {
             let fieldType = this.scheme[fieldNum];
-
-            // write the current offset
-            off = alignOffsetToType(off, fieldType);
             if (off === this.size) { // This means we are at end of field (but may be postfix newer fields we ignore) stop parsing
                 break;
-            } else if (off > this.size) {
+            }
+            // write the current offset
+            off = alignOffsetToType(off, fieldType);
+            if (off > this.size) {
                 return false;
             }
             res[fieldNum] = off;
