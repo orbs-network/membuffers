@@ -6,19 +6,10 @@
  * The above notice should be included in all copies or substantial portions of the software.
  */
 
-const {FieldAlignment, FieldDynamic, FieldDynamicContentAlignment, FieldSizes, FieldTypes} = require('./types');
+const {alignDynamicFieldContentOffset, alignOffsetToType} = require('./align');
+const {FieldDynamic, FieldSizes, FieldTypes} = require('./types');
 const {Iterator} = require("./iterator");
 const {getTextDecoder, getTextEncoder} = require('./text');
-
-function alignOffsetToType(off, fieldType) {
-    const fieldSize = FieldAlignment[fieldType];
-    return Math.floor((off + fieldSize - 1) / fieldSize) * fieldSize;
-}
-
-function alignDynamicFieldContentOffset(off, fieldType) {
-    const contentAlignment = FieldDynamicContentAlignment[fieldType];
-    return Math.floor((off + contentAlignment - 1) / contentAlignment) * contentAlignment;
-}
 
 class InternalMessage {
 
@@ -452,4 +443,4 @@ class InternalMessage {
 
 }
 
-module.exports = {alignDynamicFieldContentOffset, alignOffsetToType, InternalMessage};
+module.exports = {InternalMessage};

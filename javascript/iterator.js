@@ -6,7 +6,7 @@
  * The above notice should be included in all copies or substantial portions of the software.
  */
 
-const {alignDynamicFieldContentOffset} = require('./message');
+const {alignDynamicFieldContentOffset} = require('./align');
 const {FieldTypes, FieldSizes} = require('./types');
 const {getTextDecoder} = require("./text");
 
