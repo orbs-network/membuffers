@@ -7,7 +7,7 @@
  */
 
 let textEncoder = null;
-export function getTextEncoder() {
+function getTextEncoder() {
   if (textEncoder === null) {
     if (typeof TextEncoder === "undefined") { // node.js does not support TextEncoder
       textEncoder = new (require('text-encoding').TextEncoder)();
@@ -19,7 +19,7 @@ export function getTextEncoder() {
 }
 
 let textDecoder = null;
-export function getTextDecoder() {
+function getTextDecoder() {
   if (textDecoder === null) {
     if (typeof TextDecoder === "undefined") { // node.js does not support TextDecoder
       textDecoder = new (require('text-encoding').TextDecoder)("utf-8");
@@ -30,6 +30,8 @@ export function getTextDecoder() {
   return textDecoder;
 }
 
-export function ch(char) {
+function ch(char) {
   return char.charCodeAt(0);
 }
+
+module.exports = {getTextDecoder, getTextEncoder, ch};

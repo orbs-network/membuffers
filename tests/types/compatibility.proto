@@ -1,0 +1,22 @@
+syntax = "proto3";
+package types;
+
+message SomeObjectV1 {
+    uint32 a = 1;
+}
+
+message SomeObjectV2 {
+    uint32 a = 1;
+    uint32 b = 2;
+}
+
+message WithBytesV1 {
+    uint32 a = 1;
+    bytes b = 2;
+}
+
+message WithBytesV2 {
+    uint32 a = 1;
+    bytes b = 2;
+    uint32 c = 3;
+}

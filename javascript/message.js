@@ -6,21 +6,21 @@
  * The above notice should be included in all copies or substantial portions of the software.
  */
 
-import {FieldAlignment, FieldDynamic, FieldDynamicContentAlignment, FieldSizes, FieldTypes} from './types';
-import {Iterator} from "./iterator";
-import {getTextDecoder, getTextEncoder} from './text';
+const {FieldAlignment, FieldDynamic, FieldDynamicContentAlignment, FieldSizes, FieldTypes} = require('./types');
+const {Iterator} = require("./iterator");
+const {getTextDecoder, getTextEncoder} = require('./text');
 
-export function alignOffsetToType(off, fieldType) {
+function alignOffsetToType(off, fieldType) {
     const fieldSize = FieldAlignment[fieldType];
     return Math.floor((off + fieldSize - 1) / fieldSize) * fieldSize;
 }
 
-export function alignDynamicFieldContentOffset(off, fieldType) {
+function alignDynamicFieldContentOffset(off, fieldType) {
     const contentAlignment = FieldDynamicContentAlignment[fieldType];
     return Math.floor((off + contentAlignment - 1) / contentAlignment) * contentAlignment;
 }
 
-export class InternalMessage {
+class InternalMessage {
 
     constructor(buf, size, scheme, unions) {
         this.bytes = buf; // buf should be Uint8Array (a view over an ArrayBuffer)
@@ -451,3 +451,5 @@ export class InternalMessage {
     }
 
 }
+
+module.exports = {alignDynamicFieldContentOffset, alignOffsetToType, InternalMessage};

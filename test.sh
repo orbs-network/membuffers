@@ -34,3 +34,16 @@ cd javascript
 ./test_lib.sh
 
 popd
+
+pushd .
+
+echo ""
+echo "***** CONTRACT TESTS *****"
+echo ""
+echo "  Running ./tests/contract_tests.sh"
+echo ""
+
+cd tests
+./contract_tests.sh
+
+popd
