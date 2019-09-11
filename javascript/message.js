@@ -6,21 +6,12 @@
  * The above notice should be included in all copies or substantial portions of the software.
  */
 
-import {FieldAlignment, FieldDynamic, FieldDynamicContentAlignment, FieldSizes, FieldTypes} from './types';
-import {Iterator} from "./iterator";
-import {getTextDecoder, getTextEncoder} from './text';
+const {alignDynamicFieldContentOffset, alignOffsetToType} = require('./align');
+const {FieldDynamic, FieldSizes, FieldTypes} = require('./types');
+const {Iterator} = require("./iterator");
+const {getTextDecoder, getTextEncoder} = require('./text');
 
-export function alignOffsetToType(off, fieldType) {
-    const fieldSize = FieldAlignment[fieldType];
-    return Math.floor((off + fieldSize - 1) / fieldSize) * fieldSize;
-}
-
-export function alignDynamicFieldContentOffset(off, fieldType) {
-    const contentAlignment = FieldDynamicContentAlignment[fieldType];
-    return Math.floor((off + contentAlignment - 1) / contentAlignment) * contentAlignment;
-}
-
-export class InternalMessage {
+class InternalMessage {
 
     constructor(buf, size, scheme, unions) {
         this.bytes = buf; // buf should be Uint8Array (a view over an ArrayBuffer)
@@ -40,12 +31,12 @@ export class InternalMessage {
         let unionNum = 0;
         for (let fieldNum = 0; fieldNum < this.scheme.length; fieldNum++) {
             let fieldType = this.scheme[fieldNum];
-
-            // write the current offset
-            off = alignOffsetToType(off, fieldType);
             if (off === this.size) { // This means we are at end of field (but may be postfix newer fields we ignore) stop parsing
                 break;
-            } else if (off > this.size) {
+            }
+            // write the current offset
+            off = alignOffsetToType(off, fieldType);
+            if (off > this.size) {
                 return false;
             }
             res[fieldNum] = off;
@@ -451,3 +442,5 @@ export class InternalMessage {
     }
 
 }
+
+module.exports = {InternalMessage};

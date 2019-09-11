@@ -45,10 +45,10 @@ func (m *InternalMessage) _lazyCalcOffsets() bool {
 	var off Offset = 0
 	var unionNum = 0
 	for _, fieldType := range m.scheme {
-		// write the current offset
 		if off == m.size { // This means we are at end of field (but may be postfix newer fields we ignore) stop parsing
 			break
 		}
+		// write the current offset
 		off = alignOffsetToType(off, fieldType) // if last type needs padding
 		if off > m.size {
 			return false

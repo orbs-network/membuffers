@@ -6,7 +6,7 @@
  * The above notice should be included in all copies or substantial portions of the software.
  */
 
-export const FieldTypes = Object.freeze({
+const FieldTypes = Object.freeze({
   TypeMessage: 1,
   TypeBytes: 2,
   TypeString: 3,
@@ -24,7 +24,7 @@ export const FieldTypes = Object.freeze({
   TypeStringArray: 33,
 });
 
-export const FieldSizes = Object.freeze({
+const FieldSizes = Object.freeze({
   [FieldTypes.TypeMessage]: 4,
   [FieldTypes.TypeBytes]: 4,
   [FieldTypes.TypeString]: 4,
@@ -42,7 +42,7 @@ export const FieldSizes = Object.freeze({
   [FieldTypes.TypeStringArray]: 4,
 });
 
-export const FieldAlignment = Object.freeze({
+const FieldAlignment = Object.freeze({
   [FieldTypes.TypeMessage]: 4,
   [FieldTypes.TypeBytes]: 4,
   [FieldTypes.TypeString]: 4,
@@ -60,7 +60,7 @@ export const FieldAlignment = Object.freeze({
   [FieldTypes.TypeStringArray]: 4,
 });
 
-export const FieldDynamic = Object.freeze({
+const FieldDynamic = Object.freeze({
   [FieldTypes.TypeMessage]: true,
   [FieldTypes.TypeBytes]: true,
   [FieldTypes.TypeString]: true,
@@ -78,7 +78,7 @@ export const FieldDynamic = Object.freeze({
   [FieldTypes.TypeStringArray]: true,
 });
 
-export const FieldDynamicContentAlignment = Object.freeze({
+const FieldDynamicContentAlignment = Object.freeze({
   [FieldTypes.TypeMessage]: 4,
   [FieldTypes.TypeBytes]: 1,
   [FieldTypes.TypeString]: 1,
@@ -95,3 +95,5 @@ export const FieldDynamicContentAlignment = Object.freeze({
   [FieldTypes.TypeBytesArray]: 4,
   [FieldTypes.TypeStringArray]: 4,
 });
+
+module.exports = {FieldAlignment, FieldDynamic, FieldDynamicContentAlignment, FieldSizes, FieldTypes};

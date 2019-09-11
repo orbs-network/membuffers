@@ -6,7 +6,7 @@
  * The above notice should be included in all copies or substantial portions of the software.
  */
 
-import {alignDynamicFieldContentOffset, alignOffsetToType} from './message';
+import {alignDynamicFieldContentOffset, alignOffsetToType} from './align';
 import {FieldSizes, FieldTypes} from './types';
 import {getTextEncoder} from './text';
 
