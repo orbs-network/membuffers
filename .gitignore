@@ -1,6 +1,6 @@
 
 # Created by https://www.gitignore.io/api/go,intellij
-
+dist
 node_modules
 javascript/node_modules
 

@@ -9,8 +9,9 @@
     "esModuleInterop": true,
     "moduleResolution": "node",
     "downlevelIteration": true,
-    "lib": ["esnext", "esnext.bigint"],
+    "emitDeclarationOnly": true,
+    "lib": ["esnext"],
     "types": ["node", "jest"]
   },
-  "include": ["src/index.ts", "src/types/**/*.ts", "src/*.test.ts"]
+  "include": ["src/index.ts", "src/types/**/*.ts"]
 }

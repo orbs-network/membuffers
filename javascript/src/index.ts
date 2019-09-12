@@ -7,3 +7,6 @@
  */
 
 export { InternalBuilder } from "./builder";
+export { InternalMessage } from "./message";
+export { getTextDecoder, getTextEncoder } from "./text";
+export { FieldTypes } from "./types";

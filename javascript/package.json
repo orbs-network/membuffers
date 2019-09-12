@@ -1,13 +1,18 @@
 {
   "name": "membuffers",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "High performance memory efficient serialization library with direct wire access",
-  "main": "membuffers.js",
+  "main": "dist/membuffers.js",
+  "browser": "dist/membuffers-web.js",
+  "files": [
+    "dist"
+  ],
+  "types": "dist/index.d.ts",
   "scripts": {
     "clean": "rimraf dist",
     "build": "npm run clean && npm run build-webpack && npm run types",
-    "build-webpack": "webpack -p",
     "types": "tsc -p tsconfig-for-types.json",
+    "build-webpack": "webpack -p",
     "test": "jest"
   },
   "repository": {
@@ -40,6 +45,7 @@
     "jest": "^24.5.0",
     "regenerator-runtime": "^0.12.1",
     "rimraf": "^3.0.0",
+    "ts-jest": "^24.0.2",
     "typescript": "^3.6.3",
     "webpack": "^4.39.3",
     "webpack-cli": "^3.3.8"
@@ -47,6 +53,7 @@
   "dependencies": {
     "@babel/preset-env": "^7.5.5",
     "fast-text-encoding": "^1.0.0",
-    "text-encoding": "^0.7.0"
+    "text-encoding": "^0.7.0",
+    "tslib": "^1.10.0"
   }
 }
