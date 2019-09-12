@@ -1,6 +1,6 @@
 /**
- * Copyright 2018 the membuffers authors
- * This file is part of the membuffers library in the Orbs project.
+ * Copyright 2019 the orbs-client-sdk-javascript authors
+ * This file is part of the orbs-client-sdk-javascript library in the Orbs project.
  *
  * This source code is licensed under the MIT license found in the LICENSE file in the root directory of this source tree.
  * The above notice should be included in all copies or substantial portions of the software.
@@ -33,21 +33,21 @@ expect.extend({
       }
     }
     return {
-      message: () => `expected arrayBuffer ${arrayBufferToHex(received)} not to equal ${arrayBufferToHex(other)}`,
+      message: () => `expected arrayBuffer\n${arrayBufferToHex(received)} not to equal\n${arrayBufferToHex(other)}`,
       pass: true,
     };
   },
   toBeEqualToUint8Array(received, other) {
     if (received.byteLength != other.byteLength) {
       return {
-        message: () => `expected arrayBuffer length ${received.byteLength} to be equal ${other.byteLength}`,
+        message: () => `expected arrayBuffer length ${received.byteLength} to be equal ${other.byteLength}\n${uint8ArrayToHex(received)}\n${uint8ArrayToHex(other)}`,
         pass: false,
       };
     }
     for (let i = 0; i < received.byteLength; i++) {
       if (received[i] != other[i]) {
         return {
-          message: () => `expected uint8Array ${uint8ArrayToHex(received)} to equal ${uint8ArrayToHex(other)}`,
+          message: () => `expected uint8Array\n${uint8ArrayToHex(received)} to equal\n${uint8ArrayToHex(other)}`,
           pass: false,
         };
       }
