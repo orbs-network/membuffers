@@ -71,8 +71,7 @@ func readInJs(t testing.TB, raw []byte, code string) map[string]interface{} {
 	}
 	hexString := "[" + strings.Join(hexBuf, ",") + "]"
 	js := fmt.Sprintf(`
-const {InternalMessage} = require("../javascript/message");
-const {FieldTypes} = require("../javascript/types");
+const {InternalMessage, FieldTypes} = require("../javascript/dist/membuffers");
 
 const buf = new Uint8Array(%s);
 %s

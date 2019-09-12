@@ -1,12 +1,14 @@
 /**
- * Copyright 2018 the membuffers authors
- * This file is part of the membuffers library in the Orbs project.
+ * Copyright 2019 the orbs-client-sdk-javascript authors
+ * This file is part of the orbs-client-sdk-javascript library in the Orbs project.
  *
  * This source code is licensed under the MIT license found in the LICENSE file in the root directory of this source tree.
  * The above notice should be included in all copies or substantial portions of the software.
  */
 
-const FieldTypes = Object.freeze({
+export type FieldType = number;
+
+export const FieldTypes = Object.freeze({
   TypeMessage: 1,
   TypeBytes: 2,
   TypeString: 3,
@@ -24,7 +26,7 @@ const FieldTypes = Object.freeze({
   TypeStringArray: 33,
 });
 
-const FieldSizes = Object.freeze({
+export const FieldSizes = Object.freeze({
   [FieldTypes.TypeMessage]: 4,
   [FieldTypes.TypeBytes]: 4,
   [FieldTypes.TypeString]: 4,
@@ -42,7 +44,7 @@ const FieldSizes = Object.freeze({
   [FieldTypes.TypeStringArray]: 4,
 });
 
-const FieldAlignment = Object.freeze({
+export const FieldAlignment = Object.freeze({
   [FieldTypes.TypeMessage]: 4,
   [FieldTypes.TypeBytes]: 4,
   [FieldTypes.TypeString]: 4,
@@ -60,7 +62,7 @@ const FieldAlignment = Object.freeze({
   [FieldTypes.TypeStringArray]: 4,
 });
 
-const FieldDynamic = Object.freeze({
+export const FieldDynamic = Object.freeze({
   [FieldTypes.TypeMessage]: true,
   [FieldTypes.TypeBytes]: true,
   [FieldTypes.TypeString]: true,
@@ -78,7 +80,7 @@ const FieldDynamic = Object.freeze({
   [FieldTypes.TypeStringArray]: true,
 });
 
-const FieldDynamicContentAlignment = Object.freeze({
+export const FieldDynamicContentAlignment = Object.freeze({
   [FieldTypes.TypeMessage]: 4,
   [FieldTypes.TypeBytes]: 1,
   [FieldTypes.TypeString]: 1,
@@ -95,5 +97,3 @@ const FieldDynamicContentAlignment = Object.freeze({
   [FieldTypes.TypeBytesArray]: 4,
   [FieldTypes.TypeStringArray]: 4,
 });
-
-module.exports = {FieldAlignment, FieldDynamic, FieldDynamicContentAlignment, FieldSizes, FieldTypes};
