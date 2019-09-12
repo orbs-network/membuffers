@@ -53,7 +53,7 @@ export class InternalMessage {
       res[fieldNum] = off;
 
       // skip over the content to the next field
-      if (fieldType == FieldTypes.TypeUnion) {
+      if (fieldType === FieldTypes.TypeUnion) {
         if (off + FieldSizes[FieldTypes.TypeUnion] > this.size) {
           return false;
         }
@@ -102,7 +102,7 @@ export class InternalMessage {
     }
     let fieldType = this.scheme[fieldNum];
     let off = this.offsets[fieldNum];
-    if (fieldType == FieldTypes.TypeUnion) {
+    if (fieldType === FieldTypes.TypeUnion) {
       const unionType = this.dataView.getUint16(off, true);
       off += FieldSizes[FieldTypes.TypeUnion];
       if (unionNum >= this.unions.length || unionType >= this.unions[unionNum].length) {
@@ -128,7 +128,7 @@ export class InternalMessage {
     let fieldType = this.scheme[fieldNum];
     let off = this.offsets[fieldNum];
     const fieldHeaderOff = off;
-    if (fieldType == FieldTypes.TypeUnion) {
+    if (fieldType === FieldTypes.TypeUnion) {
       const unionType = this.dataView.getUint16(off, true);
       off += FieldSizes[FieldTypes.TypeUnion];
       if (unionNum >= this.unions.length || unionType >= this.unions[unionNum].length) {
@@ -274,7 +274,7 @@ export class InternalMessage {
 
   setBytesInOffset(off: number, v: Uint8Array) {
     const contentSize = this.dataView.getUint32(off, true);
-    if (contentSize != v.byteLength) {
+    if (contentSize !== v.byteLength) {
       throw new Error("size mismatch");
     }
     off += FieldSizes[FieldTypes.TypeBytes];
@@ -344,7 +344,7 @@ export class InternalMessage {
     }
     const fieldType = this.unions[unionNum][unionType];
     off = alignOffsetToType(off, fieldType);
-    return [unionType == unionIndex, off];
+    return [unionType === unionIndex, off];
   }
 
   getUint8ArrayIteratorInOffset(off: number): ArrayIterator {
