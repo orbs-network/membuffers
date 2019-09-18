@@ -10,6 +10,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/orbs-network/pbparser"
+	"github.com/stretchr/testify/require"
 	"go/ast"
 	"go/format"
 	"go/parser"
@@ -62,6 +63,16 @@ func TestCompilingProtoWithMessage(t *testing.T) {
 	assertImport(t, "bytes", compiled)
 	assertImport(t, "fmt", compiled)
 	assertImport(t, "github.com/orbs-network/membuffers/go", compiled)
+}
+
+func TestCompilingProto_WithFixedBytes32(t *testing.T) {
+	conf := Config{
+		language:      "go",
+		languageGoCtx: false,
+		mock:          false,
+		files:         []string{"./e2e/protos/fixed_size_bytes.proto"},
+	}
+	require.NoError(t, Compile(conf))
 }
 
 func assertImport(t *testing.T, importName string, compiled *ast.File) {

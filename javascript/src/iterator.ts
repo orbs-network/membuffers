@@ -97,6 +97,16 @@ export class ArrayIterator {
     return resBuf;
   }
 
+  nextBytes32(): Uint8Array {
+    if (this.cursor + FieldSizes[FieldTypes.TypeBytes32] > this.endCursor) {
+      this.cursor = this.endCursor;
+      return new Uint8Array();
+    }
+    const resBuf = this.m.bytes.subarray(this.cursor, this.cursor + FieldSizes[FieldTypes.TypeBytes32]);
+    this.cursor += FieldSizes[FieldTypes.TypeBytes32];
+    return resBuf;
+  }
+
   nextString(): string {
     const b = this.nextBytes();
     return getTextDecoder().decode(b);
@@ -119,6 +129,8 @@ export class ArrayIterator {
               return { value: this.nextMessage(), done: false };
             case FieldTypes.TypeBytes:
               return { value: this.nextBytes(), done: false };
+            case FieldTypes.TypeBytes32:
+              return { value: this.nextBytes32(), done: false };
             case FieldTypes.TypeString:
               return { value: this.nextString(), done: false };
             default:

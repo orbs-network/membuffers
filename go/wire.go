@@ -119,6 +119,10 @@ func GetFloat64(buf []byte) float64 {
 	return math.Float64frombits(x)
 }
 
+func GetBytes32(buf []byte) [32]byte {
+	return *(*[32]byte)(unsafe.Pointer(&buf[0]))
+}
+
 func GetOffset(buf []byte) Offset {
 	return Offset(GetUint32(buf))
 }
@@ -215,6 +219,10 @@ func WriteFloat32(buf []byte, n float32) {
 
 func WriteFloat64(buf []byte, n float64) {
 	WriteUint64(buf, math.Float64bits(n))
+}
+
+func WriteBytes32(buf []byte, v [32]byte) {
+	*(*[32]byte)(unsafe.Pointer(&buf[0])) = v
 }
 
 func WriteOffset(buf []byte, n Offset) {

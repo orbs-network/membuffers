@@ -24,6 +24,8 @@ export const FieldTypes = Object.freeze({
   TypeMessageArray: 31,
   TypeBytesArray: 32,
   TypeStringArray: 33,
+  TypeBytes32: 41,
+  TypeBytes32Array: 51,
 });
 
 export const FieldSizes = Object.freeze({
@@ -42,6 +44,8 @@ export const FieldSizes = Object.freeze({
   [FieldTypes.TypeMessageArray]: 4,
   [FieldTypes.TypeBytesArray]: 4,
   [FieldTypes.TypeStringArray]: 4,
+  [FieldTypes.TypeBytes32]: 32,
+  [FieldTypes.TypeBytes32Array]: 4,
 });
 
 export const FieldAlignment = Object.freeze({
@@ -60,6 +64,8 @@ export const FieldAlignment = Object.freeze({
   [FieldTypes.TypeMessageArray]: 4,
   [FieldTypes.TypeBytesArray]: 4,
   [FieldTypes.TypeStringArray]: 4,
+  [FieldTypes.TypeBytes32]: 4,
+  [FieldTypes.TypeBytes32Array]: 4,
 });
 
 export const FieldDynamic = Object.freeze({
@@ -78,6 +84,8 @@ export const FieldDynamic = Object.freeze({
   [FieldTypes.TypeMessageArray]: true,
   [FieldTypes.TypeBytesArray]: true,
   [FieldTypes.TypeStringArray]: true,
+  [FieldTypes.TypeBytes32]: false,
+  [FieldTypes.TypeBytes32Array]: true,
 });
 
 export const FieldDynamicContentAlignment = Object.freeze({
@@ -96,4 +104,6 @@ export const FieldDynamicContentAlignment = Object.freeze({
   [FieldTypes.TypeMessageArray]: 4,
   [FieldTypes.TypeBytesArray]: 4,
   [FieldTypes.TypeStringArray]: 4,
+  [FieldTypes.TypeBytes32]: 0,
+  [FieldTypes.TypeBytes32Array]: 4,
 });
