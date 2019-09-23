@@ -13,14 +13,17 @@ func isExtendedType(name string) bool {
 }
 
 func getExtendedType(messageName string, field pbparser.FieldElement, isArray bool) MessageField {
-	return MessageField{
-		FieldName:    convertFieldNameToGoCase(field.Name),
-		FieldGoType:  "[32]byte",
-		IsMessage:    false,
-		IsArray:      isArray,
-		IsUnion:      false,
-		TypeAccessor: "Bytes32",
-		FieldIndex:   field.Tag,
-		MessageName:  messageName,
+	if field.Type.Name() == "membuffers.bytes32" {
+		return MessageField{
+			FieldName:    convertFieldNameToGoCase(field.Name),
+			FieldGoType:  "[32]byte",
+			IsMessage:    false,
+			IsArray:      isArray,
+			IsUnion:      false,
+			TypeAccessor: "Bytes32",
+			FieldIndex:   field.Tag,
+			MessageName:  messageName,
+		}
 	}
+	return MessageField{}
 }

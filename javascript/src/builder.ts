@@ -176,14 +176,10 @@ export class InternalBuilder {
     if (buf) {
       new DataView(buf.buffer, buf.byteOffset).setUint32(this.size, v.length*32, true);
     }
-    //const sizePlaceholderOffset = this.size;
     this.size += FieldSizes[FieldTypes.TypeBytesArray];
-    //this.size = alignDynamicFieldContentOffset(this.size, FieldTypes.TypeBytesArray);
-    //const contentSizeStartOffset = this.size;
     for (const vv of v) {
       this.writeBytes32(buf, vv);
     }
-    //const contentSize = this.size - contentSizeStartOffset;
   }
 
   writeStringArray(buf: Uint8Array, v: string[]): void {

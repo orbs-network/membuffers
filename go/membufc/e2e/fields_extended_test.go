@@ -39,7 +39,6 @@ func TestMembuffersFieldsExtended_HandlesFixedBytes32(t *testing.T) {
 
 	// check
 	require.EqualValues(t, data, msg.Foo())
-	//originalRaw := msg.Raw()
 	require.True(t, bytes.Equal(msg.Raw(), data[:]), "raw message should not include size")
 
 	// overwrite
@@ -56,9 +55,7 @@ func TestMembuffersFieldsExtended_HandlesFixedBytes32(t *testing.T) {
 	// check mutate
 	require.EqualValues(t, other, msg.Foo())
 	require.True(t, bytes.Equal(msg.Raw(), other[:]), "raw message should be equal to the mutated value")
-
-	// check version with overwrite didn't change after mutate
-	require.EqualValues(t, data, msg2.Foo())
+	require.EqualValues(t, data, msg2.Foo(), "mutate of msg.Foo should not affect msg2.Foo")
 
 	// check hexdump
 	require.NoError(t, msgBuilder.HexDump("msg ", 0))
@@ -89,6 +86,15 @@ func TestMembuffersFieldsExtended_HandlesFixedBytes32InMiddle(t *testing.T) {
 	require.EqualValues(t, bar, msg.Bar())
 }
 
+func generateExectedBytes32ArrayRaw(data [][32]byte) []byte {
+	fakeRaw := make([]byte, 4+len(data)*32)
+	membuffers.WriteOffset(fakeRaw, membuffers.Offset(len(data)*32)) // size of actual data not the size of the array
+	for i, v := range data {
+		copy(fakeRaw[4+i*32:4+(i+1)*32], v[:])
+	}
+	return fakeRaw
+}
+
 func TestMembuffersFieldsExtended_HandlesFixedBytes32Array(t *testing.T) {
 	data := getByte32Array()
 	msgBuilder := &types.WithRepeatedFixedBytes32Builder{Foo: data}
@@ -97,13 +103,10 @@ func TestMembuffersFieldsExtended_HandlesFixedBytes32Array(t *testing.T) {
 	t.Log(msg.String())
 	t.Log(msg.Raw())
 	itr := msg.FooIterator()
-	oneArray := make([]byte, 4+len(data)*32)
-	membuffers.WriteOffset(oneArray, membuffers.Offset(len(data)*32))
-	for i, v := range data {
-		require.EqualValues(t, data[i], itr.NextFoo())
-		copy(oneArray[4+i*32:4+(i+1)*32], v[:])
+	for _, oneBytes32 := range data {
+		require.EqualValues(t, oneBytes32, itr.NextFoo())
 	}
-	require.True(t, bytes.Equal(msg.Raw(), oneArray[:]), "raw message should be equal to the mutated value")
+	require.True(t, bytes.Equal(msg.Raw(), generateExectedBytes32ArrayRaw(data)), "raw message should be equal to the fake raw")
 
 	// check hexdump
 	require.NoError(t, msgBuilder.HexDump("msg ", 0))
