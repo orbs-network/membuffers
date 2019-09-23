@@ -12,6 +12,7 @@ import (
 	"io"
 	"os"
 	"path"
+	"strings"
 	//	"strings"
 )
 
@@ -26,10 +27,7 @@ type importProvider struct {
 }
 
 func (i *importProvider) Provide(module string) (io.Reader, error) {
-	if r, err := i.satisfies(module); r != nil || err != nil {
-		if err != nil {
-			return nil, errors.New(fmt.Sprintf("import %s of extended type failed", module))
-		}
+	if r := i.satisfies(module); r != nil {
 		return r, nil
 	}
 	basePath := path.Dir(i.protoFile) + "/"
@@ -51,14 +49,14 @@ func (i *importProvider) Provide(module string) (io.Reader, error) {
 	return nil, errors.New(fmt.Sprintf("import %s not found, looked at %v", module, attempts))
 }
 
-func (i *importProvider) satisfies(moduleName string) (io.Reader, error) {
+func (i *importProvider) satisfies(moduleName string) io.Reader {
 	if moduleName == "membuffers" {
-		f, err := os.Open("extended_types/membuffers.proto")
-		if err != nil {
-			return nil, err
-		}
-		return f, nil
+		return strings.NewReader(`
+syntax = "proto3";
+package membuffers;
+message bytes32 {}
+`)
 	}
 
-	return nil, nil
+	return nil
 }

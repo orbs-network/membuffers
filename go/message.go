@@ -501,7 +501,7 @@ func (m *InternalMessage) GetBytes32ArrayIterator(fieldNum int) *Iterator {
 	}
 	off := m.offsets[fieldNum]
 	contentSize := GetOffset(m.bytes[off:])
-	off += FieldSizes[TypeBytesArray]
+	off += FieldSizes[TypeBytes32Array]
 	return &Iterator{
 		cursor:    off,
 		endCursor: off + contentSize,

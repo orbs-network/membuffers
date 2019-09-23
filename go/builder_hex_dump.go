@@ -85,8 +85,8 @@ func (w *InternalBuilder) HexDumpBytes(prefix string, offsetFromStart Offset, fi
 }
 
 func (w *InternalBuilder) HexDumpBytes32(prefix string, offsetFromStart Offset, fieldName string, v [32]byte) {
-	w.size = hexDumpAlignOffsetToType(prefix, offsetFromStart, w.size, TypeBytes)
-	fmt.Printf("%s%x // %s: bytes content (offset 0x%x, size: 0x%x)\n", prefix, v, fieldName, offsetFromStart+w.size, len(v))
+	w.size = hexDumpAlignOffsetToType(prefix, offsetFromStart, w.size, TypeBytes32)
+	fmt.Printf("%s%x // %s: bytes32 content (offset 0x%x, size: 0x%x)\n", prefix, v, fieldName, offsetFromStart+w.size, len(v))
 	w.size += Offset(len(v))
 }
 
