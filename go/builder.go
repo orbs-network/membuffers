@@ -112,6 +112,14 @@ func (w *InternalBuilder) WriteBytes(buf []byte, v []byte) {
 	}
 }
 
+func (w *InternalBuilder) WriteBytes20(buf []byte, v [20]byte) {
+	w.size = alignOffsetToType(w.size, TypeBytes20)
+	if buf != nil {
+		WriteBytes20(buf[w.size:], v)
+	}
+	w.size += Offset(len(v))
+}
+
 func (w *InternalBuilder) WriteBytes32(buf []byte, v [32]byte) {
 	w.size = alignOffsetToType(w.size, TypeBytes32)
 	if buf != nil {
@@ -192,6 +200,17 @@ func (w *InternalBuilder) WriteBytesArray(buf []byte, v [][]byte) {
 	contentSize := w.size - contentSizeStartOffset
 	if buf != nil {
 		WriteOffset(buf[sizePlaceholderOffset:], contentSize)
+	}
+}
+
+func (w *InternalBuilder) WriteBytes20Array(buf []byte, v [][20]byte) {
+	w.size = alignOffsetToType(w.size, TypeBytes20Array)
+	if buf != nil {
+		WriteOffset(buf[w.size:], Offset(len(v)*20))
+	}
+	w.size += FieldSizes[TypeBytes20Array]
+	for _, vv := range v {
+		w.WriteBytes20(buf, vv)
 	}
 }
 

@@ -9,7 +9,7 @@ package main
 import "github.com/orbs-network/pbparser"
 
 func isExtendedType(name string) bool {
-	return name == "membuffers.bytes32"
+	return name == "membuffers.bytes32" || name == "membuffers.bytes20"
 }
 
 func getExtendedType(messageName string, field pbparser.FieldElement, isArray bool) MessageField {
@@ -21,6 +21,17 @@ func getExtendedType(messageName string, field pbparser.FieldElement, isArray bo
 			IsArray:      isArray,
 			IsUnion:      false,
 			TypeAccessor: "Bytes32",
+			FieldIndex:   field.Tag,
+			MessageName:  messageName,
+		}
+	} else if field.Type.Name() == "membuffers.bytes20" {
+		return MessageField{
+			FieldName:    convertFieldNameToGoCase(field.Name),
+			FieldGoType:  "[20]byte",
+			IsMessage:    false,
+			IsArray:      isArray,
+			IsUnion:      false,
+			TypeAccessor: "Bytes20",
 			FieldIndex:   field.Tag,
 			MessageName:  messageName,
 		}

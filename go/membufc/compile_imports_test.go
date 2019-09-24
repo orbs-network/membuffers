@@ -75,6 +75,16 @@ func TestCompilingProto_WithFixedBytes32(t *testing.T) {
 	require.NoError(t, Compile(conf))
 }
 
+func TestCompilingProto_FailWhenBadName(t *testing.T) {
+	conf := Config{
+		language:      "go",
+		languageGoCtx: false,
+		mock:          false,
+		files:         []string{"./e2e/protos/extended_wrong_name"},
+	}
+	require.Error(t, Compile(conf))
+}
+
 func assertImport(t *testing.T, importName string, compiled *ast.File) {
 	if !hasImport(compiled, importName) {
 		t.Fatalf("Expected '%s' import, got %s", importName, importsToString(compiled.Imports))

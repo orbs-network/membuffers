@@ -8,3 +8,8 @@ message WithFixedBytes32AndUint32 {
     uint32 a = 1;
     membuffers.bytes32 b = 2;
 }
+
+message WithFixedBytes20AndUint32 {
+    uint32 a = 1;
+    membuffers.bytes20 b = 2;
+}

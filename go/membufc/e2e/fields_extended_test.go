@@ -12,25 +12,12 @@ import (
 	types "github.com/orbs-network/membuffers/go/membufc/e2e/protos"
 	"github.com/stretchr/testify/require"
 	"testing"
+	"unsafe"
 )
-
-func getByte32Obj() [32]byte {
-	return [32]byte{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xe, 0xf,
-		0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xe, 0xf}
-}
-
-func getByte32Array() [][32]byte {
-	return [][32]byte{
-		{0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1,
-			0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xe, 0xf},
-		{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xe, 0xf,
-			0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xe, 0xf},
-	}
-}
 
 func TestMembuffersFieldsExtended_HandlesFixedBytes32(t *testing.T) {
 	// prepare
-	data := getByte32Obj()
+	data := generateBytes32(-1)
 
 	// build
 	msgBuilder := &types.WithFixedBytes32Builder{Foo: data}
@@ -47,8 +34,7 @@ func TestMembuffersFieldsExtended_HandlesFixedBytes32(t *testing.T) {
 	require.True(t, bytes.Equal(msg2.Raw(), data[:]), "raw message should be equal to the original value")
 
 	// mutate
-	other := [32]byte{0xfe, 0xab, 0xab, 0xab, 0xab, 0xab, 0xab, 0xab, 0xab, 0xab, 0xab, 0xab, 0xab, 0xab, 0xab, 0xab,
-		0xab, 0xab, 0xab, 0xab, 0xab, 0xab, 0xab, 0xab, 0xab, 0xab, 0xab, 0xab, 0xab, 0xab, 0xab, 0xef}
+	other := generateBytes32(100)
 	require.NoError(t, msg.MutateFoo(other))
 	t.Log(msg.String())
 
@@ -63,7 +49,7 @@ func TestMembuffersFieldsExtended_HandlesFixedBytes32(t *testing.T) {
 
 func TestMembuffersFieldsExtended_HandlesFixedBytes32AndUint32(t *testing.T) {
 	bar := uint32(1977)
-	data := getByte32Obj()
+	data := generateBytes32(-1)
 	msg := (&types.WithFixedBytes32AndUint32Builder{Foo: data, Bar: bar}).Build()
 
 	t.Log(msg.String())
@@ -77,7 +63,7 @@ func TestMembuffersFieldsExtended_HandlesFixedBytes32AndUint32(t *testing.T) {
 func TestMembuffersFieldsExtended_HandlesFixedBytes32InMiddle(t *testing.T) {
 	baz := uint32(1789)
 	bar := "1977"
-	data := getByte32Obj()
+	data := generateBytes32(-1)
 	msg := (&types.WithFixedBytes32InMiddleBuilder{Baz: baz, Foo: data, Bar: bar}).Build()
 
 	t.Log(msg.String())
@@ -96,7 +82,7 @@ func generateExectedBytes32ArrayRaw(data [][32]byte) []byte {
 }
 
 func TestMembuffersFieldsExtended_HandlesFixedBytes32Array(t *testing.T) {
-	data := getByte32Array()
+	data := generateBytes32Array(3)
 	msgBuilder := &types.WithRepeatedFixedBytes32Builder{Foo: data}
 	msg := msgBuilder.Build()
 
@@ -113,17 +99,98 @@ func TestMembuffersFieldsExtended_HandlesFixedBytes32Array(t *testing.T) {
 }
 
 func TestMembuffersFieldsExtended_HandlesFixedBytes32ArrayAndOthers(t *testing.T) {
-	data := getByte32Array()
+	data := generateBytes32Array(3)
 	msgBuilder := &types.WithRepeatedFixedBytes32AndOthersBuilder{Foo: data, Bar: [][]byte{{0x01, 0x02}, {0x02, 0x03}}, Baz: 1997}
 	msg := msgBuilder.Build()
 
 	t.Log(msg.String())
 	t.Log(msg.Raw())
 	itr := msg.FooIterator()
-	for i, _ := range data {
+	for i := range data {
 		require.EqualValues(t, data[i], itr.NextFoo())
 	}
 
 	// check hexdump
 	require.NoError(t, msgBuilder.HexDump("msg ", 0))
+}
+
+func TestMembuffersFieldsExtended_HandlesFixedBytes20InMiddle(t *testing.T) {
+	baz := uint32(1789)
+	bar := "1977"
+	data := generateBytes20(-1)
+	msg := (&types.WithFixedBytes20InMiddleBuilder{Baz: baz, Foo: data, Bar: bar}).Build()
+
+	t.Log(msg.String())
+	require.EqualValues(t, baz, msg.Baz())
+	require.EqualValues(t, data, msg.Foo())
+	require.EqualValues(t, bar, msg.Bar())
+}
+
+func TestMembuffersFieldsExtended_HandlesFixedBytes20ArrayAndOthers(t *testing.T) {
+	data := generateBytes20Array(3)
+	msgBuilder := &types.WithRepeatedFixedBytes20AndOthersBuilder{Foo: data, Bar: [][]byte{{0x01, 0x02}, {0x02, 0x03}}, Baz: 1997}
+	msg := msgBuilder.Build()
+
+	t.Log(msg.String())
+	t.Log(msg.Raw())
+	itr := msg.FooIterator()
+	for i := range data {
+		require.EqualValues(t, data[i], itr.NextFoo())
+	}
+
+	// check hexdump
+	require.NoError(t, msgBuilder.HexDump("msg ", 0))
+}
+
+func TestMembuffersFieldsExtended_HandlesEnumAndFixedBytes32(t *testing.T) {
+	data := generateBytes32(-1)
+	msgBuilder := &types.WithEnumAndFixedBytes32Builder{Foo: data, Bar: types.FIXED_EXAMPLE_ENUM_OPTION_C}
+	msg := msgBuilder.Build()
+
+	t.Log(msg.String())
+	t.Log(msg.Raw())
+	require.EqualValues(t, data, msg.Foo())
+	require.EqualValues(t, types.FIXED_EXAMPLE_ENUM_OPTION_C, msg.Bar())
+
+	// check hexdump
+	require.NoError(t, msgBuilder.HexDump("msg ", 0))
+}
+
+// Helpers
+func generateBytes(byteValue int, size int) []byte {
+	out := make([]byte, size)
+	for i := 0; i < size; i++ {
+		if byteValue < 0 {
+			out[i] = byte(i + 1)
+		} else {
+			out[i] = byte(byteValue)
+		}
+	}
+	return out
+}
+
+func generateBytes20(byteValue int) [20]byte {
+	return *(*[20]byte)(unsafe.Pointer(&generateBytes(byteValue, 20)[0]))
+}
+
+func generateBytes20Array(arraySize int) [][20]byte {
+	out := make([][20]byte, 0, arraySize)
+	for i := 0; i < arraySize; i++ {
+		c := *(*[20]byte)(unsafe.Pointer(&generateBytes(i+1, 20)[0]))
+		out = append(out, c)
+	}
+	return out
+}
+
+func generateBytes32(byteValue int) [32]byte {
+	return *(*[32]byte)(unsafe.Pointer(&generateBytes(byteValue, 32)[0]))
+}
+
+func generateBytes32Array(arraySize int) [][32]byte {
+	out := make([][32]byte, 0, arraySize)
+	for i := 0; i < arraySize; i++ {
+		c := *(*[32]byte)(unsafe.Pointer(&generateBytes(i+1, 32)[0]))
+		out = append(out, c)
+	}
+	return out
 }

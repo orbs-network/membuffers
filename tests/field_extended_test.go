@@ -36,3 +36,28 @@ obj.B = Array.from(m.getBytes32(1))`)
 		require.EqualValues(t, b, array[i])
 	}
 }
+
+func makeBytes20ObjectWithByte(b byte) [20]byte {
+	var obj = [20]byte{}
+	for i := 0; i < 20; i++ {
+		obj[i] = b
+	}
+	return obj
+}
+
+func TestMembuffers_ExtendedFieldTypes_JSreadsBytes20(t *testing.T) {
+	obj := (&types.WithFixedBytes20AndUint32Builder{A: 24041977, B: makeBytes20ObjectWithByte(0xab)}).Build()
+	t.Log(obj.Raw())
+	jsonFromJs := readInJs(t, obj.Raw(), `
+const m = new InternalMessage(buf, buf.byteLength, [FieldTypes.TypeUint32, FieldTypes.TypeBytes20], []);
+const obj = {};
+obj.A = m.getUint32(0)
+obj.B = Array.from(m.getBytes20(1))`)
+
+	require.EqualValues(t, obj.A(), jsonFromJs["A"], "field A missing in object read in JS version")
+	array := jsonFromJs["B"].([]interface{})
+	require.Len(t, jsonFromJs["B"], 20, "field B must be len 20 ")
+	for i, b := range obj.B() {
+		require.EqualValues(t, b, array[i])
+	}
+}

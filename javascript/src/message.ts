@@ -298,6 +298,25 @@ export class InternalMessage {
     return this.setBytesInOffset(off, v);
   }
 
+  getBytes20(fieldNum: number): Uint8Array {
+    if (!this.lazyCalcOffsets() || fieldNum >= Object.keys(this.offsets).length) {
+      return new Uint8Array();
+    }
+    const off = this.offsets[fieldNum];
+    return this.bytes.subarray(off, off + 20);
+  }
+
+  setBytes20(fieldNum: number, v: Uint8Array) {
+    if (!this.lazyCalcOffsets() || fieldNum >= Object.keys(this.offsets).length) {
+      throw new Error("invalid field");
+    }
+    if (20 !== v.byteLength) {
+      throw new Error("size mismatch");
+    }
+    const off = this.offsets[fieldNum];
+    return this.bytes.set(v, off);
+  }
+
   getBytes32(fieldNum: number): Uint8Array {
     if (!this.lazyCalcOffsets() || fieldNum >= Object.keys(this.offsets).length) {
       return new Uint8Array();
@@ -454,6 +473,16 @@ export class InternalMessage {
     }
     const off = this.offsets[fieldNum];
     return this.getBytesArrayIteratorInOffset(off);
+  }
+
+  getBytes20ArrayIterator(fieldNum: number): ArrayIterator {
+    if (!this.lazyCalcOffsets() || fieldNum >= Object.keys(this.offsets).length) {
+      return new ArrayIterator(0, 0, FieldTypes.TypeBytes20, this);
+    }
+    let off = this.offsets[fieldNum];
+    const contentSize = this.dataView.getUint32(off, true);
+    off += FieldSizes[FieldTypes.TypeBytes20Array];
+    return new ArrayIterator(off, off + contentSize, FieldTypes.TypeBytes20, this);
   }
 
   getBytes32ArrayIterator(fieldNum: number): ArrayIterator {

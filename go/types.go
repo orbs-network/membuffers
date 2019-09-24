@@ -26,7 +26,9 @@ const (
 	TypeStringArray  FieldType = 33
 
 	TypeBytes32      FieldType = 41
+	TypeBytes20      FieldType = 42
 	TypeBytes32Array FieldType = 51
+	TypeBytes20Array FieldType = 52
 )
 
 var FieldSizes = map[FieldType]Offset{
@@ -47,7 +49,9 @@ var FieldSizes = map[FieldType]Offset{
 	TypeStringArray:  4,
 
 	TypeBytes32:      32,
+	TypeBytes20:      20,
 	TypeBytes32Array: 4,
+	TypeBytes20Array: 4,
 }
 
 var FieldAlignment = map[FieldType]Offset{
@@ -68,7 +72,9 @@ var FieldAlignment = map[FieldType]Offset{
 	TypeStringArray:  4,
 
 	TypeBytes32:      4,
+	TypeBytes20:      4,
 	TypeBytes32Array: 4,
+	TypeBytes20Array: 4,
 }
 
 var FieldDynamic = map[FieldType]bool{
@@ -89,7 +95,9 @@ var FieldDynamic = map[FieldType]bool{
 	TypeStringArray:  true,
 
 	TypeBytes32:      false,
+	TypeBytes20:      false,
 	TypeBytes32Array: true,
+	TypeBytes20Array: true,
 }
 
 var FieldDynamicContentAlignment = map[FieldType]Offset{
@@ -110,5 +118,7 @@ var FieldDynamicContentAlignment = map[FieldType]Offset{
 	TypeStringArray:  4,
 
 	TypeBytes32:      0,
+	TypeBytes20:      0,
 	TypeBytes32Array: 4,
+	TypeBytes20Array: 4,
 }

@@ -97,6 +97,17 @@ func (i *Iterator) NextBytes() []byte {
 	return resBuf
 }
 
+func (i *Iterator) NextBytes20() (out [20]byte) {
+	if i.cursor+FieldSizes[TypeBytes20] > i.endCursor {
+		i.cursor = i.endCursor
+		return
+	}
+
+	out = GetBytes20(i.m.bytes[i.cursor:])
+	i.cursor += FieldSizes[TypeBytes20]
+	return
+}
+
 func (i *Iterator) NextBytes32() (out [32]byte) {
 	if i.cursor+FieldSizes[TypeBytes32] > i.endCursor {
 		i.cursor = i.endCursor

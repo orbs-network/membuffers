@@ -1,0 +1,9 @@
+syntax = "proto3";
+package types;
+option go_package = "github.com/orbs-network/membuffers/go/membufc/e2e/protos/types";
+
+import "membuffers";
+
+message WithBadName {
+    membuffers.wrong foo = 1;
+}
