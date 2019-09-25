@@ -1,0 +1,53 @@
+syntax = "proto3";
+package types;
+option go_package = "github.com/orbs-network/membuffers/go/membufc/e2e/protos/types";
+
+import "membuffers";
+
+message WithFixedBytes32 {
+    membuffers.bytes32 foo = 1;
+}
+
+message WithFixedBytes32AndUint32 {
+    membuffers.bytes32 foo = 1;
+    uint32 bar = 2;
+}
+
+message WithFixedBytes32InMiddle {
+    uint32 baz = 1;
+    membuffers.bytes32 foo = 2;
+    string bar = 3;
+}
+
+message WithRepeatedFixedBytes32 {
+    repeated membuffers.bytes32 foo = 1;
+}
+
+message WithRepeatedFixedBytes32AndOthers {
+    repeated membuffers.bytes32 foo = 1;
+    repeated bytes bar = 2;
+    uint32 baz = 3;
+}
+
+message WithFixedBytes20InMiddle {
+    uint32 baz = 1;
+    membuffers.bytes20 foo = 2;
+    string bar = 3;
+}
+
+message WithRepeatedFixedBytes20AndOthers {
+    repeated membuffers.bytes20 foo = 1;
+    repeated bytes bar = 2;
+    uint32 baz = 3;
+}
+
+enum FixedExampleEnum {
+    FIXED_EXAMPLE_ENUM_OPTION_A = 0;
+    FIXED_EXAMPLE_ENUM_OPTION_B = 1;
+    FIXED_EXAMPLE_ENUM_OPTION_C = 2;
+}
+
+message WithEnumAndFixedBytes32 {
+    FixedExampleEnum bar = 1;
+    membuffers.bytes32 foo = 2;
+}

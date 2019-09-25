@@ -1,0 +1,15 @@
+syntax = "proto3";
+package types;
+option go_package = "github.com/orbs-network/membuffers/go/e2e/types";
+
+import "membuffers";
+
+message WithFixedBytes32AndUint32 {
+    uint32 a = 1;
+    membuffers.bytes32 b = 2;
+}
+
+message WithFixedBytes20AndUint32 {
+    uint32 a = 1;
+    membuffers.bytes20 b = 2;
+}

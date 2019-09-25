@@ -83,6 +83,32 @@ export class InternalBuilder {
     }
   }
 
+  writeBytes20(buf: Uint8Array, v: Uint8Array): void {
+    if (!v || 20 !== v.byteLength) {
+      throw new Error("size mismatch");
+    }
+    this.size = alignOffsetToType(this.size, FieldTypes.TypeBytes20);
+    if (v) {
+      if (buf) {
+        buf.set(v, this.size);
+      }
+      this.size += v.byteLength;
+    }
+  }
+
+  writeBytes32(buf: Uint8Array, v: Uint8Array): void {
+    if (!v || 32 !== v.byteLength) {
+      throw new Error("size mismatch");
+    }
+    this.size = alignOffsetToType(this.size, FieldTypes.TypeBytes32);
+    if (v) {
+      if (buf) {
+        buf.set(v, this.size);
+      }
+      this.size += v.byteLength;
+    }
+  }
+
   writeString(buf: Uint8Array, v: string): void {
     this.writeBytes(buf, getTextEncoder().encode(v));
   }
@@ -155,6 +181,28 @@ export class InternalBuilder {
     const contentSize = this.size - contentSizeStartOffset;
     if (buf) {
       new DataView(buf.buffer, buf.byteOffset).setUint32(sizePlaceholderOffset, contentSize, true);
+    }
+  }
+
+  writeBytes20Array(buf: Uint8Array, v: Uint8Array[]): void {
+    this.size = alignOffsetToType(this.size, FieldTypes.TypeBytes20Array);
+    if (buf) {
+      new DataView(buf.buffer, buf.byteOffset).setUint32(this.size, v.length*20, true);
+    }
+    this.size += FieldSizes[FieldTypes.TypeBytes20Array];
+    for (const vv of v) {
+      this.writeBytes20(buf, vv);
+    }
+  }
+
+  writeBytes32Array(buf: Uint8Array, v: Uint8Array[]): void {
+    this.size = alignOffsetToType(this.size, FieldTypes.TypeBytes32Array);
+    if (buf) {
+      new DataView(buf.buffer, buf.byteOffset).setUint32(this.size, v.length*32, true);
+    }
+    this.size += FieldSizes[FieldTypes.TypeBytes32Array];
+    for (const vv of v) {
+      this.writeBytes32(buf, vv);
     }
   }
 

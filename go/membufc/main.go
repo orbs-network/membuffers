@@ -7,11 +7,9 @@
 package main
 
 import (
-	"errors"
 	"fmt"
-	"io"
+	"github.com/pkg/errors"
 	"os"
-	"path"
 	"strings"
 
 	"github.com/orbs-network/pbparser"
@@ -19,14 +17,14 @@ import (
 
 const MEMBUFC_VERSION = "0.0.21"
 
-type config struct {
+type Config struct {
 	language      string   // which output language to generate (eg. "go")
 	languageGoCtx bool     // should go language contexts be added to all interfaces
 	mock          bool     // should mock services be created in addition to interfaces
 	files         []string // input files
 }
 
-var conf = config{}
+var conf = Config{}
 
 func isFlag(arg string) bool {
 	return strings.HasPrefix(arg, "-")
@@ -99,25 +97,29 @@ func main() {
 			conf.files = append(conf.files, arg)
 		}
 	}
+	if err := Compile(conf); err != nil {
+		fmt.Println("ERROR:", err.Error())
+		os.Exit(1)
+	}
+}
+
+func Compile(conf Config) error {
 	for _, path := range conf.files {
 		fmt.Println("Compiling file:\t", path)
 		in, err := os.Open(path)
 		if err != nil {
-			fmt.Println("ERROR:", err.Error())
-			os.Exit(1)
+			return errors.Wrapf(err, "error opening input file %s", path)
 		}
 		p := importProvider{protoFile: path, moduleToRelative: make(map[string]dependencyData)}
 
 		protoFile, err := pbparser.Parse(in, &p)
 		if err != nil {
-			fmt.Println("ERROR (pbparser):", err.Error())
-			os.Exit(1)
+			return errors.Wrap(err, "parse using pbparser failed")
 		}
 		outPath := outputFileForPath(path, ".mb.go")
 		out, err := os.Create(outPath)
 		if err != nil {
-			fmt.Println("ERROR:", err.Error())
-			os.Exit(1)
+			return errors.Wrapf(err, "error creating output file %s", outPath)
 		}
 		defer out.Close()
 		if isInlineFile(&protoFile) {
@@ -130,45 +132,15 @@ func main() {
 			outPath := outputFileForPath(path, "_mock.mb.go")
 			out, err := os.Create(outPath)
 			if err != nil {
-				fmt.Println("ERROR:", err.Error())
-				os.Exit(1)
+				return errors.Wrapf(err, "error creating mock output file %s", outPath)
 			}
 			defer out.Close()
 			compileMockFile(out, protoFile, p.moduleToRelative, MEMBUFC_VERSION, conf.languageGoCtx)
 			fmt.Println("Created mock file:\t", outPath)
 		}
-		fmt.Println()
 	}
-}
 
-type dependencyData struct {
-	relative string
-	path     string
-}
-
-type importProvider struct {
-	protoFile        string
-	moduleToRelative map[string]dependencyData
-}
-
-func (i *importProvider) Provide(module string) (io.Reader, error) {
-	basePath := path.Dir(i.protoFile) + "/"
-	relativePath := ""
-	attempts := []string{}
-
-	for nesting := 0; nesting < 5; nesting++ {
-		attemptPath := basePath + relativePath + module
-		f, err := os.Open(attemptPath)
-		if err == nil {
-			if i.moduleToRelative != nil {
-				i.moduleToRelative[module] = dependencyData{relative: relativePath, path: attemptPath}
-			}
-			return f, nil
-		}
-		attempts = append(attempts, attemptPath)
-		relativePath = "../" + relativePath
-	}
-	return nil, errors.New(fmt.Sprintf("import %s not found, looked at %v", module, attempts))
+	return nil
 }
 
 func isInlineFile(file *pbparser.ProtoFile) bool {

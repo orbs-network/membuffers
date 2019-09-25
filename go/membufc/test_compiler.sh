@@ -18,7 +18,7 @@ echo ""
 go test -count=1 ./e2e
 echo ""
 
-rm `find . -name "*.mb.go"`
+#rm `find . -name "*.mb.go"`
 
 echo "  * Building protos for tests (with building compiler)"
 echo ""

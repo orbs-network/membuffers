@@ -84,6 +84,18 @@ func (w *InternalBuilder) HexDumpBytes(prefix string, offsetFromStart Offset, fi
 	}
 }
 
+func (w *InternalBuilder) HexDumpBytes20(prefix string, offsetFromStart Offset, fieldName string, v [20]byte) {
+	w.size = hexDumpAlignOffsetToType(prefix, offsetFromStart, w.size, TypeBytes20)
+	fmt.Printf("%s%x // %s: bytes20 content (offset 0x%x, size: 0x%x)\n", prefix, v, fieldName, offsetFromStart+w.size, len(v))
+	w.size += Offset(len(v))
+}
+
+func (w *InternalBuilder) HexDumpBytes32(prefix string, offsetFromStart Offset, fieldName string, v [32]byte) {
+	w.size = hexDumpAlignOffsetToType(prefix, offsetFromStart, w.size, TypeBytes32)
+	fmt.Printf("%s%x // %s: bytes32 content (offset 0x%x, size: 0x%x)\n", prefix, v, fieldName, offsetFromStart+w.size, len(v))
+	w.size += Offset(len(v))
+}
+
 func (w *InternalBuilder) HexDumpString(prefix string, offsetFromStart Offset, fieldName string, v string) {
 	w.size = hexDumpAlignOffsetToType(prefix, offsetFromStart, w.size, TypeBytes)
 	buf := make([]byte, FieldSizes[TypeBytes])
@@ -176,6 +188,30 @@ func (w *InternalBuilder) HexDumpBytesArray(prefix string, offsetFromStart Offse
 	for index, vv := range v {
 		fieldNameIndex := fmt.Sprintf("%s #%d", fieldName, index)
 		w.HexDumpBytes(prefix+HEX_DUMP_INDENT, offsetFromStart, fieldNameIndex, vv)
+	}
+}
+
+func (w *InternalBuilder) HexDumpBytes20Array(prefix string, offsetFromStart Offset, fieldName string, v [][20]byte) {
+	w.size = hexDumpAlignOffsetToType(prefix, offsetFromStart, w.size, TypeBytes20Array)
+	buf := make([]byte, FieldSizes[TypeBytes20Array])
+	WriteOffset(buf, Offset(len(v)*20))
+	fmt.Printf("%s%x // %s: bytes20 array size (offset 0x%x, size: 0x%x)\n", prefix, buf, fieldName, offsetFromStart+w.size, len(buf))
+	w.size += FieldSizes[TypeBytes20Array]
+	for index, vv := range v {
+		fieldNameIndex := fmt.Sprintf("%s #%d", fieldName, index)
+		w.HexDumpBytes20(prefix+HEX_DUMP_INDENT, offsetFromStart, fieldNameIndex, vv)
+	}
+}
+
+func (w *InternalBuilder) HexDumpBytes32Array(prefix string, offsetFromStart Offset, fieldName string, v [][32]byte) {
+	w.size = hexDumpAlignOffsetToType(prefix, offsetFromStart, w.size, TypeBytes32Array)
+	buf := make([]byte, FieldSizes[TypeBytes32Array])
+	WriteOffset(buf, Offset(len(v)*32))
+	fmt.Printf("%s%x // %s: bytes32 array size (offset 0x%x, size: 0x%x)\n", prefix, buf, fieldName, offsetFromStart+w.size, len(buf))
+	w.size += FieldSizes[TypeBytes32Array]
+	for index, vv := range v {
+		fieldNameIndex := fmt.Sprintf("%s #%d", fieldName, index)
+		w.HexDumpBytes32(prefix+HEX_DUMP_INDENT, offsetFromStart, fieldNameIndex, vv)
 	}
 }
 

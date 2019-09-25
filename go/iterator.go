@@ -7,10 +7,10 @@
 package membuffers
 
 type Iterator struct {
-	cursor Offset
+	cursor    Offset
 	endCursor Offset
 	fieldType FieldType
-	m *InternalMessage
+	m         *InternalMessage
 }
 
 func (i *Iterator) HasNext() bool {
@@ -73,7 +73,7 @@ func (i *Iterator) NextMessage() (buf []byte, size Offset) {
 		i.cursor = i.endCursor
 		return []byte{}, 0
 	}
-	resBuf := i.m.bytes[i.cursor:i.cursor+resSize]
+	resBuf := i.m.bytes[i.cursor : i.cursor+resSize]
 	i.cursor += resSize
 	i.cursor = alignDynamicFieldContentOffset(i.cursor, TypeMessageArray)
 	return resBuf, resSize
@@ -91,10 +91,32 @@ func (i *Iterator) NextBytes() []byte {
 		i.cursor = i.endCursor
 		return []byte{}
 	}
-	resBuf := i.m.bytes[i.cursor:i.cursor+resSize]
+	resBuf := i.m.bytes[i.cursor : i.cursor+resSize]
 	i.cursor += resSize
 	i.cursor = alignDynamicFieldContentOffset(i.cursor, TypeBytesArray)
 	return resBuf
+}
+
+func (i *Iterator) NextBytes20() (out [20]byte) {
+	if i.cursor+FieldSizes[TypeBytes20] > i.endCursor {
+		i.cursor = i.endCursor
+		return
+	}
+
+	out = GetBytes20(i.m.bytes[i.cursor:])
+	i.cursor += FieldSizes[TypeBytes20]
+	return
+}
+
+func (i *Iterator) NextBytes32() (out [32]byte) {
+	if i.cursor+FieldSizes[TypeBytes32] > i.endCursor {
+		i.cursor = i.endCursor
+		return
+	}
+
+	out = GetBytes32(i.m.bytes[i.cursor:])
+	i.cursor += FieldSizes[TypeBytes32]
+	return
 }
 
 func (i *Iterator) NextString() string {
