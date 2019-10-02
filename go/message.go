@@ -290,12 +290,8 @@ func (m *InternalMessage) SetBytes(fieldNum int, v []byte) error {
 	return m.SetBytesInOffset(off, v)
 }
 
-func (m *InternalMessage) SetBytes32(fieldNum int, v [32]byte) error {
-	if !m.lazyCalcOffsets() || fieldNum >= len(m.offsets) {
-		return &ErrInvalidField{}
-	}
-	off := m.offsets[fieldNum]
-	copy(m.bytes[off:], v[:])
+func (m *InternalMessage) SetBytes20InOffset(off Offset, v [20]byte) error {
+	WriteBytes20(m.bytes[off:], v)
 	return nil
 }
 
@@ -304,8 +300,20 @@ func (m *InternalMessage) SetBytes20(fieldNum int, v [20]byte) error {
 		return &ErrInvalidField{}
 	}
 	off := m.offsets[fieldNum]
-	copy(m.bytes[off:], v[:])
+	return m.SetBytes20InOffset(off, v)
+}
+
+func (m *InternalMessage) SetBytes32InOffset(off Offset, v [32]byte) error {
+	WriteBytes32(m.bytes[off:], v)
 	return nil
+}
+
+func (m *InternalMessage) SetBytes32(fieldNum int, v [32]byte) error {
+	if !m.lazyCalcOffsets() || fieldNum >= len(m.offsets) {
+		return &ErrInvalidField{}
+	}
+	off := m.offsets[fieldNum]
+	return m.SetBytes32InOffset(off, v)
 }
 
 func (m *InternalMessage) GetBytesInOffset(off Offset) []byte {
@@ -326,22 +334,28 @@ func (m *InternalMessage) GetBytes(fieldNum int) []byte {
 	return m.GetBytesInOffset(off)
 }
 
-func (m *InternalMessage) GetBytes20(fieldNum int) (out [20]byte) {
-	if !m.lazyCalcOffsets() || fieldNum >= len(m.offsets) {
-		return
-	}
-	off := m.offsets[fieldNum]
-	out = GetBytes20(m.bytes[off:])
-	return
+func (m *InternalMessage) GetBytes20InOffset(off Offset) [20]byte {
+	return GetBytes20(m.bytes[off:])
 }
 
-func (m *InternalMessage) GetBytes32(fieldNum int) (out [32]byte) {
+func (m *InternalMessage) GetBytes20(fieldNum int) [20]byte {
 	if !m.lazyCalcOffsets() || fieldNum >= len(m.offsets) {
-		return
+		return [20]byte{}
 	}
 	off := m.offsets[fieldNum]
-	out = GetBytes32(m.bytes[off:])
-	return
+	return m.GetBytes20InOffset(off)
+}
+
+func (m *InternalMessage) GetBytes32InOffset(off Offset) [32]byte {
+	return GetBytes32(m.bytes[off:])
+}
+
+func (m *InternalMessage) GetBytes32(fieldNum int) [32]byte {
+	if !m.lazyCalcOffsets() || fieldNum >= len(m.offsets) {
+		return [32]byte{}
+	}
+	off := m.offsets[fieldNum]
+	return m.GetBytes32InOffset(off)
 }
 
 func (m *InternalMessage) GetStringInOffset(off Offset) string {
@@ -513,11 +527,7 @@ func (m *InternalMessage) GetBytesArrayIterator(fieldNum int) *Iterator {
 	return m.GetBytesArrayIteratorInOffset(off)
 }
 
-func (m *InternalMessage) GetBytes20ArrayIterator(fieldNum int) *Iterator {
-	if !m.lazyCalcOffsets() || fieldNum >= len(m.offsets) {
-		return &Iterator{0, 0, TypeBytes20, m}
-	}
-	off := m.offsets[fieldNum]
+func (m *InternalMessage) GetBytes20ArrayIteratorInOffset(off Offset) *Iterator {
 	contentSize := GetOffset(m.bytes[off:])
 	off += FieldSizes[TypeBytes20Array]
 	return &Iterator{
@@ -528,11 +538,15 @@ func (m *InternalMessage) GetBytes20ArrayIterator(fieldNum int) *Iterator {
 	}
 }
 
-func (m *InternalMessage) GetBytes32ArrayIterator(fieldNum int) *Iterator {
+func (m *InternalMessage) GetBytes20ArrayIterator(fieldNum int) *Iterator {
 	if !m.lazyCalcOffsets() || fieldNum >= len(m.offsets) {
-		return &Iterator{0, 0, TypeBytes32, m}
+		return &Iterator{0, 0, TypeBytes20, m}
 	}
 	off := m.offsets[fieldNum]
+	return m.GetBytes20ArrayIteratorInOffset(off)
+}
+
+func (m *InternalMessage) GetBytes32ArrayIteratorInOffset(off Offset) *Iterator {
 	contentSize := GetOffset(m.bytes[off:])
 	off += FieldSizes[TypeBytes32Array]
 	return &Iterator{
@@ -541,6 +555,14 @@ func (m *InternalMessage) GetBytes32ArrayIterator(fieldNum int) *Iterator {
 		fieldType: TypeBytes32,
 		m:         m,
 	}
+}
+
+func (m *InternalMessage) GetBytes32ArrayIterator(fieldNum int) *Iterator {
+	if !m.lazyCalcOffsets() || fieldNum >= len(m.offsets) {
+		return &Iterator{0, 0, TypeBytes32, m}
+	}
+	off := m.offsets[fieldNum]
+	return m.GetBytes32ArrayIteratorInOffset(off)
 }
 
 func (m *InternalMessage) GetStringArrayIteratorInOffset(off Offset) *Iterator {
