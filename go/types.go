@@ -17,10 +17,12 @@ const (
 	TypeUint16       FieldType = 12
 	TypeUint32       FieldType = 13
 	TypeUint64       FieldType = 14
+	TypeUint256      FieldType = 16
 	TypeUint8Array   FieldType = 21
 	TypeUint16Array  FieldType = 22
 	TypeUint32Array  FieldType = 23
 	TypeUint64Array  FieldType = 24
+	TypeUint256Array FieldType = 26
 	TypeMessageArray FieldType = 31
 	TypeBytesArray   FieldType = 32
 	TypeStringArray  FieldType = 33
@@ -40,10 +42,12 @@ var FieldSizes = map[FieldType]Offset{
 	TypeUint16:       2,
 	TypeUint32:       4,
 	TypeUint64:       8,
+	TypeUint256:      32,
 	TypeUint8Array:   4,
 	TypeUint16Array:  4,
 	TypeUint32Array:  4,
 	TypeUint64Array:  4,
+	TypeUint256Array: 4,
 	TypeMessageArray: 4,
 	TypeBytesArray:   4,
 	TypeStringArray:  4,
@@ -63,10 +67,12 @@ var FieldAlignment = map[FieldType]Offset{
 	TypeUint16:       2,
 	TypeUint32:       4,
 	TypeUint64:       4,
+	TypeUint256:      4,
 	TypeUint8Array:   4,
 	TypeUint16Array:  4,
 	TypeUint32Array:  4,
 	TypeUint64Array:  4,
+	TypeUint256Array: 4,
 	TypeMessageArray: 4,
 	TypeBytesArray:   4,
 	TypeStringArray:  4,
@@ -86,10 +92,12 @@ var FieldDynamic = map[FieldType]bool{
 	TypeUint16:       false,
 	TypeUint32:       false,
 	TypeUint64:       false,
+	TypeUint256:      false,
 	TypeUint8Array:   true,
 	TypeUint16Array:  true,
 	TypeUint32Array:  true,
 	TypeUint64Array:  true,
+	TypeUint256Array: true,
 	TypeMessageArray: true,
 	TypeBytesArray:   true,
 	TypeStringArray:  true,
@@ -109,10 +117,12 @@ var FieldDynamicContentAlignment = map[FieldType]Offset{
 	TypeUint16:       0,
 	TypeUint32:       0,
 	TypeUint64:       0,
+	TypeUint256:      0,
 	TypeUint8Array:   1,
 	TypeUint16Array:  2,
 	TypeUint32Array:  4,
 	TypeUint64Array:  4,
+	TypeUint256Array: 4,
 	TypeMessageArray: 4,
 	TypeBytesArray:   4,
 	TypeStringArray:  4,

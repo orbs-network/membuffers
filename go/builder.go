@@ -6,6 +6,8 @@
 
 package membuffers
 
+import "math/big"
+
 type MessageWriter interface {
 	HexDump(prefix string, offsetFromStart Offset) (err error)
 	Write(buf []byte) (err error)
@@ -117,7 +119,7 @@ func (w *InternalBuilder) WriteBytes20(buf []byte, v [20]byte) {
 	if buf != nil {
 		WriteBytes20(buf[w.size:], v)
 	}
-	w.size += Offset(len(v))
+	w.size += FieldSizes[TypeBytes20]
 }
 
 func (w *InternalBuilder) WriteBytes32(buf []byte, v [32]byte) {
@@ -125,7 +127,15 @@ func (w *InternalBuilder) WriteBytes32(buf []byte, v [32]byte) {
 	if buf != nil {
 		WriteBytes32(buf[w.size:], v)
 	}
-	w.size += Offset(len(v))
+	w.size += FieldSizes[TypeBytes32]
+}
+
+func (w *InternalBuilder) WriteUint256(buf []byte, v *big.Int) {
+	w.size = alignOffsetToType(w.size, TypeUint256)
+	if buf != nil {
+		WriteUint256(buf[w.size:], v)
+	}
+	w.size += FieldSizes[TypeUint256]
 }
 
 func (w *InternalBuilder) WriteString(buf []byte, v string) {
@@ -222,6 +232,17 @@ func (w *InternalBuilder) WriteBytes32Array(buf []byte, v [][32]byte) {
 	w.size += FieldSizes[TypeBytes32Array]
 	for _, vv := range v {
 		w.WriteBytes32(buf, vv)
+	}
+}
+
+func (w *InternalBuilder) WriteUint256Array(buf []byte, v []*big.Int) {
+	w.size = alignOffsetToType(w.size, TypeUint256Array)
+	if buf != nil {
+		WriteOffset(buf[w.size:], Offset(len(v)*32))
+	}
+	w.size += FieldSizes[TypeUint256Array]
+	for _, vv := range v {
+		w.WriteUint256(buf, vv)
 	}
 }
 

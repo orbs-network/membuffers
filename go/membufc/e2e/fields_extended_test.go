@@ -11,6 +11,7 @@ import (
 	membuffers "github.com/orbs-network/membuffers/go"
 	types "github.com/orbs-network/membuffers/go/membufc/e2e/protos"
 	"github.com/stretchr/testify/require"
+	"math/big"
 	"testing"
 	"unsafe"
 )
@@ -151,6 +152,38 @@ func TestMembuffersFieldsExtended_HandlesEnumAndFixedBytes32(t *testing.T) {
 	t.Log(msg.Raw())
 	require.EqualValues(t, data, msg.Foo())
 	require.EqualValues(t, types.FIXED_EXAMPLE_ENUM_OPTION_C, msg.Bar())
+
+	// check hexdump
+	require.NoError(t, msgBuilder.HexDump("msg ", 0))
+}
+
+func TestMembuffersFieldsExtended_HandlesUint256(t *testing.T) {
+	baz := uint32(1789)
+	bar := "1977"
+	data := big.NewInt(500000000)
+	msgBuilder := types.WithUint256InMiddleBuilder{Baz: baz, Foo: data, Bar: bar}
+	msg := msgBuilder.Build()
+
+	t.Log(msg.String())
+	require.EqualValues(t, baz, msg.Baz())
+	require.EqualValues(t, data, msg.Foo())
+	require.EqualValues(t, bar, msg.Bar())
+
+	// check hexdump
+	require.NoError(t, msgBuilder.HexDump("msg ", 0))
+}
+
+func TestMembuffersFieldsExtended_HandlesUint256ArrayAndOthers(t *testing.T) {
+	data := []*big.Int{big.NewInt(500000000), big.NewInt(600000000), big.NewInt(700000000)}
+	msgBuilder := &types.WithRepeatedUint256AndOthersBuilder{Foo: data, Bar: 1997}
+	msg := msgBuilder.Build()
+
+	t.Log(msg.String())
+	t.Log(msg.Raw())
+	itr := msg.FooIterator()
+	for i := range data {
+		require.EqualValues(t, data[i], itr.NextFoo())
+	}
 
 	// check hexdump
 	require.NoError(t, msgBuilder.HexDump("msg ", 0))
