@@ -61,6 +61,17 @@ export class ArrayIterator {
     return res;
   }
 
+  nextUint256(): bigint {
+    if (this.cursor + FieldSizes[FieldTypes.TypeUint256] > this.endCursor) {
+      this.cursor = this.endCursor;
+      return BigInt(0);
+    }
+    const res = this.m.getUint256InOffset(this.cursor);
+    this.cursor += FieldSizes[FieldTypes.TypeUint256];
+    this.cursor = alignDynamicFieldContentOffset(this.cursor, FieldTypes.TypeUint256Array);
+    return res;
+  }
+
   nextMessage(): [Uint8Array, number] {
     if (this.cursor + FieldSizes[FieldTypes.TypeMessage] > this.endCursor) {
       this.cursor = this.endCursor;
@@ -135,6 +146,8 @@ export class ArrayIterator {
               return { value: this.nextUint32(), done: false };
             case FieldTypes.TypeUint64:
               return { value: this.nextUint64(), done: false };
+            case FieldTypes.TypeUint256:
+              return { value: this.nextUint256(), done: false };
             case FieldTypes.TypeMessage:
               return { value: this.nextMessage(), done: false };
             case FieldTypes.TypeBytes:
