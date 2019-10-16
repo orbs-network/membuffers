@@ -10,6 +10,13 @@ type (
 	Offset uint32
 )
 
+func GetBool(buf []byte) bool {
+	if buf[0] == 0 {
+		return false
+	}
+	return true
+}
+
 func GetByte(buf []byte) byte {
 	return byte(GetUint8(buf))
 }
@@ -144,6 +151,14 @@ func GetUnionType(buf []byte) uint16 {
 
 func WriteByte(buf []byte, n byte) {
 	WriteUint8(buf, uint8(n))
+}
+
+func WriteBool(buf []byte, n bool) {
+	if n {
+		buf[0] = 1
+	} else {
+		buf[0] = 0
+	}
 }
 
 func WriteUint8(buf []byte, n uint8) {

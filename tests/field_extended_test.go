@@ -77,3 +77,25 @@ obj.C = m.getUint32(2);`)
 	require.EqualValues(t, obj.B().String(), jsonFromJs["B"], "field B missing in object read in JS version")
 	require.EqualValues(t, obj.C(), jsonFromJs["C"], "field C missing in object read in JS version")
 }
+
+func TestMembuffers_ExtendedFieldTypes_JSreadsBool(t *testing.T) {
+	obj := (&types.WithBoolsAndOthersBuilder{A: false, B: true, C: 1977, D: true, E: 1889, F: true}).Build()
+	t.Log(obj.Raw())
+	jsonFromJs := readInJs(t, obj.Raw(), `
+const m = new InternalMessage(buf, buf.byteLength, [FieldTypes.TypeBool, FieldTypes.TypeBool, FieldTypes.TypeUint32, FieldTypes.TypeBool, FieldTypes.TypeUint32, FieldTypes.TypeBool], []);
+const obj = {};
+obj.A = m.getBool(0);
+obj.B = m.getBool(1);
+obj.C = m.getUint32(2);
+obj.D = m.getBool(3);
+obj.E = m.getUint32(4);
+obj.F = m.getBool(5);
+`)
+
+	require.EqualValues(t, obj.A(), jsonFromJs["A"], "field A missing in object read in JS version")
+	require.EqualValues(t, obj.B(), jsonFromJs["B"], "field B missing in object read in JS version")
+	require.EqualValues(t, obj.C(), jsonFromJs["C"], "field C missing in object read in JS version")
+	require.EqualValues(t, obj.D(), jsonFromJs["D"], "field D missing in object read in JS version")
+	require.EqualValues(t, obj.E(), jsonFromJs["E"], "field E missing in object read in JS version")
+	require.EqualValues(t, obj.F(), jsonFromJs["F"], "field F missing in object read in JS version")
+}

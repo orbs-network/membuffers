@@ -189,6 +189,28 @@ func TestMembuffersFieldsExtended_HandlesUint256ArrayAndOthers(t *testing.T) {
 	require.NoError(t, msgBuilder.HexDump("msg ", 0))
 }
 
+func TestMembuffersFieldsExtended_HandlesBoolsAndOthers(t *testing.T) {
+	foo, bar, qux, thud := false, true, true, true
+	baz, quux := uint32(1977), uint32(1889)
+	msgBuilder := &types.WithBoolsAndOthersBuilder{Foo: foo, Bar: bar, Baz: baz, Qux: qux, Quux: quux, Thud: thud}
+	msg := msgBuilder.Build()
+
+	raw := msg.Raw()
+	t.Log(msg.String())
+	t.Log(raw)
+
+	require.Len(t, raw, 17)
+	require.True(t, foo == msg.Foo())
+	require.True(t, bar == msg.Bar())
+	require.EqualValues(t, baz, msg.Baz())
+	require.True(t, qux == msg.Qux())
+	require.EqualValues(t, quux, msg.Quux())
+	require.True(t, thud == msg.Thud())
+
+	// check hexdump
+	require.NoError(t, msgBuilder.HexDump("msg ", 0))
+}
+
 // Helpers
 func generateBytes(byteValue int, size int) []byte {
 	out := make([]byte, size)

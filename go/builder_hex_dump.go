@@ -42,6 +42,12 @@ func HexDumpRawInLines(raw []byte, lineLen int) {
 	fmt.Printf("(total size: 0x%x)\n", len(raw))
 }
 
+func (w *InternalBuilder) HexDumpBool(prefix string, offsetFromStart Offset, fieldName string, v bool) {
+	w.size = hexDumpAlignOffsetToType(prefix, offsetFromStart, w.size, TypeBool)
+	fmt.Printf("%s%v // %s: bool (offset 0x%x, size: 0x%x)\n", prefix, v, fieldName, offsetFromStart+w.size, 1)
+	w.size += FieldSizes[TypeBool]
+}
+
 func (w *InternalBuilder) HexDumpUint8(prefix string, offsetFromStart Offset, fieldName string, v uint8) {
 	w.size = hexDumpAlignOffsetToType(prefix, offsetFromStart, w.size, TypeUint8)
 	buf := make([]byte, FieldSizes[TypeUint8])

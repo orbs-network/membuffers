@@ -10,6 +10,18 @@ import "./matcher-extensions";
 import { ch } from "./text";
 import { InternalBuilder } from "./builder";
 
+test("TestBuilderBool", () => {
+  const w = new InternalBuilder();
+  const v = true;
+  w.writeBool(null, v);
+  expect(w.size).toBe(1);
+  const buf = new Uint8Array(w.size);
+  w.reset();
+  w.writeBool(buf, v);
+  const expected = new Uint8Array([0x1]);
+  expect(buf).toBeEqualToUint8Array(expected);
+});
+
 test("TestBuilderUint8", () => {
   const w = new InternalBuilder();
   const v = 0x17;

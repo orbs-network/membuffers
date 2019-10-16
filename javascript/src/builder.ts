@@ -32,6 +32,14 @@ export class InternalBuilder {
     return this.size;
   }
 
+  writeBool(buf: Uint8Array, v: boolean): void {
+    this.size = alignOffsetToType(this.size, FieldTypes.TypeBool);
+    if (buf) {
+      new DataView(buf.buffer, buf.byteOffset).setUint8(this.size, v ? 1 : 0);
+    }
+    this.size += FieldSizes[FieldTypes.TypeBool];
+  }
+
   writeUint8(buf: Uint8Array, v: number): void {
     this.size = alignOffsetToType(this.size, FieldTypes.TypeUint8);
     if (buf) {

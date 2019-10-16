@@ -67,6 +67,14 @@ func (w *InternalBuilder) NotifyBuildEnd() {
 	w.building = false
 }
 
+func (w *InternalBuilder) WriteBool(buf []byte, v bool) {
+	w.size = alignOffsetToType(w.size, TypeBool)
+	if buf != nil {
+		WriteBool(buf[w.size:], v)
+	}
+	w.size += FieldSizes[TypeBool]
+}
+
 func (w *InternalBuilder) WriteUint8(buf []byte, v uint8) {
 	w.size = alignOffsetToType(w.size, TypeUint8)
 	if buf != nil {
