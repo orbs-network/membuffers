@@ -11,10 +11,7 @@ type (
 )
 
 func GetBool(buf []byte) bool {
-	if buf[0] == 0 {
-		return false
-	}
-	return true
+	return buf[0] == 1
 }
 
 func GetByte(buf []byte) byte {

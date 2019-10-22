@@ -10,17 +10,19 @@ This standalone library was originally created as part of the [ORBS](https://www
 
 * *Canonical encoding* - Two parties encoding the same message with the same values will always receive the exact same encoding byte by byte.
 
-* *Direct access* - There's no packing/unpacking process for messages, serialized fields are accessed directly. Messages are mapped to memory.
+* *Direct access(\*)* - There's no packing/unpacking process for messages, serialized fields are accessed directly. Messages are mapped to memory.
 
 * *Familiar schema* - Messages are defined using Google [Protobuf](https://developers.google.com/protocol-buffers/docs/proto3) schema (ver 3) for easy migration and familiar syntax.
 
-* *Zero copies* - Without packing/unpacking, excessive data copying is avoided. Data can even be mutated and changed in-place.
+* *Zero copies(\*)* - Without packing/unpacking, excessive data copying is avoided. Data can even be mutated and changed in-place.
 
 * *Lazy parsing* - Fields are parsed lazily and never recursively. Accessing a single field in a complexly nested message will not parse the entire message.
 
 * *Self-contained fields* - Every field is serialized sequentially with all its children, this permits direct byte operations over fields such as hashing or signing.
 
 * *Almost human readable* - Encoding format is simple enough to be decoded by hand and even be generated manually without a fancy library.
+
+(\*) Note - Go implementation of membuffer translates uint256 into *big.Int, and usage of this type does require copy and unpacking.
 
 ## Usage
 
