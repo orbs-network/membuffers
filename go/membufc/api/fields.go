@@ -4,7 +4,7 @@
 // This source code is licensed under the MIT license found in the LICENSE file in the root directory of this source tree.
 // The above notice should be included in all copies or substantial portions of the software.
 
-package main
+package api
 
 import (
 	"fmt"
@@ -124,6 +124,7 @@ func translateMessageField(packageName string, messageName string, field pbparse
 			"uint16": "uint16",
 			"uint32": "uint32",
 			"uint64": "uint64",
+			"bool":   "bool",
 		}
 		accessor := map[string]string{
 			"bytes":  "Bytes",
@@ -132,6 +133,7 @@ func translateMessageField(packageName string, messageName string, field pbparse
 			"uint16": "Uint16",
 			"uint32": "Uint32",
 			"uint64": "Uint64",
+			"bool":   "Bool",
 		}
 		_, ok := accessor[field.Type.Name()]
 		if !ok {

@@ -4,7 +4,7 @@
 // This source code is licensed under the MIT license found in the LICENSE file in the root directory of this source tree.
 // The above notice should be included in all copies or substantial portions of the software.
 
-package main
+package api
 
 import (
 	"fmt"
@@ -36,6 +36,13 @@ func doesFileContainBigInt(file *pbparser.ProtoFile) bool {
 		for _, field := range m.Fields {
 			if isExtendedTypeBigInt(field.Type.Name()) {
 				return true
+			}
+		}
+		for _, union := range m.OneOfs {
+			for _, field := range union.Fields {
+				if isExtendedTypeBigInt(field.Type.Name()) {
+					return true
+				}
 			}
 		}
 	}

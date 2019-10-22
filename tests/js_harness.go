@@ -22,6 +22,8 @@ func readInJs(t testing.TB, raw []byte, code string) map[string]interface{} {
 		hexBuf = append(hexBuf, "0x"+hex.EncodeToString([]byte{b}))
 	}
 	hexString := "[" + strings.Join(hexBuf, ",") + "]"
+
+	// NOT the bigint part is for the test itself to allow a string representation to be read in the go part
 	js := fmt.Sprintf(`
 const {InternalMessage, FieldTypes} = require("../javascript/dist/membuffers");
 BigInt.prototype.toJSON = function() { return this.toString(); }

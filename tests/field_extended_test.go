@@ -74,7 +74,7 @@ obj.B = m.getUint256(1);
 obj.C = m.getUint32(2);`)
 
 	require.EqualValues(t, obj.A(), jsonFromJs["A"], "field A missing in object read in JS version")
-	require.EqualValues(t, obj.B().String(), jsonFromJs["B"], "field B missing in object read in JS version")
+	require.EqualValues(t, obj.B().String(), jsonFromJs["B"], "field B missing in object read in JS version") // for test we convert js bigint to string, it has no default stringify
 	require.EqualValues(t, obj.C(), jsonFromJs["C"], "field C missing in object read in JS version")
 }
 
@@ -91,7 +91,6 @@ obj.D = m.getBool(3);
 obj.E = m.getUint32(4);
 obj.F = m.getBool(5);
 `)
-
 	require.EqualValues(t, obj.A(), jsonFromJs["A"], "field A missing in object read in JS version")
 	require.EqualValues(t, obj.B(), jsonFromJs["B"], "field B missing in object read in JS version")
 	require.EqualValues(t, obj.C(), jsonFromJs["C"], "field C missing in object read in JS version")

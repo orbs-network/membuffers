@@ -4,7 +4,7 @@
 // This source code is licensed under the MIT license found in the LICENSE file in the root directory of this source tree.
 // The above notice should be included in all copies or substantial portions of the software.
 
-package main
+package api
 
 import (
 	"bytes"
@@ -67,20 +67,20 @@ func TestCompilingProtoWithMessage(t *testing.T) {
 
 func TestCompilingProto_WithFixedBytes32(t *testing.T) {
 	conf := Config{
-		language:      "go",
-		languageGoCtx: false,
-		mock:          false,
-		files:         []string{"./e2e/protos/fixed_size_bytes.proto"},
+		Language:      "go",
+		LanguageGoCtx: false,
+		Mock:          false,
+		Files:         []string{"./e2e/protos/fixed_size_bytes.proto"},
 	}
 	require.NoError(t, Compile(conf))
 }
 
 func TestCompilingProto_FailWhenBadName(t *testing.T) {
 	conf := Config{
-		language:      "go",
-		languageGoCtx: false,
-		mock:          false,
-		files:         []string{"./e2e/protos/extended_wrong_name"},
+		Language:      "go",
+		LanguageGoCtx: false,
+		Mock:          false,
+		Files:         []string{"./e2e/protos/extended_wrong_name"},
 	}
 	require.Error(t, Compile(conf))
 }

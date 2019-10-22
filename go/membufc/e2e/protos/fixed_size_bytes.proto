@@ -64,10 +64,10 @@ message WithRepeatedUint256AndOthers {
 }
 
 message WithBoolsAndOthers {
-    membuffers.bool foo = 1;
-    membuffers.bool bar = 2;
+    bool foo = 1;
+    bool bar = 2;
     uint32 baz = 3;
-    membuffers.bool qux = 4;
+    bool qux = 4;
     uint32 quux = 5;
-    membuffers.bool thud = 6;
+    bool thud = 6;
 }

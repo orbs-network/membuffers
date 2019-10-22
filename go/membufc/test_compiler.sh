@@ -9,8 +9,8 @@ echo ""
 echo "  * Building protos for tests (without building compiler)"
 echo ""
 
-go run $(ls -1 *.go | grep -v _test.go) --go --mock `find . -name "*.proto"`
-go run $(ls -1 *.go | grep -v _test.go) --go --mock --go-ctx `find . -name "*_with_ctx.proto"`
+go run main.go --go --mock `find . -name "*.proto"`
+go run main.go --go --mock --go-ctx `find . -name "*_with_ctx.proto"`
 
 echo "  * Running end to end tests"
 echo ""

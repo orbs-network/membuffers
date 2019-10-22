@@ -4,17 +4,16 @@
 // This source code is licensed under the MIT license found in the LICENSE file in the root directory of this source tree.
 // The above notice should be included in all copies or substantial portions of the software.
 
-package main
+package api
 
 import "github.com/orbs-network/pbparser"
 
 const Bytes20 = "membuffers.bytes20"
 const Bytes32 = "membuffers.bytes32"
 const Uint256 = "membuffers.uint256"
-const Bool = "membuffers.bool"
 
 func isExtendedType(name string) bool {
-	return name == Bytes32 || name == Bytes20 || name == Uint256 || name == Bool
+	return name == Bytes32 || name == Bytes20 || name == Uint256
 }
 
 func isExtendedTypeBigInt(name string) bool {
@@ -42,10 +41,6 @@ func getExtendedType(messageName string, field pbparser.FieldElement, isArray bo
 	case Uint256:
 		m.FieldGoType = "*big.Int"
 		m.TypeAccessor = "Uint256"
-		return m
-	case Bool:
-		m.FieldGoType = "bool"
-		m.TypeAccessor = "Bool"
 		return m
 	}
 	return MessageField{}
