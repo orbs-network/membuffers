@@ -458,6 +458,26 @@ func (m *InternalMessage) IsUnionIndex(fieldNum int, unionNum int, unionIndex ui
 	return unionType == unionIndex, off
 }
 
+func (m *InternalMessage) GetBoolArrayIteratorInOffset(off Offset) *Iterator {
+	contentSize := GetOffset(m.bytes[off:])
+	off += FieldSizes[TypeBoolArray]
+	off = alignDynamicFieldContentOffset(off, TypeBoolArray)
+	return &Iterator{
+		cursor:    off,
+		endCursor: off + contentSize,
+		fieldType: TypeBool,
+		m:         m,
+	}
+}
+
+func (m *InternalMessage) GetBoolArrayIterator(fieldNum int) *Iterator {
+	if !m.lazyCalcOffsets() || fieldNum >= len(m.offsets) {
+		return &Iterator{0, 0, TypeBool, m}
+	}
+	off := m.offsets[fieldNum]
+	return m.GetBoolArrayIteratorInOffset(off)
+}
+
 func (m *InternalMessage) GetUint8ArrayIteratorInOffset(off Offset) *Iterator {
 	contentSize := GetOffset(m.bytes[off:])
 	off += FieldSizes[TypeUint8Array]

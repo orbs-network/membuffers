@@ -211,6 +211,32 @@ func TestMembuffersFieldsExtended_HandlesBoolsAndOthers(t *testing.T) {
 	require.NoError(t, msgBuilder.HexDump("msg ", 0))
 }
 
+func TestMembuffersFieldsExtended_HandlesRepeatedBoolAndOthers(t *testing.T) {
+	qux := []bool{true, false, false, true, true}
+	baz := uint32(1977)
+	msgBuilder := &types.WithRepeatedBoolAndOthersBuilder{Baz: baz, Qux: qux}
+	msg := msgBuilder.Build()
+
+	raw := msg.Raw()
+	t.Log(msg.String())
+	t.Log(raw)
+
+	require.Len(t, raw, 13) // no offset in end
+	itr := msg.QuxIterator()
+	for i := range qux {
+		require.EqualValues(t, qux[i], itr.NextQux())
+	}
+	require.EqualValues(t, baz, msg.Baz())
+
+	// check hexdump
+	require.NoError(t, msgBuilder.HexDump("msg ", 0))
+
+	msgOtherOrderWithPadding := (&types.WithUint32AndRepeatedBoolBuilder{Baz: baz, Qux: qux}).Build()
+	raw = msgOtherOrderWithPadding.Raw()
+	require.Len(t, raw, 16)
+	t.Log(raw)
+}
+
 // Helpers
 func generateBytes(byteValue int, size int) []byte {
 	out := make([]byte, size)

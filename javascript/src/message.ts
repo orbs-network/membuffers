@@ -441,6 +441,21 @@ export class InternalMessage {
     return new ArrayIterator(off, off + contentSize, FieldTypes.TypeUint8, this);
   }
 
+  getBoolArrayIterator(fieldNum: number): ArrayIterator {
+    if (!this.lazyCalcOffsets() || fieldNum >= Object.keys(this.offsets).length) {
+      return new ArrayIterator(0, 0, FieldTypes.TypeBool, this);
+    }
+    const off = this.offsets[fieldNum];
+    return this.getBoolArrayIteratorInOffset(off);
+  }
+
+  getBoolArrayIteratorInOffset(off: number): ArrayIterator {
+    const contentSize = this.dataView.getUint32(off, true);
+    off += FieldSizes[FieldTypes.TypeBoolArray];
+    off = alignDynamicFieldContentOffset(off, FieldTypes.TypeBoolArray);
+    return new ArrayIterator(off, off + contentSize, FieldTypes.TypeBool, this);
+  }
+
   getUint8ArrayIterator(fieldNum: number): ArrayIterator {
     if (!this.lazyCalcOffsets() || fieldNum >= Object.keys(this.offsets).length) {
       return new ArrayIterator(0, 0, FieldTypes.TypeUint8, this);

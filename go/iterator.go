@@ -19,6 +19,17 @@ func (i *Iterator) HasNext() bool {
 	return i.cursor < i.endCursor
 }
 
+func (i *Iterator) NextBool() bool {
+	if i.cursor+FieldSizes[TypeBool] > i.endCursor {
+		i.cursor = i.endCursor
+		return false
+	}
+	res := i.m.GetBoolInOffset(i.cursor)
+	i.cursor += FieldSizes[TypeBool]
+	i.cursor = alignDynamicFieldContentOffset(i.cursor, TypeBoolArray)
+	return res
+}
+
 func (i *Iterator) NextUint8() uint8 {
 	if i.cursor+FieldSizes[TypeUint8] > i.endCursor {
 		i.cursor = i.endCursor

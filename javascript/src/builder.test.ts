@@ -194,6 +194,18 @@ test("TestBuilderUnionIndex", () => {
   expect(buf).toBeEqualToUint8Array(expected);
 });
 
+test("TestBuilderBoolArray", () => {
+  const w = new InternalBuilder();
+  const v = [true, false, false, true, false];
+  w.writeBoolArray(null, v);
+  expect(w.size).toBe(9);
+  const buf = new Uint8Array(w.size);
+  w.reset();
+  w.writeBoolArray(buf, v);
+  const expected = new Uint8Array([0x05, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x01, 0x00]);
+  expect(buf).toBeEqualToUint8Array(expected);
+});
+
 test("TestBuilderUint8Array", () => {
   const w = new InternalBuilder();
   const v = [0x01, 0x02, 0x03];

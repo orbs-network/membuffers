@@ -71,3 +71,12 @@ message WithBoolsAndOthers {
     uint32 quux = 5;
     bool thud = 6;
 }
+
+message WithRepeatedBoolAndOthers {
+    uint32 baz = 1;
+    repeated bool qux = 2;
+}
+message WithUint32AndRepeatedBool {
+    repeated bool qux = 1;
+    uint32 baz = 2;
+}
