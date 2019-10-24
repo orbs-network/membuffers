@@ -6,7 +6,10 @@
 
 package membuffers
 
-import "fmt"
+import (
+	"fmt"
+	"math/big"
+)
 
 const HEX_DUMP_INDENT = "    "
 
@@ -94,6 +97,14 @@ func (w *InternalBuilder) HexDumpBytes32(prefix string, offsetFromStart Offset, 
 	w.size = hexDumpAlignOffsetToType(prefix, offsetFromStart, w.size, TypeBytes32)
 	fmt.Printf("%s%x // %s: bytes32 content (offset 0x%x, size: 0x%x)\n", prefix, v, fieldName, offsetFromStart+w.size, len(v))
 	w.size += Offset(len(v))
+}
+
+func (w *InternalBuilder) HexDumpUint256(prefix string, offsetFromStart Offset, fieldName string, v *big.Int) {
+	w.size = hexDumpAlignOffsetToType(prefix, offsetFromStart, w.size, TypeUint256)
+	buf := make([]byte, FieldSizes[TypeUint256])
+	WriteUint256(buf, v)
+	fmt.Printf("%s%x // %s: uint256 content (offset 0x%x, size: 0x%x)\n", prefix, buf, fieldName, offsetFromStart+w.size, FieldSizes[TypeUint256])
+	w.size += FieldSizes[TypeUint256]
 }
 
 func (w *InternalBuilder) HexDumpString(prefix string, offsetFromStart Offset, fieldName string, v string) {
@@ -212,6 +223,18 @@ func (w *InternalBuilder) HexDumpBytes32Array(prefix string, offsetFromStart Off
 	for index, vv := range v {
 		fieldNameIndex := fmt.Sprintf("%s #%d", fieldName, index)
 		w.HexDumpBytes32(prefix+HEX_DUMP_INDENT, offsetFromStart, fieldNameIndex, vv)
+	}
+}
+
+func (w *InternalBuilder) HexDumpUint256Array(prefix string, offsetFromStart Offset, fieldName string, v []*big.Int) {
+	w.size = hexDumpAlignOffsetToType(prefix, offsetFromStart, w.size, TypeUint256Array)
+	buf := make([]byte, FieldSizes[TypeUint256Array])
+	WriteOffset(buf, Offset(len(v)*32))
+	fmt.Printf("%s%x // %s: bytes32 array size (offset 0x%x, size: 0x%x)\n", prefix, buf, fieldName, offsetFromStart+w.size, len(buf))
+	w.size += FieldSizes[TypeUint256Array]
+	for index, vv := range v {
+		fieldNameIndex := fmt.Sprintf("%s #%d", fieldName, index)
+		w.HexDumpUint256(prefix+HEX_DUMP_INDENT, offsetFromStart, fieldNameIndex, vv)
 	}
 }
 

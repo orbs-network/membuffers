@@ -51,3 +51,14 @@ message WithEnumAndFixedBytes32 {
     FixedExampleEnum bar = 1;
     membuffers.bytes32 foo = 2;
 }
+
+message WithUint256InMiddle {
+    uint32 baz = 1;
+    membuffers.uint256 foo = 2;
+    string bar = 3;
+}
+
+message WithRepeatedUint256AndOthers {
+    repeated membuffers.uint256 foo = 1;
+    uint32 bar = 2;
+}

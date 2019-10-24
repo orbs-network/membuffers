@@ -2,6 +2,7 @@ package membuffers
 
 import (
 	"math"
+	"math/big"
 	"unsafe"
 )
 
@@ -127,6 +128,12 @@ func GetBytes32(buf []byte) [32]byte {
 	return *(*[32]byte)(unsafe.Pointer(&buf[0]))
 }
 
+func GetUint256(buf []byte) *big.Int {
+	x := big.NewInt(0)
+	x.SetBytes(buf[0:FieldSizes[TypeUint256]])
+	return x
+}
+
 func GetOffset(buf []byte) Offset {
 	return Offset(GetUint32(buf))
 }
@@ -231,6 +238,15 @@ func WriteBytes20(buf []byte, v [20]byte) {
 
 func WriteBytes32(buf []byte, v [32]byte) {
 	*(*[32]byte)(unsafe.Pointer(&buf[0])) = v
+}
+
+func WriteUint256(buf []byte, v *big.Int) {
+	actual := [32]byte{}
+	if v != nil {
+		b := v.Bytes()
+		copy(actual[32-len(b):], b)
+	}
+	*(*[32]byte)(unsafe.Pointer(&buf[0])) = actual
 }
 
 func WriteOffset(buf []byte, n Offset) {

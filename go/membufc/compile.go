@@ -38,7 +38,8 @@ func templateByBoxName(name string) *template.Template {
 
 func compileProtoFile(w io.Writer, file pbparser.ProtoFile, dependencyData map[string]dependencyData, compilerVersion string, languageGoCtx bool) {
 	serializeAllMessages := shouldSerializeAllMessages(&file)
-	addHeader(w, &file, dependencyData, serializeAllMessages, compilerVersion, languageGoCtx)
+	hasBigInt := doesFileContainBigInt(&file)
+	addHeader(w, &file, dependencyData, serializeAllMessages, hasBigInt, compilerVersion, languageGoCtx)
 	for _, s := range file.Services {
 		addService(w, file.PackageName, s, &file, languageGoCtx)
 	}
@@ -52,7 +53,7 @@ func compileProtoFile(w io.Writer, file pbparser.ProtoFile, dependencyData map[s
 	addEnums(w, file.Enums)
 }
 
-func addHeader(w io.Writer, file *pbparser.ProtoFile, dependencyData map[string]dependencyData, serializeServiceArgs bool, compilerVersion string, languageGoCtx bool) {
+func addHeader(w io.Writer, file *pbparser.ProtoFile, dependencyData map[string]dependencyData, serializeServiceArgs bool, hasBigInt bool, compilerVersion string, languageGoCtx bool) {
 	var goPackage string
 	for _, option := range file.Options {
 		if option.Name == "go_package" {
@@ -80,6 +81,7 @@ func addHeader(w io.Writer, file *pbparser.ProtoFile, dependencyData map[string]
 		HasMembuffers     bool
 		HasMessages       bool
 		HasServiceMethods bool
+		HasBigInt         bool
 		CompilerVersion   string
 		LanguageGoCtx     bool
 	}{
@@ -87,6 +89,7 @@ func addHeader(w io.Writer, file *pbparser.ProtoFile, dependencyData map[string]
 		Imports:           unique(imports),
 		HasMembuffers:     len(file.Messages) > 0 && serializeServiceArgs,
 		HasMessages:       len(file.Messages) > 0,
+		HasBigInt:         hasBigInt,
 		HasServiceMethods: fileHasServiceMethods(file),
 		CompilerVersion:   compilerVersion,
 		LanguageGoCtx:     languageGoCtx,

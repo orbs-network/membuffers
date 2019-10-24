@@ -8,9 +8,9 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"github.com/orbs-network/pbparser"
 	"io"
+	"os"
 )
 
 func shouldSerializeAllMessages(file *pbparser.ProtoFile) bool {
@@ -29,6 +29,17 @@ func shouldSerializeMessage(m pbparser.MessageElement) bool {
 		}
 	}
 	return true
+}
+
+func doesFileContainBigInt(file *pbparser.ProtoFile) bool {
+	for _, m := range file.Messages {
+		for _, field := range m.Fields {
+			if isExtendedTypeBigInt(field.Type.Name()) {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 func doesFileContainHandlers(path string, handlers []NameWithAndWithoutImport) bool {
@@ -61,14 +72,14 @@ func addMessageNonSerializable(w io.Writer, packageName string, m pbparser.Messa
 	}
 	t := templateByBoxName("MessageNonSerializable.template")
 	t.Execute(w, struct {
-		MessageName string
-		MessageFields []MessageField
-		UnionByIndex [][]MessageField
+		MessageName      string
+		MessageFields    []MessageField
+		UnionByIndex     [][]MessageField
 		UnionNameToIndex map[string]int
 	}{
-		MessageName:   messageName,
-		MessageFields: messageFields,
-		UnionByIndex:  unionByIndex,
+		MessageName:      messageName,
+		MessageFields:    messageFields,
+		UnionByIndex:     unionByIndex,
 		UnionNameToIndex: unionNameToIndex,
 	})
 }

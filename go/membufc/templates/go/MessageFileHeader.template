@@ -2,12 +2,15 @@
 package {{.PackageName}}
 
 import (
-{{if .HasMembuffers}}	"github.com/orbs-network/membuffers/go"
-	"bytes"
+{{if .HasMembuffers}}	"bytes"
+{{end -}}
+{{if and .HasServiceMethods .LanguageGoCtx}}	"context"
 {{end -}}
 {{if .HasMessages}}	"fmt"
 {{end -}}
-{{if and .HasServiceMethods .LanguageGoCtx}}	"context"
+{{if .HasMembuffers}}	"github.com/orbs-network/membuffers/go"
+{{end -}}
+{{if .HasBigInt}}	"math/big"
 {{end -}}
 {{range .Imports}}	"{{.}}"
 {{end -}}

@@ -6,6 +6,8 @@
 
 package membuffers
 
+import "math/big"
+
 type Iterator struct {
 	cursor    Offset
 	endCursor Offset
@@ -116,6 +118,17 @@ func (i *Iterator) NextBytes32() (out [32]byte) {
 
 	out = GetBytes32(i.m.bytes[i.cursor:])
 	i.cursor += FieldSizes[TypeBytes32]
+	return
+}
+
+func (i *Iterator) NextUint256() (out *big.Int) {
+	if i.cursor+FieldSizes[TypeUint256] > i.endCursor {
+		i.cursor = i.endCursor
+		return
+	}
+
+	out = GetUint256(i.m.bytes[i.cursor:])
+	i.cursor += FieldSizes[TypeUint256]
 	return
 }
 
