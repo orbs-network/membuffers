@@ -9,6 +9,7 @@ package tests
 import (
 	"github.com/orbs-network/membuffers/tests/types"
 	"github.com/stretchr/testify/require"
+	"math/big"
 	"testing"
 )
 
@@ -60,4 +61,19 @@ obj.B = Array.from(m.getBytes20(1))`)
 	for i, b := range obj.B() {
 		require.EqualValues(t, b, array[i])
 	}
+}
+
+func TestMembuffers_ExtendedFieldTypes_JSreadsUint256(t *testing.T) {
+	obj := (&types.WithFixedUint256AndUint32Builder{A: 2, B: big.NewInt(8224), C: 2}).Build()
+	t.Log(obj.Raw())
+	jsonFromJs := readInJs(t, obj.Raw(), `
+const m = new InternalMessage(buf, buf.byteLength, [FieldTypes.TypeUint32, FieldTypes.TypeUint256, FieldTypes.TypeUint32], []);
+const obj = {};
+obj.A = m.getUint32(0);
+obj.B = m.getUint256(1);
+obj.C = m.getUint32(2);`)
+
+	require.EqualValues(t, obj.A(), jsonFromJs["A"], "field A missing in object read in JS version")
+	require.EqualValues(t, obj.B().String(), jsonFromJs["B"], "field B missing in object read in JS version")
+	require.EqualValues(t, obj.C(), jsonFromJs["C"], "field C missing in object read in JS version")
 }

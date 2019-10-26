@@ -55,6 +55,7 @@ syntax = "proto3";
 package membuffers;
 message bytes32 {}
 message bytes20 {}
+message uint256 {}
 `)
 	}
 

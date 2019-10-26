@@ -10,6 +10,7 @@ import { FieldTypes, FieldSizes, FieldAlignment, FieldDynamic, FieldDynamicConte
 import { ArrayIterator } from "./iterator";
 import { getTextEncoder, getTextDecoder } from "./text";
 import { DataViewWrapper } from "./data-view-wrapper";
+import { bigIntToUint8Array, uint8ArrayToBigInt } from "./bigint";
 
 export function alignOffsetToType(off: number, fieldType: FieldType) {
   const fieldSize = FieldAlignment[fieldType];
@@ -248,6 +249,30 @@ export class InternalMessage {
     return this.setUint64InOffset(off, v);
   }
 
+  getUint256InOffset(off: number): bigint {
+    return uint8ArrayToBigInt(this.bytes.subarray(off, off + FieldSizes[FieldTypes.TypeUint256]));
+  }
+
+  setUint256InOffset(off: number, v: bigint): void {
+    this.bytes.set(bigIntToUint8Array(v), off);
+  }
+
+  getUint256(fieldNum: number): bigint {
+    if (!this.lazyCalcOffsets() || fieldNum >= Object.keys(this.offsets).length) {
+      return BigInt(0);
+    }
+    const off = this.offsets[fieldNum];
+    return this.getUint256InOffset(off);
+  }
+
+  setUint256(fieldNum: number, v: bigint): void {
+    if (!this.lazyCalcOffsets() || fieldNum >= Object.keys(this.offsets).length) {
+      throw new Error("invalid field");
+    }
+    const off = this.offsets[fieldNum];
+    return this.setUint256InOffset(off, v);
+  }
+
   getMessageInOffset(off: number): Uint8Array {
     const contentSize = this.dataView.getUint32(off, true);
     off += FieldSizes[FieldTypes.TypeMessage];
@@ -444,6 +469,21 @@ export class InternalMessage {
     }
     const off = this.offsets[fieldNum];
     return this.getUint64ArrayIteratorInOffset(off);
+  }
+
+  getUint256ArrayIteratorInOffset(off: number): ArrayIterator {
+    const contentSize = this.dataView.getUint32(off, true);
+    off += FieldSizes[FieldTypes.TypeUint256Array];
+    off = alignDynamicFieldContentOffset(off, FieldTypes.TypeUint256Array);
+    return new ArrayIterator(off, off + contentSize, FieldTypes.TypeUint256, this);
+  }
+
+  getUint256ArrayIterator(fieldNum: number): ArrayIterator {
+    if (!this.lazyCalcOffsets() || fieldNum >= Object.keys(this.offsets).length) {
+      return new ArrayIterator(0, 0, FieldTypes.TypeUint256, this);
+    }
+    const off = this.offsets[fieldNum];
+    return this.getUint256ArrayIteratorInOffset(off);
   }
 
   getMessageArrayIteratorInOffset(off: number): ArrayIterator {

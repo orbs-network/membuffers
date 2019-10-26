@@ -7,6 +7,7 @@
 package membuffers
 
 import (
+	"math/big"
 	"sync"
 )
 
@@ -316,6 +317,19 @@ func (m *InternalMessage) SetBytes32(fieldNum int, v [32]byte) error {
 	return m.SetBytes32InOffset(off, v)
 }
 
+func (m *InternalMessage) SetUint256InOffset(off Offset, v *big.Int) error {
+	WriteUint256(m.bytes[off:], v)
+	return nil
+}
+
+func (m *InternalMessage) SetUint256(fieldNum int, v *big.Int) error {
+	if !m.lazyCalcOffsets() || fieldNum >= len(m.offsets) {
+		return &ErrInvalidField{}
+	}
+	off := m.offsets[fieldNum]
+	return m.SetUint256InOffset(off, v)
+}
+
 func (m *InternalMessage) GetBytesInOffset(off Offset) []byte {
 	contentSize := GetOffset(m.bytes[off:])
 	off += FieldSizes[TypeBytes]
@@ -356,6 +370,18 @@ func (m *InternalMessage) GetBytes32(fieldNum int) [32]byte {
 	}
 	off := m.offsets[fieldNum]
 	return m.GetBytes32InOffset(off)
+}
+
+func (m *InternalMessage) GetUint256InOffset(off Offset) *big.Int {
+	return GetUint256(m.bytes[off:])
+}
+
+func (m *InternalMessage) GetUint256(fieldNum int) *big.Int {
+	if !m.lazyCalcOffsets() || fieldNum >= len(m.offsets) {
+		return big.NewInt(0)
+	}
+	off := m.offsets[fieldNum]
+	return m.GetUint256InOffset(off)
 }
 
 func (m *InternalMessage) GetStringInOffset(off Offset) string {
@@ -563,6 +589,25 @@ func (m *InternalMessage) GetBytes32ArrayIterator(fieldNum int) *Iterator {
 	}
 	off := m.offsets[fieldNum]
 	return m.GetBytes32ArrayIteratorInOffset(off)
+}
+
+func (m *InternalMessage) GetUint256ArrayIteratorInOffset(off Offset) *Iterator {
+	contentSize := GetOffset(m.bytes[off:])
+	off += FieldSizes[TypeUint256Array]
+	return &Iterator{
+		cursor:    off,
+		endCursor: off + contentSize,
+		fieldType: TypeUint256,
+		m:         m,
+	}
+}
+
+func (m *InternalMessage) GetUint256ArrayIterator(fieldNum int) *Iterator {
+	if !m.lazyCalcOffsets() || fieldNum >= len(m.offsets) {
+		return &Iterator{0, 0, TypeUint256, m}
+	}
+	off := m.offsets[fieldNum]
+	return m.GetUint256ArrayIteratorInOffset(off)
 }
 
 func (m *InternalMessage) GetStringArrayIteratorInOffset(off Offset) *Iterator {

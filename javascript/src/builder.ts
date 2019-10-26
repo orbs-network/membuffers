@@ -10,6 +10,7 @@ import { alignOffsetToType, alignDynamicFieldContentOffset } from "./message";
 import { FieldTypes, FieldSizes } from "./types";
 import { getTextEncoder } from "./text";
 import { DataViewWrapper } from "./data-view-wrapper";
+import { bigIntToUint8Array } from "./bigint";
 
 interface MessageWriter {
   write(buf: Uint8Array): void;
@@ -62,6 +63,14 @@ export class InternalBuilder {
       new DataViewWrapper(buf.buffer, buf.byteOffset).setBigUint64(this.size, v, true);
     }
     this.size += FieldSizes[FieldTypes.TypeUint64];
+  }
+
+  writeUint256(buf: Uint8Array, v: bigint): void {
+    this.size = alignOffsetToType(this.size, FieldTypes.TypeUint256);
+    if (buf) {
+      buf.set(bigIntToUint8Array(v), this.size);
+    }
+    this.size += FieldSizes[FieldTypes.TypeUint256];
   }
 
   writeBytes(buf: Uint8Array, v: Uint8Array): void {
@@ -167,6 +176,18 @@ export class InternalBuilder {
     this.size = alignDynamicFieldContentOffset(this.size, FieldTypes.TypeUint64Array);
     for (const vv of v) {
       this.writeUint64(buf, vv);
+    }
+  }
+
+  writeUint256Array(buf: Uint8Array, v: bigint[]): void {
+    this.size = alignOffsetToType(this.size, FieldTypes.TypeUint256Array);
+    if (buf) {
+      new DataView(buf.buffer, buf.byteOffset).setUint32(this.size, v.length * FieldSizes[FieldTypes.TypeUint256], true);
+    }
+    this.size += FieldSizes[FieldTypes.TypeUint256Array];
+    this.size = alignDynamicFieldContentOffset(this.size, FieldTypes.TypeUint256Array);
+    for (const vv of v) {
+      this.writeUint256(buf, vv);
     }
   }
 

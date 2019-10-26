@@ -8,33 +8,40 @@ package main
 
 import "github.com/orbs-network/pbparser"
 
+const Bytes20 = "membuffers.bytes20"
+const Bytes32 = "membuffers.bytes32"
+const Uint256 = "membuffers.uint256"
+
 func isExtendedType(name string) bool {
-	return name == "membuffers.bytes32" || name == "membuffers.bytes20"
+	return name == Bytes32 || name == Bytes20 || name == Uint256
+}
+
+func isExtendedTypeBigInt(name string) bool {
+	return name == Uint256
 }
 
 func getExtendedType(messageName string, field pbparser.FieldElement, isArray bool) MessageField {
-	if field.Type.Name() == "membuffers.bytes32" {
-		return MessageField{
-			FieldName:    convertFieldNameToGoCase(field.Name),
-			FieldGoType:  "[32]byte",
-			IsMessage:    false,
-			IsArray:      isArray,
-			IsUnion:      false,
-			TypeAccessor: "Bytes32",
-			FieldIndex:   field.Tag,
-			MessageName:  messageName,
-		}
-	} else if field.Type.Name() == "membuffers.bytes20" {
-		return MessageField{
-			FieldName:    convertFieldNameToGoCase(field.Name),
-			FieldGoType:  "[20]byte",
-			IsMessage:    false,
-			IsArray:      isArray,
-			IsUnion:      false,
-			TypeAccessor: "Bytes20",
-			FieldIndex:   field.Tag,
-			MessageName:  messageName,
-		}
+	m := MessageField{
+		FieldName:   convertFieldNameToGoCase(field.Name),
+		IsMessage:   false,
+		IsArray:     isArray,
+		IsUnion:     false,
+		FieldIndex:  field.Tag,
+		MessageName: messageName,
+	}
+	switch field.Type.Name() {
+	case Bytes32:
+		m.FieldGoType = "[32]byte"
+		m.TypeAccessor = "Bytes32"
+		return m
+	case Bytes20:
+		m.FieldGoType = "[20]byte"
+		m.TypeAccessor = "Bytes20"
+		return m
+	case Uint256:
+		m.FieldGoType = "*big.Int"
+		m.TypeAccessor = "Uint256"
+		return m
 	}
 	return MessageField{}
 }

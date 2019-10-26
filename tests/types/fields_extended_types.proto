@@ -13,3 +13,9 @@ message WithFixedBytes20AndUint32 {
     uint32 a = 1;
     membuffers.bytes20 b = 2;
 }
+
+message WithFixedUint256AndUint32 {
+    uint32 a = 1;
+    membuffers.uint256 b = 2;
+    uint32 c = 3;
+}

@@ -24,7 +24,7 @@ func readInJs(t testing.TB, raw []byte, code string) map[string]interface{} {
 	hexString := "[" + strings.Join(hexBuf, ",") + "]"
 	js := fmt.Sprintf(`
 const {InternalMessage, FieldTypes} = require("../javascript/dist/membuffers");
-
+BigInt.prototype.toJSON = function() { return this.toString(); }
 const buf = new Uint8Array(%s);
 %s
 console.log(JSON.stringify(obj));
