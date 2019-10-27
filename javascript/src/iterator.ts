@@ -17,6 +17,17 @@ export class ArrayIterator {
     return this.cursor < this.endCursor;
   }
 
+  nextBool(): boolean {
+    if (this.cursor + FieldSizes[FieldTypes.TypeBool] > this.endCursor) {
+      this.cursor = this.endCursor;
+      return false;
+    }
+    const res = this.m.getBoolInOffset(this.cursor);
+    this.cursor += FieldSizes[FieldTypes.TypeBool];
+    this.cursor = alignDynamicFieldContentOffset(this.cursor, FieldTypes.TypeBoolArray);
+    return res;
+  }
+
   nextUint8(): number {
     if (this.cursor + FieldSizes[FieldTypes.TypeUint8] > this.endCursor) {
       this.cursor = this.endCursor;
@@ -133,11 +144,13 @@ export class ArrayIterator {
     return getTextDecoder().decode(b);
   }
 
-  [Symbol.iterator](): Iterator<number | bigint | [Uint8Array, number] | Uint8Array | string> {
+  [Symbol.iterator](): Iterator<number | bigint | [Uint8Array, number] | Uint8Array | string | boolean> {
     return {
       next: () => {
         if (this.hasNext()) {
           switch (this.fieldType) {
+            case FieldTypes.TypeBool:
+              return { value: this.nextBool(), done: false };
             case FieldTypes.TypeUint8:
               return { value: this.nextUint8(), done: false };
             case FieldTypes.TypeUint16:

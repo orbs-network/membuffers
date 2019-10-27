@@ -10,6 +10,18 @@ import "./matcher-extensions";
 import { ch } from "./text";
 import { InternalBuilder } from "./builder";
 
+test("TestBuilderBool", () => {
+  const w = new InternalBuilder();
+  const v = true;
+  w.writeBool(null, v);
+  expect(w.size).toBe(1);
+  const buf = new Uint8Array(w.size);
+  w.reset();
+  w.writeBool(buf, v);
+  const expected = new Uint8Array([0x1]);
+  expect(buf).toBeEqualToUint8Array(expected);
+});
+
 test("TestBuilderUint8", () => {
   const w = new InternalBuilder();
   const v = 0x17;
@@ -179,6 +191,18 @@ test("TestBuilderUnionIndex", () => {
   w.reset();
   w.writeUnionIndex(buf, v);
   const expected = new Uint8Array([0x01, 0x00]);
+  expect(buf).toBeEqualToUint8Array(expected);
+});
+
+test("TestBuilderBoolArray", () => {
+  const w = new InternalBuilder();
+  const v = [true, false, false, true, false];
+  w.writeBoolArray(null, v);
+  expect(w.size).toBe(9);
+  const buf = new Uint8Array(w.size);
+  w.reset();
+  w.writeBoolArray(buf, v);
+  const expected = new Uint8Array([0x05, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x01, 0x00]);
   expect(buf).toBeEqualToUint8Array(expected);
 });
 

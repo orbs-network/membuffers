@@ -157,6 +157,31 @@ func (m *InternalMessage) GetOffsetInOffset(off Offset) Offset {
 	return GetOffset(m.bytes[off:])
 }
 
+func (m *InternalMessage) GetBoolInOffset(off Offset) bool {
+	return GetBool(m.bytes[off:])
+}
+
+func (m *InternalMessage) SetBoolInOffset(off Offset, v bool) {
+	WriteBool(m.bytes[off:], v)
+}
+
+func (m *InternalMessage) GetBool(fieldNum int) bool {
+	if !m.lazyCalcOffsets() || fieldNum >= len(m.offsets) {
+		return false
+	}
+	off := m.offsets[fieldNum]
+	return m.GetBoolInOffset(off)
+}
+
+func (m *InternalMessage) SetBool(fieldNum int, v bool) error {
+	if !m.lazyCalcOffsets() || fieldNum >= len(m.offsets) {
+		return &ErrInvalidField{}
+	}
+	off := m.offsets[fieldNum]
+	m.SetBoolInOffset(off, v)
+	return nil
+}
+
 func (m *InternalMessage) GetUint8InOffset(off Offset) uint8 {
 	return GetUint8(m.bytes[off:])
 }
@@ -431,6 +456,26 @@ func (m *InternalMessage) IsUnionIndex(fieldNum int, unionNum int, unionIndex ui
 	fieldType := m.unions[unionNum][unionType]
 	off = alignOffsetToType(off, fieldType)
 	return unionType == unionIndex, off
+}
+
+func (m *InternalMessage) GetBoolArrayIteratorInOffset(off Offset) *Iterator {
+	contentSize := GetOffset(m.bytes[off:])
+	off += FieldSizes[TypeBoolArray]
+	off = alignDynamicFieldContentOffset(off, TypeBoolArray)
+	return &Iterator{
+		cursor:    off,
+		endCursor: off + contentSize,
+		fieldType: TypeBool,
+		m:         m,
+	}
+}
+
+func (m *InternalMessage) GetBoolArrayIterator(fieldNum int) *Iterator {
+	if !m.lazyCalcOffsets() || fieldNum >= len(m.offsets) {
+		return &Iterator{0, 0, TypeBool, m}
+	}
+	off := m.offsets[fieldNum]
+	return m.GetBoolArrayIteratorInOffset(off)
 }
 
 func (m *InternalMessage) GetUint8ArrayIteratorInOffset(off Offset) *Iterator {

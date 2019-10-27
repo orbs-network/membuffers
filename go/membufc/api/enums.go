@@ -4,23 +4,23 @@
 // This source code is licensed under the MIT license found in the LICENSE file in the root directory of this source tree.
 // The above notice should be included in all copies or substantial portions of the software.
 
-package main
+package api
 
 import (
 	"fmt"
-	"os"
-	"path"
 	"github.com/orbs-network/pbparser"
 	"io"
+	"os"
+	"path"
 )
 
-type Enum struct{
-	Name string
+type Enum struct {
+	Name   string
 	Values []EnumValue
 }
 
-type EnumValue struct{
-	Name string
+type EnumValue struct {
+	Name  string
 	Value int
 }
 
@@ -66,14 +66,14 @@ func getFileEnums(enums []pbparser.EnumElement) ([]Enum, map[string]int) {
 		values := []EnumValue{}
 		for _, value := range enum.EnumConstants {
 			values = append(values, EnumValue{
-				Name: value.Name,
+				Name:  value.Name,
 				Value: value.Tag,
 			})
 		}
 		// only add here enums from this package
 		if enum.Documentation != "imported" {
 			enumByIndex = append(enumByIndex, Enum{
-				Name: enum.Name,
+				Name:   enum.Name,
 				Values: values,
 			})
 		}

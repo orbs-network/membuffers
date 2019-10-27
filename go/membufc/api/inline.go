@@ -4,20 +4,20 @@
 // This source code is licensed under the MIT license found in the LICENSE file in the root directory of this source tree.
 // The above notice should be included in all copies or substantial portions of the software.
 
-package main
+package api
 
 import (
-	"io"
-	"github.com/orbs-network/pbparser"
 	"fmt"
+	"github.com/orbs-network/pbparser"
+	"io"
 	"os"
 )
 
 var globalInlineTypes = make(map[string]string)
 
 type InlineType struct {
-	Name string
-	Alias string
+	Name        string
+	Alias       string
 	FieldGoType string
 }
 
@@ -40,8 +40,8 @@ func compileInlineFile(w io.Writer, file pbparser.ProtoFile, dependencyData map[
 					hasBytes = true
 				}
 				inlines = append(inlines, InlineType{
-					Name: convertFieldNameToGoCase(m.Name),
-					Alias: m.Options[0].Value,
+					Name:        convertFieldNameToGoCase(m.Name),
+					Alias:       m.Options[0].Value,
 					FieldGoType: fieldGoType,
 				})
 			}
@@ -49,15 +49,15 @@ func compileInlineFile(w io.Writer, file pbparser.ProtoFile, dependencyData map[
 	}
 	t := templateByBoxName("InlineFile.template")
 	t.Execute(w, struct {
-		PackageName string
-		InlineType []InlineType
+		PackageName     string
+		InlineType      []InlineType
 		CompilerVersion string
-		HasBytes bool
+		HasBytes        bool
 	}{
-		PackageName: file.PackageName,
-		InlineType: inlines,
+		PackageName:     file.PackageName,
+		InlineType:      inlines,
 		CompilerVersion: compilerVersion,
-		HasBytes: hasBytes,
+		HasBytes:        hasBytes,
 	})
 }
 
@@ -73,7 +73,7 @@ func addInlineFromImports(file *pbparser.ProtoFile, dependencyData map[string]de
 				for _, m := range importedFile.Messages {
 					if len(m.Options) == 1 && m.Options[0].Name == "inline_type" {
 						if importedFile.PackageName != file.PackageName {
-							globalInlineTypes[importedFile.PackageName + "." + m.Name] = m.Options[0].Value
+							globalInlineTypes[importedFile.PackageName+"."+m.Name] = m.Options[0].Value
 						} else {
 							globalInlineTypes[m.Name] = m.Options[0].Value
 						}

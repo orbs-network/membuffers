@@ -153,6 +153,30 @@ export class InternalMessage {
     return this.dataView.getUint32(off, true);
   }
 
+  getBoolInOffset(off: number): boolean {
+    return this.dataView.getUint8(off) !== 0;
+  }
+
+  setBoolInOffset(off: number, v: boolean): void {
+    return this.dataView.setUint8(off, v ? 1 : 0);
+  }
+
+  getBool(fieldNum: number): boolean {
+    if (!this.lazyCalcOffsets() || fieldNum >= Object.keys(this.offsets).length) {
+      return false;
+    }
+    const off = this.offsets[fieldNum];
+    return this.getBoolInOffset(off);
+  }
+
+  setBool(fieldNum: number, v: boolean): void {
+    if (!this.lazyCalcOffsets() || fieldNum >= Object.keys(this.offsets).length) {
+      throw new Error("invalid field");
+    }
+    const off = this.offsets[fieldNum];
+    return this.setBoolInOffset(off, v);
+  }
+
   getUint8InOffset(off: number): number {
     return this.dataView.getUint8(off);
   }
@@ -416,6 +440,21 @@ export class InternalMessage {
     off += FieldSizes[FieldTypes.TypeUint8Array];
     off = alignDynamicFieldContentOffset(off, FieldTypes.TypeUint8Array);
     return new ArrayIterator(off, off + contentSize, FieldTypes.TypeUint8, this);
+  }
+
+  getBoolArrayIterator(fieldNum: number): ArrayIterator {
+    if (!this.lazyCalcOffsets() || fieldNum >= Object.keys(this.offsets).length) {
+      return new ArrayIterator(0, 0, FieldTypes.TypeBool, this);
+    }
+    const off = this.offsets[fieldNum];
+    return this.getBoolArrayIteratorInOffset(off);
+  }
+
+  getBoolArrayIteratorInOffset(off: number): ArrayIterator {
+    const contentSize = this.dataView.getUint32(off, true);
+    off += FieldSizes[FieldTypes.TypeBoolArray];
+    off = alignDynamicFieldContentOffset(off, FieldTypes.TypeBoolArray);
+    return new ArrayIterator(off, off + contentSize, FieldTypes.TypeBool, this);
   }
 
   getUint8ArrayIterator(fieldNum: number): ArrayIterator {
