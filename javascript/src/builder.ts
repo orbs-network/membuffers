@@ -36,7 +36,7 @@ export class InternalBuilder {
   writeBool(buf: Uint8Array, v: boolean): void {
     this.size = alignOffsetToType(this.size, FieldTypes.TypeBool);
     if (buf) {
-      new DataView(buf.buffer, buf.byteOffset).setUint8(this.size, v ? 1 : 0);
+      new DataViewWrapper(buf.buffer, buf.byteOffset).setUint8(this.size, v ? 1 : 0);
     }
     this.size += FieldSizes[FieldTypes.TypeBool];
   }
@@ -142,7 +142,7 @@ export class InternalBuilder {
   writeBoolArray(buf: Uint8Array, v: boolean[]): void {
     this.size = alignOffsetToType(this.size, FieldTypes.TypeBoolArray);
     if (buf) {
-      new DataView(buf.buffer, buf.byteOffset).setUint32(this.size, v.length * FieldSizes[FieldTypes.TypeBool], true);
+      new DataViewWrapper(buf.buffer, buf.byteOffset).setUint32(this.size, v.length * FieldSizes[FieldTypes.TypeBool], true);
     }
     this.size += FieldSizes[FieldTypes.TypeBoolArray];
     this.size = alignDynamicFieldContentOffset(this.size, FieldTypes.TypeBoolArray);
@@ -202,7 +202,7 @@ export class InternalBuilder {
   writeUint256Array(buf: Uint8Array, v: bigint[]): void {
     this.size = alignOffsetToType(this.size, FieldTypes.TypeUint256Array);
     if (buf) {
-      new DataView(buf.buffer, buf.byteOffset).setUint32(this.size, v.length * FieldSizes[FieldTypes.TypeUint256], true);
+      new DataViewWrapper(buf.buffer, buf.byteOffset).setUint32(this.size, v.length * FieldSizes[FieldTypes.TypeUint256], true);
     }
     this.size += FieldSizes[FieldTypes.TypeUint256Array];
     this.size = alignDynamicFieldContentOffset(this.size, FieldTypes.TypeUint256Array);
