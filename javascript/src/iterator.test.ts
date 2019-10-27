@@ -45,6 +45,28 @@ test("TestIteratorUint32", () => {
   }
 });
 
+test("TestIteratorBool", () => {
+  const tests: any[] = [
+    {
+      buf: new Uint8Array([0x06, 0x00, 0x00, 0x00, 0x01, 0x01, 0x00, 0x01, 0x01, 0x00]),
+      scheme: [FieldTypes.TypeBoolArray],
+      unions: [],
+      expected: [true, true, false, true, true, false],
+    },
+  ];
+
+  for (const tt of tests) {
+    const m = new InternalMessage(tt.buf, tt.buf.byteLength, tt.scheme, tt.unions);
+    const iterator = m.getBoolArrayIterator(0);
+    const res = [];
+    for (const v of iterator) {
+      res.push(v);
+    }
+    // console.log(tt); // uncomment on failure to find out where
+    expect(res).toEqual(tt.expected);
+  }
+});
+
 test("TestIteratorUint8", () => {
   const tests: any[] = [
     {

@@ -42,6 +42,12 @@ func HexDumpRawInLines(raw []byte, lineLen int) {
 	fmt.Printf("(total size: 0x%x)\n", len(raw))
 }
 
+func (w *InternalBuilder) HexDumpBool(prefix string, offsetFromStart Offset, fieldName string, v bool) {
+	w.size = hexDumpAlignOffsetToType(prefix, offsetFromStart, w.size, TypeBool)
+	fmt.Printf("%s%v // %s: bool (offset 0x%x, size: 0x%x)\n", prefix, v, fieldName, offsetFromStart+w.size, 1)
+	w.size += FieldSizes[TypeBool]
+}
+
 func (w *InternalBuilder) HexDumpUint8(prefix string, offsetFromStart Offset, fieldName string, v uint8) {
 	w.size = hexDumpAlignOffsetToType(prefix, offsetFromStart, w.size, TypeUint8)
 	buf := make([]byte, FieldSizes[TypeUint8])
@@ -126,6 +132,19 @@ func (w *InternalBuilder) HexDumpUnionIndex(prefix string, offsetFromStart Offse
 	WriteUnionType(buf, unionIndex)
 	fmt.Printf("%s%x // %s: union type (offset 0x%x, size: 0x%x)\n", prefix, buf, fieldName, offsetFromStart+w.size, len(buf))
 	w.size += FieldSizes[TypeUnion]
+}
+
+func (w *InternalBuilder) HexDumpBoolArray(prefix string, offsetFromStart Offset, fieldName string, v []bool) {
+	w.size = hexDumpAlignOffsetToType(prefix, offsetFromStart, w.size, TypeBoolArray)
+	buf := make([]byte, FieldSizes[TypeBoolArray])
+	WriteOffset(buf, Offset(len(v))*FieldSizes[TypeBool])
+	fmt.Printf("%s%x // %s: bool array size (offset 0x%x, size: 0x%x)\n", prefix, buf, fieldName, offsetFromStart+w.size, len(buf))
+	w.size += FieldSizes[TypeBoolArray]
+	w.size = hexDumpAlignDynamicFieldContentOffset(prefix, offsetFromStart, w.size, TypeBoolArray)
+	for index, vv := range v {
+		fieldNameIndex := fmt.Sprintf("%s #%d", fieldName, index)
+		w.HexDumpBool(prefix+HEX_DUMP_INDENT, offsetFromStart, fieldNameIndex, vv)
+	}
 }
 
 func (w *InternalBuilder) HexDumpUint8Array(prefix string, offsetFromStart Offset, fieldName string, v []uint8) {

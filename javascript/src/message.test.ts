@@ -251,6 +251,63 @@ test("TestMessageRawBufferWithHeaderForField", () => {
   }
 });
 
+test("TestMessageReadBool", () => {
+  const tests: any[] = [
+    {
+      buf: new Uint8Array([0x44, 0x33, 0x22, 0x11, 0x00, 0x01]),
+      scheme: [FieldTypes.TypeUint32, FieldTypes.TypeUint8, FieldTypes.TypeBool],
+      unions: [],
+      fieldNum: 2,
+      expected: true,
+    },
+  ];
+
+  for (const tt of tests) {
+    const m = new InternalMessage(tt.buf, tt.buf.byteLength, tt.scheme, tt.unions);
+    const s = m.getBool(tt.fieldNum);
+    // console.log(tt); // uncomment on failure to find out where
+    expect(s).toBe(tt.expected);
+  }
+});
+
+test("TestMessageReadUint8", () => {
+  const tests: any[] = [
+    {
+      buf: new Uint8Array([0x44, 0x33, 0x22, 0x11, 0x88, 0x99]),
+      scheme: [FieldTypes.TypeUint32, FieldTypes.TypeUint8, FieldTypes.TypeUint8],
+      unions: [],
+      fieldNum: 2,
+      expected: 0x99,
+    },
+  ];
+
+  for (const tt of tests) {
+    const m = new InternalMessage(tt.buf, tt.buf.byteLength, tt.scheme, tt.unions);
+    const s = m.getUint8(tt.fieldNum);
+    // console.log(tt); // uncomment on failure to find out where
+    expect(s).toBe(tt.expected);
+  }
+});
+
+test("TestMessageReadUint16", () => {
+  const tests: any[] = [
+    {
+      buf: new Uint8Array([0x44, 0x33, 0x22, 0x11, 0x88, 0x00, 0x99, 0xaa]),
+      scheme: [FieldTypes.TypeUint32, FieldTypes.TypeUint8, FieldTypes.TypeUint16],
+      unions: [],
+      fieldNum: 2,
+      expected: 0xaa99,
+    },
+  ];
+
+  for (const tt of tests) {
+    const m = new InternalMessage(tt.buf, tt.buf.byteLength, tt.scheme, tt.unions);
+    const s = m.getUint16(tt.fieldNum);
+    // console.log(tt); // uncomment on failure to find out where
+    expect(s).toBe(tt.expected);
+  }
+});
+
 test("TestMessageReadUint32", () => {
   const tests: any[] = [
     {
@@ -307,44 +364,6 @@ test("TestMessageReadUint32", () => {
   for (const tt of tests) {
     const m = new InternalMessage(tt.buf, tt.buf.byteLength, tt.scheme, tt.unions);
     const s = m.getUint32(tt.fieldNum);
-    // console.log(tt); // uncomment on failure to find out where
-    expect(s).toBe(tt.expected);
-  }
-});
-
-test("TestMessageReadUint8", () => {
-  const tests: any[] = [
-    {
-      buf: new Uint8Array([0x44, 0x33, 0x22, 0x11, 0x88, 0x99]),
-      scheme: [FieldTypes.TypeUint32, FieldTypes.TypeUint8, FieldTypes.TypeUint8],
-      unions: [],
-      fieldNum: 2,
-      expected: 0x99,
-    },
-  ];
-
-  for (const tt of tests) {
-    const m = new InternalMessage(tt.buf, tt.buf.byteLength, tt.scheme, tt.unions);
-    const s = m.getUint8(tt.fieldNum);
-    // console.log(tt); // uncomment on failure to find out where
-    expect(s).toBe(tt.expected);
-  }
-});
-
-test("TestMessageReadUint16", () => {
-  const tests: any[] = [
-    {
-      buf: new Uint8Array([0x44, 0x33, 0x22, 0x11, 0x88, 0x00, 0x99, 0xaa]),
-      scheme: [FieldTypes.TypeUint32, FieldTypes.TypeUint8, FieldTypes.TypeUint16],
-      unions: [],
-      fieldNum: 2,
-      expected: 0xaa99,
-    },
-  ];
-
-  for (const tt of tests) {
-    const m = new InternalMessage(tt.buf, tt.buf.byteLength, tt.scheme, tt.unions);
-    const s = m.getUint16(tt.fieldNum);
     // console.log(tt); // uncomment on failure to find out where
     expect(s).toBe(tt.expected);
   }
@@ -892,6 +911,34 @@ test("TestMessageMutateUint32", () => {
     } else {
       expect(() => {
         m.setUint32(tt.fieldNum, 0x55555555);
+      }).not.toThrow();
+    }
+    expect(tt.buf).toBeEqualToUint8Array(tt.expected);
+  }
+});
+
+test("TestMessageMutateBool", () => {
+  const tests: any[] = [
+    {
+      buf: new Uint8Array([0x44, 0x33, 0x22, 0x11, 0x88, 0x1]),
+      scheme: [FieldTypes.TypeUint32, FieldTypes.TypeUint8, FieldTypes.TypeBool],
+      unions: [],
+      fieldNum: 2,
+      expected: new Uint8Array([0x44, 0x33, 0x22, 0x11, 0x88, 0x0]),
+      err: false,
+    },
+  ];
+
+  for (const tt of tests) {
+    const m = new InternalMessage(tt.buf, tt.buf.byteLength, tt.scheme, tt.unions);
+    // console.log(tt); // uncomment on failure to find out where
+    if (tt.err) {
+      expect(() => {
+        m.setBool(tt.fieldNum, false);
+      }).toThrow();
+    } else {
+      expect(() => {
+        m.setBool(tt.fieldNum, false);
       }).not.toThrow();
     }
     expect(tt.buf).toBeEqualToUint8Array(tt.expected);

@@ -1,5 +1,8 @@
 syntax = "proto3";
+option go_package = "github.com/orbs-network/membuffers/go/membufc/e2e/protos/types";
 package types;
+
+import "membuffers";
 
 message ExampleMessage {
     string str = 1;
@@ -16,5 +19,12 @@ message ComplexUnion {
         uint32 num = 1;
         ExampleMessage msg = 2;
         ExampleEnum enu = 3;
+    }
+}
+
+message UnionWithBigInt {
+    oneof option {
+        membuffers.uint256 big = 1;
+        membuffers.bytes32 fix = 2;
     }
 }

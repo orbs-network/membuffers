@@ -4,17 +4,89 @@
 // This source code is licensed under the MIT license found in the LICENSE file in the root directory of this source tree.
 // The above notice should be included in all copies or substantial portions of the software.
 
-package main
+package api
 
 import (
 	"fmt"
 	"github.com/gobuffalo/packr"
 	"github.com/orbs-network/pbparser"
+	"github.com/pkg/errors"
 	"io"
 	"os"
 	"path"
+	"strings"
 	"text/template"
 )
+
+const MEMBUFC_VERSION = "0.0.32"
+
+type Config struct {
+	Language      string   // which output language to generate (eg. "go")
+	LanguageGoCtx bool     // should go language contexts be added to all interfaces
+	Mock          bool     // should mock services be created in addition to interfaces
+	Files         []string // input files
+	Version       string   // version
+}
+
+func NewConfig() *Config {
+	return &Config{
+		Version: MEMBUFC_VERSION,
+	}
+}
+
+func Compile(conf *Config) error {
+	for _, path := range conf.Files {
+		fmt.Println("Compiling file:\t", path)
+		in, err := os.Open(path)
+		if err != nil {
+			return errors.Wrapf(err, "error opening input file %s", path)
+		}
+		p := importProvider{protoFile: path, moduleToRelative: make(map[string]dependencyData)}
+
+		protoFile, err := pbparser.Parse(in, &p)
+		if err != nil {
+			return errors.Wrap(err, "parse using pbparser failed")
+		}
+		outPath := outputFileForPath(path, ".mb.go")
+		out, err := os.Create(outPath)
+		if err != nil {
+			return errors.Wrapf(err, "error creating output file %s", outPath)
+		}
+		defer out.Close()
+		if isInlineFile(&protoFile) {
+			compileInlineFile(out, protoFile, p.moduleToRelative, MEMBUFC_VERSION)
+		} else {
+			compileProtoFile(out, protoFile, p.moduleToRelative, MEMBUFC_VERSION, conf.LanguageGoCtx)
+		}
+		fmt.Println("Created file:\t", outPath)
+		if len(protoFile.Services) > 0 && conf.Mock {
+			outPath := outputFileForPath(path, "_mock.mb.go")
+			out, err := os.Create(outPath)
+			if err != nil {
+				return errors.Wrapf(err, "error creating Mock output file %s", outPath)
+			}
+			defer out.Close()
+			compileMockFile(out, protoFile, p.moduleToRelative, MEMBUFC_VERSION, conf.LanguageGoCtx)
+			fmt.Println("Created Mock file:\t", outPath)
+		}
+	}
+
+	return nil
+}
+
+func outputFileForPath(path string, suffix string) string {
+	parts := strings.Split(path, ".")
+	return strings.Join(parts[0:len(parts)-1], ".") + suffix
+}
+
+func isInlineFile(file *pbparser.ProtoFile) bool {
+	for _, option := range file.Options {
+		if option.Name == "inline" && option.Value == "true" {
+			return true
+		}
+	}
+	return false
+}
 
 var box = packr.NewBox("./templates/go")
 

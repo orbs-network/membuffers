@@ -19,3 +19,12 @@ message WithFixedUint256AndUint32 {
     membuffers.uint256 b = 2;
     uint32 c = 3;
 }
+
+message WithBoolsAndOthers {
+    bool a = 1;
+    bool b = 2;
+    uint32 c = 3;
+    bool d = 4;
+    uint32 e = 5;
+    bool f = 6;
+}

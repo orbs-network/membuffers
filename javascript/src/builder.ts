@@ -32,6 +32,14 @@ export class InternalBuilder {
     return this.size;
   }
 
+  writeBool(buf: Uint8Array, v: boolean): void {
+    this.size = alignOffsetToType(this.size, FieldTypes.TypeBool);
+    if (buf) {
+      new DataView(buf.buffer, buf.byteOffset).setUint8(this.size, v ? 1 : 0);
+    }
+    this.size += FieldSizes[FieldTypes.TypeBool];
+  }
+
   writeUint8(buf: Uint8Array, v: number): void {
     this.size = alignOffsetToType(this.size, FieldTypes.TypeUint8);
     if (buf) {
@@ -128,6 +136,18 @@ export class InternalBuilder {
       new DataView(buf.buffer, buf.byteOffset).setUint16(this.size, unionIndex, true);
     }
     this.size += FieldSizes[FieldTypes.TypeUnion];
+  }
+
+  writeBoolArray(buf: Uint8Array, v: boolean[]): void {
+    this.size = alignOffsetToType(this.size, FieldTypes.TypeBoolArray);
+    if (buf) {
+      new DataView(buf.buffer, buf.byteOffset).setUint32(this.size, v.length * FieldSizes[FieldTypes.TypeBool], true);
+    }
+    this.size += FieldSizes[FieldTypes.TypeBoolArray];
+    this.size = alignDynamicFieldContentOffset(this.size, FieldTypes.TypeBoolArray);
+    for (const vv of v) {
+      this.writeBool(buf, vv);
+    }
   }
 
   writeUint8Array(buf: Uint8Array, v: number[]): void {

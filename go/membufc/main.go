@@ -8,56 +8,43 @@ package main
 
 import (
 	"fmt"
-	"github.com/pkg/errors"
+	"github.com/orbs-network/membuffers/go/membufc/api"
 	"os"
 	"strings"
-
-	"github.com/orbs-network/pbparser"
 )
-
-const MEMBUFC_VERSION = "0.0.21"
-
-type Config struct {
-	language      string   // which output language to generate (eg. "go")
-	languageGoCtx bool     // should go language contexts be added to all interfaces
-	mock          bool     // should mock services be created in addition to interfaces
-	files         []string // input files
-}
-
-var conf = Config{}
 
 func isFlag(arg string) bool {
 	return strings.HasPrefix(arg, "-")
 }
 
-func handleFlag(flag string) {
+func handleFlag(flag string, conf *api.Config) {
 	switch flag {
 	case "--version":
-		displayVersion()
+		displayVersion(conf)
 	case "-v":
-		displayVersion()
+		displayVersion(conf)
 	case "--help":
 		displayUsage()
 	case "-h":
 		displayUsage()
 	case "--go":
-		conf.language = "go"
+		conf.Language = "go"
 	case "-g":
-		conf.language = "go"
+		conf.Language = "go"
 	case "-m":
-		conf.mock = true
+		conf.Mock = true
 	case "--mock":
-		conf.mock = true
+		conf.Mock = true
 	case "--go-ctx":
-		conf.languageGoCtx = true
+		conf.LanguageGoCtx = true
 	default:
 		fmt.Println("ERROR: Unknown command line flag:", flag)
 		displayUsage()
 	}
 }
 
-func displayVersion() {
-	fmt.Println("membufc " + MEMBUFC_VERSION)
+func displayVersion(conf *api.Config) {
+	fmt.Println("membufc " + conf.Version)
 	os.Exit(0)
 }
 
@@ -79,75 +66,22 @@ func assertFileExists(path string) {
 	}
 }
 
-func outputFileForPath(path string, suffix string) string {
-	parts := strings.Split(path, ".")
-	return strings.Join(parts[0:len(parts)-1], ".") + suffix
-}
-
 func main() {
 	args := os.Args[1:]
 	if len(args) == 0 {
 		displayUsage()
 	}
+	conf := api.NewConfig()
 	for _, arg := range args {
 		if isFlag(arg) {
-			handleFlag(arg)
+			handleFlag(arg, conf)
 		} else {
 			assertFileExists(arg)
-			conf.files = append(conf.files, arg)
+			conf.Files = append(conf.Files, arg)
 		}
 	}
-	if err := Compile(conf); err != nil {
+	if err := api.Compile(conf); err != nil {
 		fmt.Println("ERROR:", err.Error())
 		os.Exit(1)
 	}
-}
-
-func Compile(conf Config) error {
-	for _, path := range conf.files {
-		fmt.Println("Compiling file:\t", path)
-		in, err := os.Open(path)
-		if err != nil {
-			return errors.Wrapf(err, "error opening input file %s", path)
-		}
-		p := importProvider{protoFile: path, moduleToRelative: make(map[string]dependencyData)}
-
-		protoFile, err := pbparser.Parse(in, &p)
-		if err != nil {
-			return errors.Wrap(err, "parse using pbparser failed")
-		}
-		outPath := outputFileForPath(path, ".mb.go")
-		out, err := os.Create(outPath)
-		if err != nil {
-			return errors.Wrapf(err, "error creating output file %s", outPath)
-		}
-		defer out.Close()
-		if isInlineFile(&protoFile) {
-			compileInlineFile(out, protoFile, p.moduleToRelative, MEMBUFC_VERSION)
-		} else {
-			compileProtoFile(out, protoFile, p.moduleToRelative, MEMBUFC_VERSION, conf.languageGoCtx)
-		}
-		fmt.Println("Created file:\t", outPath)
-		if len(protoFile.Services) > 0 && conf.mock {
-			outPath := outputFileForPath(path, "_mock.mb.go")
-			out, err := os.Create(outPath)
-			if err != nil {
-				return errors.Wrapf(err, "error creating mock output file %s", outPath)
-			}
-			defer out.Close()
-			compileMockFile(out, protoFile, p.moduleToRelative, MEMBUFC_VERSION, conf.languageGoCtx)
-			fmt.Println("Created mock file:\t", outPath)
-		}
-	}
-
-	return nil
-}
-
-func isInlineFile(file *pbparser.ProtoFile) bool {
-	for _, option := range file.Options {
-		if option.Name == "inline" && option.Value == "true" {
-			return true
-		}
-	}
-	return false
 }

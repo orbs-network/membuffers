@@ -67,6 +67,14 @@ func (w *InternalBuilder) NotifyBuildEnd() {
 	w.building = false
 }
 
+func (w *InternalBuilder) WriteBool(buf []byte, v bool) {
+	w.size = alignOffsetToType(w.size, TypeBool)
+	if buf != nil {
+		WriteBool(buf[w.size:], v)
+	}
+	w.size += FieldSizes[TypeBool]
+}
+
 func (w *InternalBuilder) WriteUint8(buf []byte, v uint8) {
 	w.size = alignOffsetToType(w.size, TypeUint8)
 	if buf != nil {
@@ -148,6 +156,18 @@ func (w *InternalBuilder) WriteUnionIndex(buf []byte, unionIndex uint16) {
 		WriteUnionType(buf[w.size:], unionIndex)
 	}
 	w.size += FieldSizes[TypeUnion]
+}
+
+func (w *InternalBuilder) WriteBoolArray(buf []byte, v []bool) {
+	w.size = alignOffsetToType(w.size, TypeBoolArray)
+	if buf != nil {
+		WriteOffset(buf[w.size:], Offset(len(v))*FieldSizes[TypeBool])
+	}
+	w.size += FieldSizes[TypeBoolArray]
+	w.size = alignDynamicFieldContentOffset(w.size, TypeBoolArray)
+	for _, vv := range v {
+		w.WriteBool(buf, vv)
+	}
 }
 
 func (w *InternalBuilder) WriteUint8Array(buf []byte, v []uint8) {
