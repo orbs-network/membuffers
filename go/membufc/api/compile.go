@@ -18,7 +18,7 @@ import (
 	"text/template"
 )
 
-const MEMBUFC_VERSION = "0.0.32"
+const MEMBUFC_VERSION = "0.3.3"
 
 type Config struct {
 	Language      string   // which output language to generate (eg. "go")
