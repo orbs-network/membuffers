@@ -9,6 +9,7 @@
 import { FieldTypes, FieldSizes, FieldAlignment, FieldDynamic, FieldDynamicContentAlignment, FieldType } from "./types";
 import { ArrayIterator } from "./iterator";
 import { getTextEncoder, getTextDecoder } from "./text";
+import { DataViewWrapper } from "./data-view-wrapper";
 import { bigIntToUint8Array, uint8ArrayToBigInt } from "./bigint";
 
 export function alignOffsetToType(off: number, fieldType: FieldType) {
@@ -29,7 +30,7 @@ export class InternalMessage {
 
   constructor(buf: Uint8Array, private size: number, private scheme: FieldType[], private unions: FieldType[][]) {
     this.bytes = buf; // buf should be Uint8Array (a view over an ArrayBuffer)
-    this.dataView = new DataView(buf.buffer, buf.byteOffset);
+    this.dataView = new DataViewWrapper(buf.buffer, buf.byteOffset);
     this.offsets = null; // map: fieldNum -> offset in bytes
   }
 

@@ -9,9 +9,9 @@ interface BigIntConstructor {
 declare var BigInt: BigIntConstructor;
 */
 
-interface DataView {
-  getBigInt64(byteOffset: number, littleEndian?: boolean): bigint;
-  getBigUint64(byteOffset: number, littleEndian?: boolean): bigint;
-  setBigInt64(byteOffset: number, value: bigint, littleEndian?: boolean): void;
-  setBigUint64(byteOffset: number, value: bigint, littleEndian?: boolean): void;
-}
+// interface DataView {
+//   getBigInt64(byteOffset: number, littleEndian?: boolean): bigint;
+//   getBigUint64(byteOffset: number, littleEndian?: boolean): bigint;
+//   setBigInt64(byteOffset: number, value: bigint, littleEndian?: boolean): void;
+//   setBigUint64(byteOffset: number, value: bigint, littleEndian?: boolean): void;
+// }

@@ -10,3 +10,4 @@ export { InternalBuilder } from "./builder";
 export { InternalMessage } from "./message";
 export { getTextDecoder, getTextEncoder } from "./text";
 export { FieldTypes } from "./types";
+export { DataViewWrapper } from "./data-view-wrapper";
