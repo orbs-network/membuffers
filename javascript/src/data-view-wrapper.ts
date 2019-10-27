@@ -1,37 +1,23 @@
 import jDataView from "jdataview";
+import { wrapInt64, wrapUint64, unwrapInt64, unwrapUint64 } from "./jdataview-bigint";
 
 let wrapper: any = DataView;
 
 class JDataViewImplemetation extends jDataView {
     setBigInt64(byteOffset: number, value: bigint, littleEndian?: boolean): void {
-        let lo: number = Number(value & BigInt("0xffffffff"));
-        let hi: number = Number((value >> BigInt(32)) & BigInt("0xffffffff"));
-
-        this.setInt64(byteOffset, new jDataView.Int64(lo, hi), littleEndian)
+        this.setInt64(byteOffset, wrapInt64(value), littleEndian)
     }
 
     setBigUint64(byteOffset: number, value: bigint, littleEndian?: boolean): void {
-        let lo: number = Number(value & BigInt("0xffffffff"));
-        let hi: number = Number((value >> BigInt(32)) & BigInt("0xffffffff"));
-
-        this.setUint64(byteOffset, new jDataView.Uint64(lo, hi), littleEndian)
+        this.setUint64(byteOffset, wrapUint64(value), littleEndian)
     }
 
     getBigInt64(byteOffset?: number, littleEndian?: boolean): bigint {
-        const { lo, hi } = this.getInt64(byteOffset, littleEndian);
-
-        if (hi > Math.pow(2, 31)) {
-            const p32 = BigInt(Math.pow(2, 32));
-            return -((p32 - BigInt(lo)) + p32* (p32 - BigInt(1) - BigInt(hi)));
-        }
-
-        return BigInt(lo) + (BigInt(hi) << BigInt(32))
+        return unwrapInt64(this.getInt64(byteOffset, littleEndian));
     }
     
     getBigUint64(byteOffset?: number, littleEndian?: boolean): bigint {
-        const { lo, hi } = this.getInt64(byteOffset, littleEndian);
-
-        return BigInt(lo) + (BigInt(hi) << BigInt(32))
+        return unwrapUint64(this.getUint64(byteOffset, littleEndian))
     }
 }
 
