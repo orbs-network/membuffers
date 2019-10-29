@@ -7,37 +7,58 @@
  */
 
 import "./matcher-extensions";
-import { DataViewWrapper, JDataViewWrapper } from "./data-view-wrapper";
-import jDataView from "jdataview";
+import { DataViewWrapper, IOSDataViewWrapper } from "./data-view-wrapper";
 
-test("Test jDataView", () => {
-    expect(() => {
-        const Wrapper: any = jDataView;
-        const z = new Wrapper(new ArrayBuffer(8));
-        z.setUint64(0, 29273397577908224);
-    }).not.toThrow();
-})
+const HugeNumber = BigInt("29273397577908229");
 
 test("Test DataViewWrapper polyfill", () => {
-    const z = new DataViewWrapper(new ArrayBuffer(8))
-    z.setBigUint64(0, BigInt("29273397577908224"));
-    expect(z.getBigUint64(0)).toEqual(BigInt("29273397577908224"))
+    const z = new DataViewWrapper(new ArrayBuffer(8));
+    z.setBigUint64(0, HugeNumber);
+    expect(z.getBigUint64(0)).toEqual(HugeNumber);
 })
 
-test("Test JDataViewWrapper", () => {
-    const z = new JDataViewWrapper(new ArrayBuffer(8))
-    z.setBigUint64(0, BigInt("29273397577908224"));
-    expect(z.getBigUint64(0)).toEqual(BigInt("29273397577908224"))
+test("Test IOSDataViewWrapper", () => {
+    const z = new IOSDataViewWrapper(new ArrayBuffer(8))
+    z.setBigUint64(0, HugeNumber);
+    expect(z.getBigUint64(0).toString()).toEqual(HugeNumber.toString());
 })
 
-test("Test DataViewWrapper polyfill (negative)", () => {
-    const z = new DataViewWrapper(new ArrayBuffer(8))
-    z.setBigInt64(0, BigInt("-292733"));
-    expect(z.getBigInt64(0)).toEqual(BigInt("-292733"))
+test("Contract test: custom to native, big indian", () => {
+    const buffer = new ArrayBuffer(8);
+    const customWrapper = new IOSDataViewWrapper(buffer);
+    customWrapper.setBigUint64(0, HugeNumber);
+    expect(customWrapper.getBigUint64(0)).toEqual(HugeNumber);
+
+    const nativeWrapper = new DataViewWrapper(buffer);
+    expect(nativeWrapper.getBigUint64(0)).toEqual(HugeNumber);
 })
 
-test("Test JDataViewWrapper (negative)", () => {
-    const z = new JDataViewWrapper(new ArrayBuffer(8))
-    z.setBigInt64(0, BigInt("-292733"));
-    expect(z.getBigInt64(0)).toEqual(BigInt("-292733"))
+test("Contract test: native to custom, big indian", () => {
+    const buffer = new ArrayBuffer(8);
+    const nativeWrapper = new DataViewWrapper(buffer);
+    nativeWrapper.setBigUint64(0, HugeNumber);
+    expect(nativeWrapper.getBigUint64(0)).toEqual(HugeNumber);
+
+    const customWrapper = new IOSDataViewWrapper(buffer);
+    expect(customWrapper.getBigUint64(0)).toEqual(HugeNumber);
+})
+
+test("Contract test: custom to native, little indian", () => {
+    const buffer = new ArrayBuffer(8);
+    const customWrapper = new IOSDataViewWrapper(buffer);
+    customWrapper.setBigUint64(0, HugeNumber, true);
+    expect(customWrapper.getBigUint64(0, true)).toEqual(HugeNumber);
+
+    const nativeWrapper = new DataViewWrapper(buffer);
+    expect(nativeWrapper.getBigUint64(0, true)).toEqual(HugeNumber);
+})
+
+test("Contract test: native to custom, little indian", () => {
+    const buffer = new ArrayBuffer(8);
+    const nativeWrapper = new DataViewWrapper(buffer);
+    nativeWrapper.setBigUint64(0, HugeNumber, true);
+    expect(nativeWrapper.getBigUint64(0, true)).toEqual(HugeNumber);
+
+    const customWrapper = new IOSDataViewWrapper(buffer);
+    expect(customWrapper.getBigUint64(0, true)).toEqual(HugeNumber);
 })
