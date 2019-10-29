@@ -1,12 +1,10 @@
-// import jDataView, { Uint64 } from "jdataview";
-// import { wrapInt64, wrapUint64, unwrapInt64, unwrapUint64 } from "./jdataview-bigint";
 import { uint64ToUint8Array, uint8ArrayToUint64 } from "./bigint";
 
 let wrapper: any = DataView;
 
+// iOS at the time of writing did not support DataView.setBigUint64 and DataView.getBigUint64
+// This is an issue that prevents JS SDK from running on iOS
 class IOSDataViewImplemetation extends DataView {
-    OFFSET_32 = 4
-
     setBigUint64(byteOffset: number, value: bigint, littleEndian?: boolean): void {
         let arr = uint64ToUint8Array(value);
         if (littleEndian) {

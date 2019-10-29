@@ -35,9 +35,9 @@ export function uint8ArrayToBigInt(v: Uint8Array): bigint {
 
 export function uint64ToUint8Array(v: bigint): Uint8Array {
     let hex = v.toString(16);
-    // if (16 < hex.length) {
-    //     throw new Error("size mismatch");
-    // }
+    if (16 < hex.length) {
+        throw new Error("size mismatch");
+    }
     if (hex.length % 2 !== 0) {
         hex = '0' + hex;
     }
