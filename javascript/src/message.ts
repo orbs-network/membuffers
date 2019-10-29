@@ -348,12 +348,20 @@ export class InternalMessage {
     return this.setBytesInOffset(off, v);
   }
 
+  getBytes20InOffset(off: number): Uint8Array {
+    return this.bytes.subarray(off, off + 20);
+  }
+
+  setBytes20InOffset(off: number, v: Uint8Array) {
+    return this.bytes.set(v, off);
+  }
+
   getBytes20(fieldNum: number): Uint8Array {
     if (!this.lazyCalcOffsets() || fieldNum >= Object.keys(this.offsets).length) {
       return new Uint8Array();
     }
     const off = this.offsets[fieldNum];
-    return this.bytes.subarray(off, off + 20);
+    return this.getBytes20InOffset(off);
   }
 
   setBytes20(fieldNum: number, v: Uint8Array) {
@@ -364,6 +372,14 @@ export class InternalMessage {
       throw new Error("size mismatch");
     }
     const off = this.offsets[fieldNum];
+    return this.setBytes20InOffset(off, v);
+  }
+
+  getBytes32InOffset(off: number): Uint8Array {
+    return this.bytes.subarray(off, off + 32);
+  }
+
+  setBytes32InOffset(off: number, v: Uint8Array) {
     return this.bytes.set(v, off);
   }
 
@@ -372,7 +388,7 @@ export class InternalMessage {
       return new Uint8Array();
     }
     const off = this.offsets[fieldNum];
-    return this.bytes.subarray(off, off + 32);
+    return this.getBytes32InOffset(off);
   }
 
   setBytes32(fieldNum: number, v: Uint8Array) {
@@ -383,7 +399,7 @@ export class InternalMessage {
       throw new Error("size mismatch");
     }
     const off = this.offsets[fieldNum];
-    return this.bytes.set(v, off);
+    return this.setBytes32InOffset(off, v);
   }
 
   getStringInOffset(off: number): string {
