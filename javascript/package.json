@@ -1,6 +1,6 @@
 {
   "name": "membuffers",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "description": "High performance memory efficient serialization library with direct wire access",
   "main": "dist/membuffers.js",
   "browser": "dist/membuffers-web.js",
@@ -48,13 +48,10 @@
     "ts-jest": "^24.0.2",
     "typescript": "^3.6.3",
     "webpack": "^4.39.3",
-    "webpack-cli": "^3.3.8"
+    "webpack-cli": "^3.3.8",
+    "tslib": "^1.10.0"
   },
   "dependencies": {
-    "@babel/preset-env": "^7.5.5",
-    "@types/jdataview": "0.0.30",
-    "fast-text-encoding": "^1.0.0",
-    "text-encoding": "^0.7.0",
-    "tslib": "^1.10.0"
+    "fast-text-encoding": "^1.0.0"
   }
 }
