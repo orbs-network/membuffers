@@ -38,7 +38,7 @@ func TestReadWriteTransaction(t *testing.T) {
 			},
 			TimeStamp: 0x445566778899,
 		},
-		Signature: []byte{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,},
+		Signature: []byte{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22},
 		Type:      types.NETWORK_TYPE_RESERVED,
 	}
 	buf := make([]byte, builder.CalcRequiredSize())
@@ -58,7 +58,7 @@ func TestReadWriteTransaction(t *testing.T) {
 	if transaction.Data().TimeStamp() != 0x445566778899 {
 		t.Fatalf("TimeStamp: instead of expected got %v", transaction.Data().TimeStamp())
 	}
-	if !bytes.Equal(transaction.Signature(), []byte{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,}) {
+	if !bytes.Equal(transaction.Signature(), []byte{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22}) {
 		t.Fatalf("Signature: instead of expected got %v", transaction.Signature())
 	}
 	if transaction.Type() != types.NETWORK_TYPE_RESERVED {
@@ -96,7 +96,7 @@ func TestReadWriteTransaction(t *testing.T) {
 		}
 		senderCount++
 	}
-	if transaction.String() != `{Data:{ProtocolVersion:1,VirtualChain:11223344,Sender:[{Name:johnny,Friend:[billy,jeff,alex,],},{Name:rachel,Friend:[jessica,sara,],},],TimeStamp:445566778899,},Signature:22222222222222222222222222222222,Type:NETWORK_TYPE_RESERVED,}` {
+	if transaction.String() != `{Data:{ProtocolVersion:1,VirtualChain:287454020,Sender:[{Name:johnny,Friend:[billy,jeff,alex,],},{Name:rachel,Friend:[jessica,sara,],},],TimeStamp:75133582018713,},Signature:22222222222222222222222222222222,Type:NETWORK_TYPE_RESERVED,}` {
 		t.Fatalf("String: instead of expected got %s", transaction.String())
 	}
 
@@ -106,7 +106,7 @@ func TestReadWriteTransaction(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Signature: mutate to hash value failed: %v", err.Error())
 	}
-	if bytes.Equal(transaction.Signature(), []byte{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,}) {
+	if bytes.Equal(transaction.Signature(), []byte{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22}) {
 		t.Fatalf("Signature: value did not change after mutation")
 	}
 }
@@ -168,7 +168,7 @@ func TestReadWriteMethod(t *testing.T) {
 	if arg1.Str() != "flower" {
 		t.Fatalf("Arg1.Str: instead of expected got %v", arg1.Str())
 	}
-	if method.String() != `{Name:MyMethod,Arg:[{Type:(Num)17,},{Type:(Str)flower,},{Type:(Data)010203,},],}` {
+	if method.String() != `{Name:MyMethod,Arg:[{Type:(Num)23,},{Type:(Str)flower,},{Type:(Data)010203,},],}` {
 		t.Fatalf("String: instead of expected got %s", method.String())
 	}
 }
@@ -212,7 +212,7 @@ func TestQuickBuildTransaction(t *testing.T) {
 			},
 			TimeStamp: 0x445566778899,
 		},
-		Signature: []byte{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,},
+		Signature: []byte{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22},
 		Type:      types.NETWORK_TYPE_RESERVED,
 	}).Build()
 
@@ -225,7 +225,7 @@ func TestQuickBuildTransaction(t *testing.T) {
 	if transaction.Data().TimeStamp() != 0x445566778899 {
 		t.Fatalf("TimeStamp: instead of expected got %v", transaction.Data().TimeStamp())
 	}
-	if !bytes.Equal(transaction.Signature(), []byte{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,}) {
+	if !bytes.Equal(transaction.Signature(), []byte{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22}) {
 		t.Fatalf("Signature: instead of expected got %v", transaction.Signature())
 	}
 	if transaction.Type() != types.NETWORK_TYPE_RESERVED {
