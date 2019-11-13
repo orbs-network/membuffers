@@ -6,4 +6,4 @@ export NVM_DIR="$HOME/.nvm"
 
 cd javascript && npm install
 cd ..
-go get -u github.com/gobuffalo/packr/packr
+go get github.com/gobuffalo/packr/packr

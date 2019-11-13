@@ -3,7 +3,7 @@
 type {{.MessageName}}Builder struct {
 {{range .MessageFields}}	{{.FieldName}} {{if .IsArray}}[]{{end}}{{if .IsMessage}}*{{.FieldGoType}}Builder{{else}}{{.FieldGoType}}{{end}}
 {{end -}}
-{{range .UnionByIndex}}{{range .}}	{{.FieldName}} {{if .IsMessage}}*{{.FieldGoType}}Builder{{else}}{{.FieldGoType}}{{end}}
+{{range .UnionByIndex}}{{range .}}	{{.FieldName}} {{if .IsMessage}}*{{.FieldGoType}}Builder{{else}}{{if .IsArray}}[]{{end}}{{.FieldGoType}}{{end}}
 {{end}}{{end}}
 	// internal
 	// implements membuffers.Builder
@@ -50,7 +50,7 @@ func (w *{{.MessageName}}Builder) Write(buf []byte) (err error) {
 	{{- $UnionName := .FieldName}}{{$UnionNum := index $UnionNameToIndex .FieldName}}
 	{{- range index $UnionByIndex $UnionNum}}
 	case {{capsnake (print .MessageName $UnionName .FieldName)}}:
-		w._builder.Write{{.TypeAccessor}}(buf, {{if .IsEnum}}uint16({{end}}{{if .IsInline}}{{.InlineUnderlyingGoType}}({{end}}w.{{.FieldName}}){{if or .IsEnum .IsInline}}){{end}}
+		w._builder.Write{{.TypeAccessor}}{{if .IsArray}}Array{{end}}(buf, {{if .IsEnum}}uint16({{end}}{{if .IsInline}}{{.InlineUnderlyingGoType}}({{end}}w.{{.FieldName}}){{if or .IsEnum .IsInline}}){{end}}
 	{{- end}}
 	}
 	{{- else if .IsMessage}}
@@ -80,7 +80,7 @@ func (w *{{.MessageName}}Builder) HexDump(prefix string, offsetFromStart membuff
 	{{- $UnionName := .FieldName}}{{$UnionNum := index $UnionNameToIndex .FieldName}}
 	{{- range index $UnionByIndex $UnionNum}}
 	case {{capsnake (print .MessageName $UnionName .FieldName)}}:
-		w._builder.HexDump{{.TypeAccessor}}(prefix, offsetFromStart, "{{.MessageName}}.{{.FieldName}}", {{if .IsEnum}}uint16({{end}}{{if .IsInline}}{{.InlineUnderlyingGoType}}({{end}}w.{{.FieldName}}){{if or .IsEnum .IsInline}}){{end}}
+		w._builder.HexDump{{.TypeAccessor}}{{if .IsArray}}Array{{end}}(prefix, offsetFromStart, "{{.MessageName}}.{{.FieldName}}", {{if .IsEnum}}uint16({{end}}{{if .IsInline}}{{.InlineUnderlyingGoType}}({{end}}w.{{.FieldName}}){{if or .IsEnum .IsInline}}){{end}}
 	{{- end}}
 	}
 	{{- else if .IsMessage}}

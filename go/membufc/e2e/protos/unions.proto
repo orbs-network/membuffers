@@ -28,3 +28,13 @@ message UnionWithBigInt {
         membuffers.bytes32 fix = 2;
     }
 }
+
+message UnionWithUint32Array {
+    oneof option {
+        membuffers.uint256 big = 1;
+        repeated uint32 bog = 2;
+        repeated bytes bag = 3;
+        repeated bool bug = 4;
+        repeated membuffers.uint256 beg = 5;
+    }
+}
