@@ -16,10 +16,10 @@ func (x *{{.MessageName}}) String() string {
 func (x *{{.MessageName}}) String{{.FieldName}}() (res string) {
 	{{if .IsArray}}res = "["
 		for _, v := range x.{{.FieldName}} {
-		res += {{if .IsMessage}}v.String(){{else}}fmt.Sprintf({{if ne .FieldGoType "string"}}{{if .IsInline}}"%s"{{else}}"%x"{{end}}, {{end}}v){{end}} + ","
+		res += {{if .IsMessage}}v.String(){{else}}fmt.Sprintf({{if or (eq .FieldGoType "string") .IsInline}}"%s"{{else if or (eq .FieldGoType "bool") (eq .FieldGoType "uint32") (eq .FieldGoType "uint64") (eq .TypeAccessor "Uint256")}}"%v"{{else}}"%x"{{end}}, v){{end}} + ","
   }
 	res += "]"
-{{- else}}res = {{if .IsMessage}}x.{{.FieldName}}.String(){{else}}fmt.Sprintf({{if ne .FieldGoType "string"}}{{if .IsInline}}"%s"{{else}}"%x"{{end}}, {{end}}x.{{.FieldName}}){{end}}
+{{- else}}res = {{if .IsMessage}}x.{{.FieldName}}.String(){{else}}fmt.Sprintf({{if or (eq .FieldGoType "string") .IsInline}}"%s"{{else if or (eq .FieldGoType "bool") (eq .FieldGoType "uint32") (eq .FieldGoType "uint64") (eq .TypeAccessor "Uint256")}}"%v"{{else}}"%x"{{end}}, x.{{.FieldName}}){{end}}
 {{- end}}
 	return
 }

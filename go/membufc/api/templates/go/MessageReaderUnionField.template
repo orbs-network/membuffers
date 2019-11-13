@@ -16,8 +16,8 @@ func (x *{{.MessageName}}) Is{{$UnionName}}{{.FieldName}}() bool {
 	is, _ := x._message.IsUnionIndex({{$ParentFieldIndex}}, {{$UnionNum}}, {{.FieldIndex}})
 	return is
 }
-
-{{if not .IsMessage -}}
+{{ if not .IsMessage -}}
+    {{if not .IsArray -}}{{/* !.IsArray */}}
 func (x *{{.MessageName}}) {{.FieldName}}() {{.FieldGoType}} {
 	is, off := x._message.IsUnionIndex({{$ParentFieldIndex}}, {{$UnionNum}}, {{.FieldIndex}})
 	if !is {
@@ -27,7 +27,11 @@ func (x *{{.MessageName}}) {{.FieldName}}() {{.FieldGoType}} {
 }
 
 func (x *{{.MessageName}}) String{{.FieldName}}() string {
-{{if .IsEnum}}	return x.{{.FieldName}}().String(){{else}}	return fmt.Sprintf({{if ne .FieldGoType "string"}}{{if .IsInline}}"%s"{{else}}"%x"{{end}}, {{end}}x.{{.FieldName}}()){{end}}
+        {{if .IsEnum -}}
+	return x.{{.FieldName}}().String()
+        {{- else -}}
+    return fmt.Sprintf({{if or (eq .FieldGoType "string") .IsInline}}"%s"{{else if or (eq .FieldGoType "bool") (eq .FieldGoType "uint32") (eq .FieldGoType "uint64") (eq .TypeAccessor "Uint256")}}"%v"{{else}}"%x"{{end}}, x.{{.FieldName}}())
+        {{- end}}
 }
 
 func (x *{{.MessageName}}) Mutate{{.FieldName}}(v {{.FieldGoType}}) error {
@@ -38,7 +42,39 @@ func (x *{{.MessageName}}) Mutate{{.FieldName}}(v {{.FieldGoType}}) error {
 	x._message.Set{{.TypeAccessor}}InOffset(off, {{if .IsEnum}}uint16({{end}}{{if .IsInline}}{{.InlineUnderlyingGoType}}({{end}}v){{if or .IsEnum .IsInline}}){{end}}
 	return nil
 }
-{{- else -}}
+    {{else -}}{{/* .IsArray */}}
+func (x *{{.MessageName}}) {{.FieldName}}CopiedToNative() []{{.FieldGoType}} {
+	is, off := x._message.IsUnionIndex({{$ParentFieldIndex}}, {{$UnionNum}}, {{.FieldIndex}})
+	if !is {
+		panic("Accessed union field of incorrect type, did you check which union type it is first?")
+	}
+	var res []{{.FieldGoType}}
+	itr := x._message.Get{{.TypeAccessor}}ArrayIteratorInOffset(off)
+	for ;itr.HasNext(); {
+		res = append(res, itr.Next{{.TypeAccessor}}())
+	}
+	return res
+}
+
+func (x *{{.MessageName}}) {{.FieldName}}Iterator() *membuffers.Iterator {
+	is, off := x._message.IsUnionIndex({{$ParentFieldIndex}}, {{$UnionNum}}, {{.FieldIndex}})
+	if !is {
+		panic("Accessed union field of incorrect type, did you check which union type it is first?")
+	}
+	return x._message.Get{{.TypeAccessor}}ArrayIteratorInOffset(off)
+}
+
+func (x *{{.MessageName}}) String{{.FieldName}}() string {
+	res := "["
+	itr := x.{{.FieldName}}Iterator()
+	for ;itr.HasNext(); {
+		res += fmt.Sprintf({{if or (eq .FieldGoType "string") .IsInline}}"%s"{{else if or (eq .FieldGoType "bool") (eq .FieldGoType "uint32") (eq .FieldGoType "uint64") (eq .TypeAccessor "Uint256")}}"%v"{{else}}"%x"{{end}}, itr.Next{{.TypeAccessor}}()) + ","
+	}
+	res += "]"
+	return res
+}
+    {{end -}}{{/* .IsAarray */}}
+{{- else -}}{{/* .IsMessage */}}
 func (x *{{.MessageName}}) {{.FieldName}}() *{{.FieldGoType}} {
 	is, off := x._message.IsUnionIndex({{$ParentFieldIndex}}, {{$UnionNum}}, {{.FieldIndex}})
 	if !is {
@@ -51,7 +87,8 @@ func (x *{{.MessageName}}) {{.FieldName}}() *{{.FieldGoType}} {
 func (x *{{.MessageName}}) String{{.FieldName}}() string {
 	return x.{{.FieldName}}().String()
 }
-{{- end -}}{{end}}
+{{- end -}}{{/* .IsMessage */}}
+{{- end}}{{/* range .UnionFields */}}
 
 func (x *{{.MessageName}}) Raw{{.UnionName}}() []byte {
 	return x._message.RawBufferForField({{.FieldIndex}}, {{.UnionNum}})
@@ -70,4 +107,3 @@ func (x *{{.MessageName}}) String{{.UnionName}}() string {
 	}
 	return "(Unknown)"
 }
-

@@ -260,6 +260,8 @@ Detailed documentation about the API is available [here](API.md). It shows concr
 
 * Indication of the type (which one of the OneOf it is) is encoded first as a `uint16` (a 4 byte field).
 * Encoding of the field itself appears immediately after (zero padding may be added for alignment).
+* A 'repeated' keyword before a type indicate an array of that type. 
+  * Note: arrayed type in union cannot be mutated.
 
 #### The decode process
 
